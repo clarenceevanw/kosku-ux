@@ -27,6 +27,7 @@ return new class extends Migration
                 ->cascadeOnDelete();
 
             $table->unique(['boarding_house_id', 'facility_id']);
+            $table->timestamps();
         });
     }
 

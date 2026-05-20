@@ -18,6 +18,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('name');
             $table->string('icon')->nullable()->comment('CSS/Lucide icon class, e.g. lucide-wifi');
+            $table->timestamps();
         });
     }
 
