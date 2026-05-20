@@ -17,8 +17,6 @@ class Facility extends Model
 {
     use HasUuids;
 
-    public $timestamps = false;
-
     public function boardingHouses(): BelongsToMany
     {
         return $this->belongsToMany(BoardingHouse::class)

@@ -15,6 +15,4 @@ use Illuminate\Database\Eloquent\Attributes\Hidden;
 class RoomFacility extends Pivot
 {
     use HasUuids;
-
-    public $timestamps = false;
 }
