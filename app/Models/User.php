@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 
-#[Fillable(['name', 'email', 'password', 'phone_number', 'role', 'is_verified'])]
+#[Fillable(['name', 'email', 'password', 'phone_number', 'role', 'is_verified', 'email_verified_at'])]
 #[Guarded(['id', 'created_at', 'updated_at'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
@@ -26,6 +26,7 @@ class User extends Authenticatable
             'password' => 'hashed',
             'role' => UserRole::class,
             'is_verified' => 'boolean',
+            'email_verified_at' => 'datetime',
         ];
     }
 
