@@ -26,7 +26,7 @@ class Room extends Model
 
     public function facilities(): BelongsToMany
     {
-        return $this->belongsToMany(Facility::class)
+        return $this->belongsToMany(Facility::class, 'room_facility')
             ->using(RoomFacility::class)
             ->withPivot('id');
     }
