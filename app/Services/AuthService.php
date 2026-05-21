@@ -59,7 +59,7 @@ class AuthService
      * Flow:
      *   1. Look up user by email.
      *   2. If found  → log them in directly.
-     *   3. If not found → create a new 'tenant' account and log them in.
+     *   3. If not found → throw exception (do not auto-register).
      *
      * Google users are marked as verified (email is verified by Google).
      */
@@ -68,13 +68,14 @@ class AuthService
         $user = User::where('email', $googleUser->getEmail())->first();
 
         if (! $user) {
-            $user = User::create([
-                'name'         => $googleUser->getName(),
-                'email'        => $googleUser->getEmail(),
-                'password'     => Hash::make(\Illuminate\Support\Str::random(32)),
-                'phone_number' => null,
-                'role'         => UserRole::TENANT->value,
-                'is_verified'  => true,
+            throw new \Exception('Akun dengan email ini belum terdaftar. Silakan daftar terlebih dahulu.');
+        }
+
+        // If the user hasn't verified their email but logs in via Google, mark them as verified.
+        if (! $user->is_verified || is_null($user->email_verified_at)) {
+            $user->update([
+                'is_verified' => true,
+                'email_verified_at' => now(),
             ]);
         }
 
