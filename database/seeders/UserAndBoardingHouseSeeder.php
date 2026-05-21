@@ -265,7 +265,7 @@ class UserAndBoardingHouseSeeder extends Seeder
                 // Contract
                 $contract = Contract::create([
                     'transaction_id'      => $transaction->id,
-                    'contract_number'     => '#KOS-' . now()->year . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT),
+                    'contract_number'     => '#KOS-' . now()->year . '-' . strtoupper(Str::random(8)),
                     'start_date'          => $transaction->start_date,
                     'end_date'            => $transaction->end_date,
                     'monthly_fee'         => $room->price_per_month,
