@@ -31,3 +31,22 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 });
+
+// ──────────────────────────────────────────────────────────────
+// Owner routes (Protected by RoleMiddleware)
+// ──────────────────────────────────────────────────────────────
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->group(function () {
+    Route::get('/dashboard', function () {
+        return 'Welcome to Owner Dashboard';
+    })->name('owner.dashboard');
+});
+
+// ──────────────────────────────────────────────────────────────
+// Admin routes (Protected by RoleMiddleware)
+// ──────────────────────────────────────────────────────────────
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+    Route::get('/dashboard', function () {
+        return 'Welcome to Admin Dashboard';
+    })->name('admin.dashboard');
+});
+

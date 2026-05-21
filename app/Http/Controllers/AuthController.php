@@ -28,6 +28,20 @@ class AuthController extends Controller
     ) {}
 
     /**
+     * Helper to route users to the correct dashboard based on their role.
+     */
+    protected function redirectBasedOnRole(): RedirectResponse
+    {
+        $role = Auth::user()->role->value;
+
+        return match ($role) {
+            'owner' => redirect()->intended('/owner/dashboard'),
+            'admin' => redirect()->intended('/admin/dashboard'),
+            default => redirect()->intended(route('home')),
+        };
+    }
+
+    /**
      * GET /login
      * Show the combined Login / Register auth form.
      */
@@ -50,7 +64,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'))
+        return $this->redirectBasedOnRole()
             ->with('success', 'Akun berhasil dibuat! Selamat datang di KosKu.');
     }
 
@@ -70,7 +84,7 @@ class AuthController extends Controller
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'));
+        return $this->redirectBasedOnRole();
     }
 
     /**
@@ -106,7 +120,7 @@ class AuthController extends Controller
             $googleUser = Socialite::driver('google')->user();
             $this->authService->handleGoogleCallback($googleUser);
 
-            return redirect()->intended(route('home'))
+            return $this->redirectBasedOnRole()
                 ->with('success', 'Berhasil masuk dengan Google!');
         } catch (\Exception $e) {
             return redirect()->route('login')
