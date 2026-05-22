@@ -60,50 +60,6 @@
                 @endforeach
             </div>
 
-            {{-- Demo conversation (static example) --}}
-            <div class="flex w-full justify-end gap-4">
-                <div class="bg-[#111827] text-white rounded-2xl rounded-tr-sm p-5 max-w-[85%] md:max-w-[60%] shadow-md text-sm leading-relaxed">
-                    Cari kos putra dekat UK Petra, budget max 1.5jt, ada AC.
-                </div>
-            </div>
-
-            <div class="flex w-full justify-start gap-4">
-                <div class="w-10 h-10 rounded-full bg-[#111827] flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-white text-[18px]">smart_toy</span>
-                </div>
-                <div class="flex flex-col gap-3 max-w-[85%] md:max-w-[70%]">
-                    <div class="bg-white border border-gray-100 text-[#111827] rounded-2xl rounded-tl-sm p-5 shadow-sm text-sm leading-relaxed">
-                        Saya menemukan beberapa kos putra yang cocok dekat UK Petra dengan budget di bawah Rp 1.500.000! Ini rekomendasi terbaik saya:
-                    </div>
-
-                    {{-- Kos result card --}}
-                    <a href="{{ route('search', ['q' => 'Petra Surabaya']) }}"
-                       class="bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col md:flex-row group cursor-pointer transition-transform hover:-translate-y-1">
-                        <div class="h-48 md:h-auto md:w-48 relative shrink-0 bg-gray-100">
-                            <img class="w-full h-full object-cover"
-                                 src="https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400"
-                                 alt="Kos Petra">
-                            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-bold text-[#111827] shadow-sm">
-                                Terverifikasi
-                            </div>
-                        </div>
-                        <div class="p-5 flex flex-col justify-between flex-1">
-                            <div>
-                                <h3 class="font-bold text-[#111827] text-base mb-1">Kos Petra Executive</h3>
-                                <p class="text-xs text-gray-500 mb-3 flex items-center gap-1">
-                                    <span class="material-symbols-outlined text-[13px]">location_on</span>
-                                    Siwalankerto, Surabaya
-                                </p>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-base font-extrabold text-[#0D9488]">Rp 1.200.000<span class="text-xs font-normal text-gray-400">/bln</span></span>
-                                <span class="text-[11px] font-bold text-[#111827] bg-gray-100 px-3 py-1 rounded-full">Lihat Detail →</span>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
             {{-- Typing indicator placeholder --}}
             <div id="typing-indicator" class="flex w-full justify-start gap-4 hidden">
                 <div class="w-10 h-10 rounded-full bg-[#111827] flex items-center justify-center shrink-0">
@@ -222,77 +178,39 @@
 </div>
 
 <script>
+    const CHAT_API_URL = '{{ url("/api/bot/chat") }}';
+    const CSRF_TOKEN   = '{{ csrf_token() }}';
+
+    // ── Tab switching ────────────────────────────────────────────────────────
     function switchAITab(tab) {
-        const chatSection = document.getElementById('section-chat');
+        const chatSection  = document.getElementById('section-chat');
         const priceSection = document.getElementById('section-price');
-        const chatTabBtn = document.getElementById('tab-chat');
-        const priceTabBtn = document.getElementById('tab-price');
+        const chatTabBtn   = document.getElementById('tab-chat');
+        const priceTabBtn  = document.getElementById('tab-price');
 
         if (tab === 'chat') {
             chatSection.classList.remove('hidden');
             chatSection.classList.add('flex');
             priceSection.classList.add('hidden');
-            
             chatTabBtn.classList.add('bg-white', 'text-[#111827]', 'shadow-sm');
-            chatTabBtn.classList.remove('text-gray-500', 'hover:text-[#111827]');
-            
+            chatTabBtn.classList.remove('text-gray-500');
             priceTabBtn.classList.remove('bg-white', 'text-[#111827]', 'shadow-sm');
-            priceTabBtn.classList.add('text-gray-500', 'hover:text-[#111827]');
+            priceTabBtn.classList.add('text-gray-500');
         } else {
             priceSection.classList.remove('hidden');
             chatSection.classList.add('hidden');
             chatSection.classList.remove('flex');
-            
             priceTabBtn.classList.add('bg-white', 'text-[#111827]', 'shadow-sm');
-            priceTabBtn.classList.remove('text-gray-500', 'hover:text-[#111827]');
-            
+            priceTabBtn.classList.remove('text-gray-500');
             chatTabBtn.classList.remove('bg-white', 'text-[#111827]', 'shadow-sm');
-            chatTabBtn.classList.add('text-gray-500', 'hover:text-[#111827]');
+            chatTabBtn.classList.add('text-gray-500');
         }
     }
 
+    // ── Helpers ──────────────────────────────────────────────────────────────
     function fillInput(text) {
         document.getElementById('chat-input').value = text;
         document.getElementById('chat-input').focus();
-    }
-
-    function sendMessage() {
-        const input = document.getElementById('chat-input');
-        const text = input.value.trim();
-        if (!text) return;
-
-        const messagesEl = document.getElementById('chat-messages');
-        const typingEl   = document.getElementById('typing-indicator');
-
-        // Append user bubble
-        const userBubble = document.createElement('div');
-        userBubble.className = 'flex w-full justify-end gap-4';
-        userBubble.innerHTML = `<div class="bg-[#111827] text-white rounded-2xl rounded-tr-sm p-5 max-w-[85%] md:max-w-[60%] shadow-md text-sm leading-relaxed">${escapeHtml(text)}</div>`;
-        messagesEl.insertBefore(userBubble, typingEl);
-
-        // Show typing indicator
-        typingEl.classList.remove('hidden');
-        input.value = '';
-
-        // Redirect to search with user's query after a brief delay
-        setTimeout(() => {
-            typingEl.classList.add('hidden');
-            const searchUrl = '{{ route('search') }}?q=' + encodeURIComponent(text);
-            const botReply = document.createElement('div');
-            botReply.className = 'flex w-full justify-start gap-4';
-            botReply.innerHTML = `
-                <div class="w-10 h-10 rounded-full bg-[#111827] flex items-center justify-center shrink-0">
-                    <span class="material-symbols-outlined text-white text-[18px]">smart_toy</span>
-                </div>
-                <div class="bg-white border border-gray-100 text-[#111827] rounded-2xl rounded-tl-sm p-5 max-w-[85%] md:max-w-[60%] shadow-sm text-sm leading-relaxed">
-                    Saya sedang mencari kos yang cocok dengan permintaanmu! 
-                    <a href="${searchUrl}" class="text-teal-600 font-bold underline hover:text-teal-700">Lihat hasil pencarian →</a>
-                </div>`;
-            messagesEl.insertBefore(botReply, typingEl);
-            messagesEl.scrollTop = messagesEl.scrollHeight;
-        }, 1200);
-
-        messagesEl.scrollTop = messagesEl.scrollHeight;
     }
 
     function escapeHtml(text) {
@@ -301,8 +219,146 @@
         return div.innerHTML;
     }
 
-    // Allow Enter key to send
-    document.getElementById('chat-input').addEventListener('keydown', function(e) {
+    function scrollToBottom() {
+        const el = document.getElementById('chat-messages');
+        el.scrollTop = el.scrollHeight;
+    }
+
+    // ── Render helpers ───────────────────────────────────────────────────────
+    function renderUserBubble(text) {
+        const el = document.createElement('div');
+        el.className = 'flex w-full justify-end gap-4';
+        el.innerHTML = `<div class="bg-[#111827] text-white rounded-2xl rounded-tr-sm p-5 max-w-[85%] md:max-w-[60%] shadow-md text-sm leading-relaxed">${escapeHtml(text)}</div>`;
+        return el;
+    }
+
+    function renderBotBubble(text) {
+        const el = document.createElement('div');
+        el.className = 'flex w-full justify-start gap-4';
+        el.innerHTML = `
+            <div class="w-10 h-10 rounded-full bg-[#111827] flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-white text-[18px]">smart_toy</span>
+            </div>
+            <div class="bg-white border border-gray-100 text-[#111827] rounded-2xl rounded-tl-sm p-5 max-w-[85%] md:max-w-[70%] shadow-sm text-sm leading-relaxed">${escapeHtml(text)}</div>`;
+        return el;
+    }
+
+    function renderKosCard(kos) {
+        const priceText = kos.price_text || ('Rp ' + Number(kos.min_price).toLocaleString('id-ID') + '/bulan');
+        const rating    = kos.rating ? `⭐ ${kos.rating}` : '';
+        const imgSrc    = kos.image_url || 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400';
+
+        const card = document.createElement('a');
+        card.href      = kos.detail_url || '#';
+        card.target    = '_blank';
+        card.className = 'bg-white rounded-2xl overflow-hidden shadow-md border border-gray-100 flex flex-col md:flex-row group cursor-pointer transition-transform hover:-translate-y-1 no-underline';
+        card.innerHTML = `
+            <div class="h-40 md:h-auto md:w-44 relative shrink-0 bg-gray-100">
+                <img class="w-full h-full object-cover" src="${escapeHtml(imgSrc)}" alt="${escapeHtml(kos.name)}" onerror="this.src='https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=400'">
+            </div>
+            <div class="p-4 flex flex-col justify-between flex-1">
+                <div>
+                    <h3 class="font-bold text-[#111827] text-sm mb-1">${escapeHtml(kos.name)}</h3>
+                    <p class="text-xs text-gray-500 mb-2 flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[12px]">location_on</span>
+                        ${escapeHtml(kos.city || '')}
+                    </p>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm font-extrabold text-[#0D9488]">${priceText}</span>
+                    <span class="text-[10px] font-semibold text-gray-500">${rating}</span>
+                </div>
+            </div>`;
+        return card;
+    }
+
+    function renderKosResults(results) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'flex w-full justify-start gap-4';
+        const inner = document.createElement('div');
+        inner.className = 'pl-14 flex flex-col gap-2 w-full max-w-lg';
+        (results || []).forEach(kos => inner.appendChild(renderKosCard(kos)));
+        wrapper.appendChild(inner);
+        return wrapper;
+    }
+
+    function showTyping() {
+        document.getElementById('typing-indicator').classList.remove('hidden');
+    }
+    function hideTyping() {
+        document.getElementById('typing-indicator').classList.add('hidden');
+    }
+
+    // ── Main send function ───────────────────────────────────────────────────
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const text  = input.value.trim();
+        if (!text) return;
+
+        const messagesEl = document.getElementById('chat-messages');
+        const typingEl   = document.getElementById('typing-indicator');
+
+        // 1. Append user bubble
+        messagesEl.insertBefore(renderUserBubble(text), typingEl);
+        input.value = '';
+        showTyping();
+        scrollToBottom();
+
+        // 2. Disable input while waiting
+        input.disabled = true;
+
+        try {
+            // 3. Get conversation_id from localStorage (multi-turn support)
+            const conversationId = localStorage.getItem('kosku_conversation_id');
+
+            // 4. Call KosBot API
+            const res = await fetch(CHAT_API_URL, {
+                method:  'POST',
+                headers: {
+                    'Content-Type':  'application/json',
+                    'Accept':        'application/json',
+                    'X-CSRF-TOKEN':  CSRF_TOKEN,
+                },
+                body: JSON.stringify({
+                    message:         text,
+                    conversation_id: conversationId,
+                }),
+            });
+
+            const data = await res.json();
+
+            hideTyping();
+
+            // 5. Save conversation_id for multi-turn
+            if (data.conversation_id) {
+                localStorage.setItem('kosku_conversation_id', data.conversation_id);
+            }
+
+            // 6. Render bot text reply
+            if (data.reply) {
+                messagesEl.insertBefore(renderBotBubble(data.reply), typingEl);
+            }
+
+            // 7. Render kos result cards (if any)
+            if (data.results && data.results.length > 0) {
+                messagesEl.insertBefore(renderKosResults(data.results), typingEl);
+            }
+
+        } catch (err) {
+            hideTyping();
+            messagesEl.insertBefore(
+                renderBotBubble('Maaf, ada gangguan koneksi. Silakan coba lagi. 🙏'),
+                typingEl
+            );
+        } finally {
+            input.disabled = false;
+            input.focus();
+            scrollToBottom();
+        }
+    }
+
+    // ── Enter key to send ────────────────────────────────────────────────────
+    document.getElementById('chat-input').addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && !e.shiftKey) {
             e.preventDefault();
             sendMessage();

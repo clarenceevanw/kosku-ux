@@ -1,13 +1,142 @@
 # KosKu AI Integration Plan
 
-## 1. KosBot Chatbot (Laravel 13 AI SDK)
-- **Objective:** Provide a conversational AI agent to help tenants find boarding houses, get personalized recommendations, and answer FAQs.
-- **Tech Stack:** Laravel 13 AI SDK (using OpenAI or Anthropic drivers).
-- **Implementation Steps:**
-  1. Set up the AI SDK connection in `config/ai.php`.
-  2. Create a dedicated `KosBotService` to manage the context and conversation history.
-  3. Implement AI Tools/Functions (e.g., `searchBoardingHouse(location, budget, facilities)` so the AI can query the local database and return actual links).
-  4. Build an API endpoint (`POST /api/bot/chat`) that streams the AI response back to the Blade frontend for a real-time typing effect.
+---
+
+## ✅ Plan 1: KosBot Chatbot
+
+### Overview
+KosBot adalah asisten AI berbasis Gemini yang dapat melakukan percakapan **multi-turn** dan mencari data kos **dari database lokal KosKu secara real-time** menggunakan fitur **Tool Calling** bawaan Laravel 13. AI tidak sekadar menjawab generik — ia dapat memanggil fungsi pencarian database dan mengembalikan hasil nyata.
+
+### Tech Stack
+- **AI Provider:** Google Gemini (`gemini-2.0-flash`) via **`laravel/ai`** (First-party Laravel 13 SDK)
+- **Agent System:** Native `php artisan make:agent KosBot` — bukan Prism PHP
+- **Memory:** Native — percakapan disimpan otomatis ke database (`agent_conversations` table) via `RemembersConversations` trait
+- **Frontend:** Blade + Vanilla JS (`fetch` API, polling atau SSE)
+- **Pattern:** Clean Architecture — `KosBotController` → `KosBotAgent` → Gemini
+
+> **Kenapa tidak pakai Prism PHP?**
+> Laravel 13 sudah memiliki official first-party AI SDK (`laravel/ai`) yang built-in support untuk Gemini, menyediakan agent system yang jauh lebih terintegrasi dengan framework (native memory, testing fake, queue support), sehingga Prism PHP tidak diperlukan.
+
+---
+
+### Step 1: Install `laravel/ai`
+
+```bash
+composer require laravel/ai
+php artisan vendor:publish --provider="Laravel\Ai\AiServiceProvider"
+php artisan migrate
+```
+
+Tambahkan ke `.env`:
+```env
+GEMINI_API_KEY=your-gemini-api-key
+```
+
+Konfigurasi di `config/ai.php`:
+```php
+'default' => 'gemini',
+
+'providers' => [
+    'gemini' => [
+        'driver' => 'gemini',
+        'key'    => env('GEMINI_API_KEY'),
+    ],
+],
+```
+
+---
+
+### Step 2: Buat KosBot Agent
+
+```bash
+php artisan make:agent KosBotAgent
+```
+
+File yang dibuat: `app/Ai/Agents/KosBotAgent.php`
+
+Agent ini bertanggung jawab atas:
+1. **System Instructions** — kepribadian dan batasan KosBot.
+2. **Tools** — fungsi-fungsi PHP yang bisa dipanggil Gemini dari database.
+3. **Memory** — via `RemembersConversations` trait, history tersimpan otomatis di DB.
+
+**Tools yang akan diimplementasi (sebagai PHP class):**
+
+| Tool Class | Deskripsi | Input |
+|---|---|---|
+| `SearchBoardingHouseTool` | Cari kos by keyword & kota | `query: string`, `city?: string` |
+| `FilterByBudgetTool` | Filter kos by rentang harga | `min_price?: int`, `max_price?: int`, `city?: string` |
+| `GetHouseDetailsTool` | Detail kos by ID | `boarding_house_id: string` |
+
+---
+
+### Step 3: Buat KosBotController (`app/Http/Controllers/KosBotController.php`)
+
+Skinny controller — hanya menerima request dan memanggil agent.
+
+**Endpoint:**
+- `POST /api/bot/chat` — Menerima `{ message: string, conversation_id?: string }`.
+- Mengembalikan JSON: `{ reply: string, results?: array, conversation_id: string }`.
+
+> **Perbedaan vs Prism:** Tidak perlu kirim `history[]` dari frontend karena memory dikelola di sisi server oleh agent menggunakan `conversation_id`.
+
+---
+
+### Step 4: Daftarkan Route di `routes/api.php`
+
+```php
+// KosBot API (public — no auth required)
+Route::post('/bot/chat', [KosBotController::class, 'chat'])->name('api.bot.chat');
+```
+
+---
+
+### Step 5: Update Frontend `kosbot.blade.php`
+
+Ganti fungsi `sendMessage()` menjadi AJAX call ke endpoint baru.
+
+**Alur frontend (lebih sederhana vs Prism):**
+1. User mengirim pesan → append user bubble ke DOM.
+2. Tampilkan typing indicator.
+3. `fetch('POST /api/bot/chat', { message, conversation_id })`.
+4. Simpan `conversation_id` yang dikembalikan server di `localStorage`.
+5. Saat response diterima → render reply bubble.
+6. Jika `results[]` ada di response → render kartu kos di bawah bubble.
+
+---
+
+### Step 6: System Instructions KosBotAgent
+
+```
+Kamu adalah KosBot, asisten AI dari platform KosKu — marketplace kos terpercaya di Indonesia.
+Tugasmu adalah membantu pengguna menemukan kos yang cocok dengan kebutuhan mereka.
+
+Aturan:
+- Selalu berbahasa Indonesia yang ramah dan santai.
+- Jika pengguna menyebutkan lokasi, budget, atau fasilitas, WAJIB gunakan tool untuk mencari dari database.
+- JANGAN memberikan rekomendasi kos yang tidak ada di database KosKu.
+- Jika tidak ada hasil cocok, informasikan dengan sopan dan tawarkan alternatif pencarian.
+- Jawaban teks maksimal 2-3 kalimat, ringkas dan to the point.
+- Saat menampilkan kos, cukup sebutkan nama dan harga. Detail akan ditampilkan oleh UI.
+```
+
+---
+
+### File-File yang Perlu Dibuat/Dimodifikasi
+
+| File | Aksi |
+|---|---|
+| `app/Ai/Agents/KosBotAgent.php` | **Buat** via `php artisan make:agent` |
+| `app/Ai/Tools/SearchBoardingHouseTool.php` | **Buat baru** — Tool pencarian |
+| `app/Ai/Tools/FilterByBudgetTool.php` | **Buat baru** — Tool filter harga |
+| `app/Ai/Tools/GetHouseDetailsTool.php` | **Buat baru** — Tool detail kos |
+| `app/Http/Controllers/KosBotController.php` | **Buat baru** — Skinny controller |
+| `app/Http/Requests/KosBotChatRequest.php` | **Buat baru** — Validasi input |
+| `routes/api.php` | **Modifikasi** — Tambah route `/bot/chat` |
+| `resources/views/kosbot.blade.php` | **Modifikasi** — Update JS `sendMessage()` |
+| `.env` | **Modifikasi** — Tambah `GEMINI_API_KEY` |
+| `config/ai.php` | **Buat** via artisan publish |
+
+---
 
 ## 2. AI Price Checker (Python Machine Learning Model)
 - **Objective:** Allow users to validate if a boarding house price is reasonable based on market data.
