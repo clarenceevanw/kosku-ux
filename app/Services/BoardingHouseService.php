@@ -22,7 +22,7 @@ class BoardingHouseService
     {
         return BoardingHouse::query()
             ->with([
-                'rooms:id,boarding_house_id,type_name,price_per_month,image_url',
+                'rooms:id,boarding_house_id,type_name,price_per_month,stock,size,image_url',
                 'facilities:id,name,icon',
                 'reviews:id,boarding_house_id,rating',
             ])
@@ -71,6 +71,7 @@ class BoardingHouseService
     {
         return BoardingHouse::with([
             'owner:id,name,phone_number',
+            'rooms',
             'rooms.facilities:id,name,icon',
             'facilities:id,name,icon',
             'rules:id,boarding_house_id,category,rule_text',

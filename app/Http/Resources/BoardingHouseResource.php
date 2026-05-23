@@ -92,7 +92,10 @@ class BoardingHouseResource extends JsonResource
             'facilities'           => FacilityResource::collection($this->whenLoaded('facilities')),
 
             // Rooms (full detail page)
-            'rooms'                => RoomResource::collection($this->whenLoaded('rooms')),
+            'rooms'                => $this->when(
+                $this->relationLoaded('rooms'),
+                fn () => RoomResource::collection($this->rooms)->resolve()
+            ),
 
             // Owner (detail page)
             'owner'                => $this->when(
