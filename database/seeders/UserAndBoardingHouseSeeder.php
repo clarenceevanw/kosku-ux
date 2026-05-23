@@ -158,9 +158,9 @@ class UserAndBoardingHouseSeeder extends Seeder
     ];
 
     private array $roomTemplates = [
-        ['type_name' => 'Kamar Standar', 'price_per_month' => 1200000, 'stock' => 6, 'size' => '3x3 m'],
-        ['type_name' => 'Kamar Deluxe',  'price_per_month' => 1800000, 'stock' => 4, 'size' => '3x4 m'],
-        ['type_name' => 'Kamar VIP',     'price_per_month' => 2500000, 'stock' => 2, 'size' => '4x4 m'],
+        ['type_name' => 'Kamar Standar', 'price_per_month' => 1200000, 'stock' => 10, 'size' => '3x3 m'],
+        ['type_name' => 'Kamar Deluxe',  'price_per_month' => 1800000, 'stock' => 8, 'size' => '3x4 m'],
+        ['type_name' => 'Kamar VIP',     'price_per_month' => 2500000, 'stock' => 5, 'size' => '4x4 m'],
     ];
 
     private array $indonesianNames = [
