@@ -35,9 +35,9 @@ class AuthController extends Controller
         $role = Auth::user()->role->value;
 
         return match ($role) {
-            'owner' => redirect()->intended('/owner/dashboard'),
-            'admin' => redirect()->intended('/admin/dashboard'),
-            default => redirect()->intended(route('home')),
+            'owner'  => redirect()->intended(route('owner.dashboard')),
+            'admin'  => redirect()->intended(route('admin.dashboard')),
+            default  => redirect()->intended(route('home')),
         };
     }
 
@@ -48,7 +48,7 @@ class AuthController extends Controller
     public function showAuthForm(): View|RedirectResponse
     {
         if (Auth::check()) {
-            return redirect()->route('home');
+            return $this->redirectBasedOnRole();
         }
 
         return view('auth.login');
