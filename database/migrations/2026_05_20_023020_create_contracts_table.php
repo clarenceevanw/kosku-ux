@@ -12,8 +12,8 @@ return new class extends Migration
      * Table: contracts
      * Depends on: transactions
      *
-     * 1-to-1 relationship with transactions.
-     * Stores digital signature timestamps and PDF storage URL (AWS S3 / GDrive).
+     * 1-to-1 relationship with initial transaction.
+     * After contract created, generates monthly billing transactions.
      */
     public function up(): void
     {
@@ -23,7 +23,7 @@ return new class extends Migration
             // 1-to-1: one transaction → one contract
             $table->uuid('transaction_id')
                   ->unique()
-                  ->comment('1-to-1 FK to transactions');
+                  ->comment('1-to-1 FK to initial transaction');
 
             $table->string('contract_number')
                   ->unique()

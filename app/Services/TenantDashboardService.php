@@ -6,6 +6,7 @@ use App\Enum\ContractStatus;
 use App\Enum\PaymentStatus;
 use App\Enum\TicketStatus;
 use App\Models\MaintenanceTicket;
+use App\Models\MonthlyPayment;
 use App\Models\Transaction;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -79,16 +80,28 @@ class TenantDashboardService
 
     /**
      * Get all transactions (payment history) for the tenant, ordered by latest.
-     * Only returns monthly bills (transactions with billing_month set).
+     * Returns monthly payments from all contracts.
      */
     public function getPaymentHistory(User $tenant): \Illuminate\Database\Eloquent\Collection
     {
-        return $tenant->transactions()
-            ->whereNotNull('billing_month')
+        // Get all contracts for this tenant
+        $contractIds = $tenant->transactions()
+            ->whereHas('contract')
+            ->with('contract:id')
+            ->get()
+            ->pluck('contract.id')
+            ->filter();
+        
+        if ($contractIds->isEmpty()) {
+            return collect();
+        }
+        
+        return MonthlyPayment::whereIn('contract_id', $contractIds)
             ->with([
-                'room:id,boarding_house_id,type_name,price_per_month',
-                'room.boardingHouse:id,name,city',
-                'contract:id,transaction_id,contract_number,start_date,end_date,status',
+                'contract:id,transaction_id,contract_number,start_date,end_date,status,monthly_fee',
+                'contract.transaction:id,room_id',
+                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.transaction.room.boardingHouse:id,name,city',
             ])
             ->orderBy('due_date', 'desc')
             ->get();
@@ -96,23 +109,23 @@ class TenantDashboardService
 
     /**
      * Get payment history for a specific contract.
-     * Only returns monthly bills for the selected contract.
+     * Returns monthly payments for the selected contract.
      */
-    public function getPaymentHistoryForContract(Transaction $contract): \Illuminate\Database\Eloquent\Collection
+    public function getPaymentHistoryForContract(Transaction $transaction): \Illuminate\Database\Eloquent\Collection
     {
         // Get the actual contract from the transaction
-        $actualContract = $contract->contract;
+        $actualContract = $transaction->contract;
         
         if (!$actualContract) {
             return collect();
         }
         
-        return Transaction::where('contract_id', $actualContract->id)
-            ->whereNotNull('billing_month')
+        return MonthlyPayment::where('contract_id', $actualContract->id)
             ->with([
-                'room:id,boarding_house_id,type_name,price_per_month',
-                'room.boardingHouse:id,name,city',
-                'contract:id,transaction_id,contract_number,start_date,end_date,status',
+                'contract:id,transaction_id,contract_number,start_date,end_date,status,monthly_fee',
+                'contract.transaction:id,room_id',
+                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.transaction.room.boardingHouse:id,name,city',
             ])
             ->orderBy('due_date', 'desc')
             ->get();
@@ -120,19 +133,31 @@ class TenantDashboardService
 
     /**
      * Get the upcoming/most recent pending payment for the tenant.
-     * Returns the next due monthly bill.
-     * Only returns bills due within 31 days.
+     * Returns the next due monthly payment.
+     * Only returns payments due within 31 days.
      */
-    public function getUpcomingPayment(User $tenant): ?Transaction
+    public function getUpcomingPayment(User $tenant): ?MonthlyPayment
     {
         $thirtyOneDaysFromNow = Carbon::now()->addDays(31);
         
-        return $tenant->transactions()
-            ->whereNotNull('billing_month')
+        // Get all contracts for this tenant
+        $contractIds = $tenant->transactions()
+            ->whereHas('contract')
+            ->with('contract:id')
+            ->get()
+            ->pluck('contract.id')
+            ->filter();
+        
+        if ($contractIds->isEmpty()) {
+            return null;
+        }
+        
+        return MonthlyPayment::whereIn('contract_id', $contractIds)
             ->with([
-                'room:id,boarding_house_id,type_name,price_per_month',
-                'room.boardingHouse:id,name',
-                'contract:id,transaction_id,contract_number,monthly_fee,start_date,end_date',
+                'contract:id,transaction_id,contract_number,start_date,end_date,monthly_fee',
+                'contract.transaction:id,room_id',
+                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.transaction.room.boardingHouse:id,name',
             ])
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->where('due_date', '<=', $thirtyOneDaysFromNow)
@@ -142,13 +167,13 @@ class TenantDashboardService
 
     /**
      * Get the upcoming payment for a specific contract.
-     * Returns the next due monthly bill for this contract.
-     * Only returns bills due within 31 days.
+     * Returns the next due monthly payment for this contract.
+     * Only returns payments due within 31 days.
      */
-    public function getUpcomingPaymentForContract(Transaction $contract): ?Transaction
+    public function getUpcomingPaymentForContract(Transaction $transaction): ?MonthlyPayment
     {
         // Get the actual contract from the transaction
-        $actualContract = $contract->contract;
+        $actualContract = $transaction->contract;
         
         if (!$actualContract) {
             return null;
@@ -156,12 +181,12 @@ class TenantDashboardService
         
         $thirtyOneDaysFromNow = Carbon::now()->addDays(31);
         
-        return Transaction::where('contract_id', $actualContract->id)
-            ->whereNotNull('billing_month')
+        return MonthlyPayment::where('contract_id', $actualContract->id)
             ->with([
-                'room:id,boarding_house_id,type_name,price_per_month',
-                'room.boardingHouse:id,name',
-                'contract:id,transaction_id,contract_number,monthly_fee,start_date,end_date',
+                'contract:id,transaction_id,contract_number,start_date,end_date,monthly_fee',
+                'contract.transaction:id,room_id',
+                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.transaction.room.boardingHouse:id,name',
             ])
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->where('due_date', '<=', $thirtyOneDaysFromNow)
@@ -339,13 +364,13 @@ class TenantDashboardService
      * Calculate days until a payment is due.
      * Returns null if no upcoming payment exists.
      */
-    public function getDaysUntilDue(?Transaction $transaction): ?int
+    public function getDaysUntilDue(?MonthlyPayment $payment): ?int
     {
-        if (! $transaction || ! $transaction->due_date) {
+        if (! $payment || ! $payment->due_date) {
             return null;
         }
 
-        $dueDate = Carbon::parse($transaction->due_date);
+        $dueDate = Carbon::parse($payment->due_date);
         $now     = Carbon::now();
 
         if ($dueDate->isPast()) {

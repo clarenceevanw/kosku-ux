@@ -66,16 +66,13 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create initial transaction (for contract reference only, not for payment)
+            // Create initial transaction (for contract reference only)
             $initialTransaction = Transaction::create([
                 'tenant_id' => $tenant->id,
                 'room_id' => $room->id,
-                'contract_id' => null, // Will be updated after contract creation
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'billing_month' => null,
-                'due_date' => null,
-                'total_amount' => $monthlyFee * $durationMonths,
+                'total_amount' => $depositFee,
                 'payment_status' => PaymentStatus::PENDING->value,
                 'payment_method' => null,
             ]);

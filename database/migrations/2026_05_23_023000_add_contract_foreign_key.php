@@ -17,13 +17,6 @@ return new class extends Migration
                 ->on('transactions')
                 ->cascadeOnDelete();
         });
-
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->foreign('contract_id')
-                ->references('id')
-                ->on('contracts')
-                ->nullOnDelete();
-        });
     }
 
     /**
@@ -33,10 +26,6 @@ return new class extends Migration
     {
         Schema::table('contracts', function (Blueprint $table) {
             $table->dropForeign(['transaction_id']);
-        });
-
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->dropForeign(['contract_id']);
         });
     }
 };

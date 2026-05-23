@@ -137,21 +137,17 @@
 
             @if($upcomingPayment)
                 <p class="font-display text-3xl font-bold text-on-surface mb-1">
-                    Rp {{ number_format($upcomingPayment->total_amount, 0, ',', '.') }}
+                    Rp {{ number_format($upcomingPayment->amount, 0, ',', '.') }}
                 </p>
                 <p class="font-body text-base text-on-surface-variant">
-                    {{ $upcomingPayment->room?->boardingHouse?->name ?? 'Sewa Bulanan' }}
-                    @if($upcomingPayment->billing_month)
+                    {{ $upcomingPayment->contract->transaction->room->boardingHouse->name ?? 'Sewa Bulanan' }}
                     <span class="inline-block ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold border border-primary/30">
                         Bulan ke-{{ $upcomingPayment->billing_month }}
                     </span>
-                    @endif
                 </p>
-                @if($upcomingPayment->start_date && $upcomingPayment->end_date)
                 <p class="font-body text-sm text-on-surface-variant mt-2">
-                    Periode: {{ $upcomingPayment->start_date->translatedFormat('d M') }} - {{ $upcomingPayment->end_date->translatedFormat('d M Y') }}
+                    Jatuh tempo: {{ $upcomingPayment->due_date->translatedFormat('d M Y') }}
                 </p>
-                @endif
 
                 {{-- Due date indicator --}}
                 <div class="mt-6 bg-surface-container-lowest rounded-xl p-4 border border-outline-variant/30 flex items-center gap-3 shadow-sm">

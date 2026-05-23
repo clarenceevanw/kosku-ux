@@ -6,7 +6,7 @@ use App\Enum\ContractStatus;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
@@ -35,9 +35,9 @@ class Contract extends Model
         return $this->belongsTo(Transaction::class);
     }
 
-    public function monthlyBills(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function monthlyPayments(): HasMany
     {
-        return $this->hasMany(Transaction::class, 'contract_id');
+        return $this->hasMany(MonthlyPayment::class);
     }
 
     public function review(): HasOne

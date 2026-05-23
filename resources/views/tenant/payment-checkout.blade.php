@@ -13,7 +13,7 @@
             </a>
             <div class="flex flex-col">
                 <span class="font-headline text-lg font-semibold text-on-surface">Pembayaran</span>
-                <span class="font-body text-sm text-on-surface-variant">{{ $payment->room->boardingHouse->name }} - {{ $payment->room->type_name }}</span>
+                <span class="font-body text-sm text-on-surface-variant">{{ $payment->contract->transaction->room->boardingHouse->name }} - {{ $payment->contract->transaction->room->type_name }}</span>
             </div>
         </div>
         <div class="hidden md:flex items-center gap-2 bg-surface-container px-4 py-2 rounded-full">
@@ -49,35 +49,20 @@
             <section class="bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-sm border border-outline-variant relative overflow-hidden">
                 <div class="flex justify-between items-start mb-8">
                     <h2 class="font-headline text-2xl font-semibold text-on-surface">Rincian Tagihan</h2>
-                    @if($payment->billing_month)
                     <div class="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 border border-primary/30">
                         <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
                         <span class="font-label text-xs font-semibold tracking-wide uppercase">Bulan ke-{{ $payment->billing_month }}</span>
                     </div>
-                    @endif
                 </div>
                 <div class="space-y-6">
-                    @if($payment->billing_month === 1)
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                        <div class="flex gap-3">
-                            <span class="material-symbols-outlined text-blue-600 mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
-                            <div>
-                                <p class="font-label text-sm font-semibold text-blue-900 mb-1">Pembayaran Bulan Pertama</p>
-                                <p class="font-body text-sm text-blue-700">Anda hanya perlu membayar sewa bulan pertama saat ini. Tagihan bulan berikutnya akan muncul di tab Tagihan sesuai jadwal.</p>
-                            </div>
-                        </div>
-                    </div>
-                    @endif
                     <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
                         <div class="flex flex-col">
-                            <span class="font-body text-base text-on-surface-variant">Sewa Bulan {{ $payment->billing_month ?? 1 }}</span>
-                            @if($payment->start_date && $payment->end_date)
+                            <span class="font-body text-base text-on-surface-variant">Sewa Bulan {{ $payment->billing_month }}</span>
                             <span class="font-body text-sm text-outline mt-1">
-                                {{ $payment->start_date->translatedFormat('d M Y') }} - {{ $payment->end_date->translatedFormat('d M Y') }}
+                                {{ $payment->contract->start_date->translatedFormat('d M Y') }} - {{ $payment->contract->end_date->translatedFormat('d M Y') }}
                             </span>
-                            @endif
                         </div>
-                        <span class="font-label text-base font-semibold text-on-surface">Rp {{ number_format($payment->total_amount, 0, ',', '.') }}</span>
+                        <span class="font-label text-base font-semibold text-on-surface">Rp {{ number_format($payment->amount, 0, ',', '.') }}</span>
                     </div>
                     <div class="flex justify-between items-center pb-4 border-b border-outline-variant">
                         <span class="font-body text-base text-on-surface-variant">Biaya Admin Platform</span>
@@ -85,21 +70,19 @@
                     </div>
                     <div class="flex justify-between items-center pt-4">
                         <span class="font-headline text-xl font-semibold text-on-surface">Total Pembayaran</span>
-                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->total_amount + 2000, 0, ',', '.') }}</span>
+                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
                     </div>
-                    @if($payment->contract)
                     <div class="bg-surface-container p-4 rounded-xl flex gap-4 items-start mt-6 border border-outline-variant">
                         <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
                         <div class="font-body text-sm text-on-surface-variant">
                             <p class="mb-2"><strong>Informasi Kontrak:</strong></p>
                             <ul class="space-y-1 list-disc list-inside">
                                 <li>Periode sewa: {{ $payment->contract->start_date->translatedFormat('d M Y') }} - {{ $payment->contract->end_date->translatedFormat('d M Y') }}</li>
-                                <li>Durasi: {{ $payment->contract->start_date->diffInMonths($payment->contract->end_date) }} bulan</li>
+                                <li>Durasi: {{ ceil($payment->contract->start_date->floatDiffInMonths($payment->contract->end_date)) }} bulan</li>
                                 <li>Pembayaran bulanan: Rp {{ number_format($payment->contract->monthly_fee, 0, ',', '.') }}/bulan</li>
                             </ul>
                         </div>
                     </div>
-                    @endif
                 </div>
             </section>
 
@@ -202,16 +185,14 @@
         <div class="w-full lg:w-1/3">
             <div class="sticky top-[88px] bg-surface-container-lowest rounded-[2rem] shadow-sm border border-outline-variant p-6 md:p-8 flex flex-col gap-6">
                 <div>
-                    <h3 class="font-headline text-xl font-semibold text-on-surface mb-1">{{ $payment->room->boardingHouse->name }}</h3>
-                    <p class="font-body text-sm text-on-surface-variant mb-4">{{ $payment->room->type_name }} • Mulai {{ $payment->contract ? $payment->contract->start_date->translatedFormat('d M Y') : $payment->start_date->translatedFormat('d M Y') }}</p>
-                    @if($payment->billing_month)
+                    <h3 class="font-headline text-xl font-semibold text-on-surface mb-1">{{ $payment->contract->transaction->room->boardingHouse->name }}</h3>
+                    <p class="font-body text-sm text-on-surface-variant mb-4">{{ $payment->contract->transaction->room->type_name }} • Mulai {{ $payment->contract->start_date->translatedFormat('d M Y') }}</p>
                     <div class="bg-primary/10 border border-primary/30 rounded-lg p-3 mb-4">
                         <p class="font-label text-xs text-primary font-semibold mb-1">TAGIHAN BULAN KE-{{ $payment->billing_month }}</p>
                         <p class="font-body text-xs text-on-surface-variant">
-                            Periode: {{ $payment->start_date->translatedFormat('d M') }} - {{ $payment->end_date->translatedFormat('d M Y') }}
+                            Jatuh tempo: {{ $payment->due_date->translatedFormat('d M Y') }}
                         </p>
                     </div>
-                    @endif
                     <div class="flex items-center gap-3 bg-surface-container p-3 rounded-xl border border-outline-variant">
                         <span class="material-symbols-outlined text-on-surface-variant">account_balance_wallet</span>
                         <span class="font-label text-sm font-medium text-on-surface" id="selectedMethod">BCA Virtual Account</span>
@@ -220,7 +201,7 @@
                 <div class="border-t border-outline-variant pt-6">
                     <div class="flex justify-between items-end mb-2">
                         <span class="font-body text-lg text-on-surface-variant">Total Bayar</span>
-                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->total_amount + 2000, 0, ',', '.') }}</span>
+                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
                     </div>
                     <p class="font-body text-sm text-outline text-right">Termasuk admin Rp 2.000</p>
                 </div>

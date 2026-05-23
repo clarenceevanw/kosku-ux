@@ -54,23 +54,18 @@
                         <div>
                             <div class="flex items-center gap-2 mb-1">
                                 <p class="font-headline text-base font-semibold text-on-surface">
-                                    {{ $payment->room?->boardingHouse?->name ?? 'Sewa Kos' }}
+                                    {{ $payment->contract->transaction->room->boardingHouse->name ?? 'Sewa Kos' }}
                                 </p>
-                                @if($payment->billing_month)
                                 <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold border border-primary/30">
                                     Bulan ke-{{ $payment->billing_month }}
                                 </span>
-                                @endif
                             </div>
                             <p class="font-body text-sm text-on-surface-variant">
-                                {{ $payment->room?->type_name ?? '—' }}
+                                {{ $payment->contract->transaction->room->type_name ?? '—' }}
                             </p>
-                            @if($payment->start_date && $payment->end_date)
                             <p class="font-body text-xs text-on-surface-variant mt-1">
-                                Periode: {{ $payment->start_date->translatedFormat('d M Y') }} — {{ $payment->end_date->translatedFormat('d M Y') }}
+                                Periode: {{ $payment->contract->start_date->translatedFormat('d M Y') }} — {{ $payment->contract->end_date->translatedFormat('d M Y') }}
                             </p>
-                            @endif
-                            @if($payment->due_date)
                             <p class="font-label text-xs {{ $isOverdue ? 'text-red-600 font-semibold' : 'text-on-surface-variant' }} mt-1">
                                 @if($isOverdue)
                                     <span class="material-symbols-outlined text-[14px] align-middle">warning</span>
@@ -79,17 +74,14 @@
                                     Jatuh tempo: {{ $payment->due_date->translatedFormat('d M Y') }}
                                 @endif
                             </p>
-                            @endif
-                            @if($payment->contract)
                             <p class="font-label text-xs text-on-surface-variant mt-1">
                                 No. Kontrak: {{ $payment->contract->contract_number }}
                             </p>
-                            @endif
                         </div>
                     </div>
                     <div class="flex flex-col sm:items-end gap-2">
                         <p class="font-headline text-xl font-bold text-on-surface">
-                            Rp {{ number_format($payment->total_amount, 0, ',', '.') }}
+                            Rp {{ number_format($payment->amount, 0, ',', '.') }}
                         </p>
                         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border self-start sm:self-auto {{ $statusConfig['class'] }}">
                             <span class="w-1.5 h-1.5 rounded-full bg-current"></span>

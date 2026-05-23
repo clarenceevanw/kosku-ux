@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreMaintananceTicketRequest;
 use App\Models\MaintenanceTicket;
+use App\Models\MonthlyPayment;
 use App\Models\Transaction;
 use App\Services\MonthlyBillingService;
 use App\Services\TenantDashboardService;
@@ -98,25 +99,25 @@ class TenantDashboardController extends Controller
         ]);
     }
 
-    public function paymentCheckout(Transaction $payment): View
+    public function paymentCheckout(MonthlyPayment $payment): View
     {
         $tenant = Auth::user();
         
-        if ($payment->tenant_id !== $tenant->id) {
+        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 
         return view('tenant.payment-checkout', [
             'tenant'  => $tenant,
-            'payment' => $payment->load(['room.boardingHouse', 'contract']),
+            'payment' => $payment->load(['contract.transaction.room.boardingHouse']),
         ]);
     }
 
-    public function processPayment(Transaction $payment): RedirectResponse
+    public function processPayment(MonthlyPayment $payment): RedirectResponse
     {
         $tenant = Auth::user();
         
-        if ($payment->tenant_id !== $tenant->id) {
+        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 

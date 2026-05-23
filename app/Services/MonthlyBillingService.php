@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Enum\PaymentStatus;
 use App\Models\Contract;
-use App\Models\Transaction;
+use App\Models\MonthlyPayment;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -17,14 +17,14 @@ use Illuminate\Support\Facades\DB;
 class MonthlyBillingService
 {
     /**
-     * Generate monthly billing transactions for a contract.
+     * Generate monthly payment records for a contract.
      * 
-     * Creates separate transaction records for each month of the rental period.
+     * Creates separate monthly_payment records for each month of the rental period.
      * First month is due immediately, subsequent months are due on the start date
      * of each billing period.
      *
      * @param Contract $contract The rental contract
-     * @return array Array of created transactions
+     * @return array Array of created monthly payments
      */
     public function generateMonthlyBills(Contract $contract): array
     {
@@ -47,47 +47,32 @@ class MonthlyBillingService
             $totalMonths = 1;
         }
         
-        $transactions = [];
+        $payments = [];
         
         DB::beginTransaction();
         try {
             for ($month = 1; $month <= $totalMonths; $month++) {
                 // Calculate billing period for this month
                 $billingStart = $startDate->copy()->addMonths($month - 1);
-                $billingEnd = $startDate->copy()->addMonths($month)->subDay();
-                
-                // Ensure billing end doesn't exceed contract end
-                if ($billingEnd->greaterThan($endDate)) {
-                    $billingEnd = $endDate->copy();
-                }
                 
                 // Due date is the start of the billing period
-                // First month is due immediately (start date)
-                // Subsequent months are due on their respective start dates
                 $dueDate = $billingStart->copy();
                 
-                // Get the initial transaction to link tenant and room
-                $initialTransaction = $contract->transaction;
-                
-                $transaction = Transaction::create([
-                    'tenant_id' => $initialTransaction->tenant_id,
-                    'room_id' => $initialTransaction->room_id,
+                $payment = MonthlyPayment::create([
                     'contract_id' => $contract->id,
-                    'start_date' => $billingStart,
-                    'end_date' => $billingEnd,
                     'billing_month' => $month,
                     'due_date' => $dueDate,
-                    'total_amount' => $monthlyFee,
+                    'amount' => $monthlyFee,
                     'payment_status' => PaymentStatus::PENDING->value,
                     'payment_method' => null,
                     'paid_at' => null,
                 ]);
                 
-                $transactions[] = $transaction;
+                $payments[] = $payment;
             }
             
             DB::commit();
-            return $transactions;
+            return $payments;
             
         } catch (\Exception $e) {
             DB::rollBack();
@@ -104,7 +89,7 @@ class MonthlyBillingService
      */
     public function getUpcomingBills(Contract $contract)
     {
-        return $contract->monthlyBills()
+        return $contract->monthlyPayments()
             ->whereIn('payment_status', [PaymentStatus::PENDING->value])
             ->orderBy('due_date', 'asc')
             ->get();
@@ -114,11 +99,11 @@ class MonthlyBillingService
      * Get the next due bill for a contract.
      *
      * @param Contract $contract
-     * @return Transaction|null
+     * @return MonthlyPayment|null
      */
-    public function getNextDueBill(Contract $contract): ?Transaction
+    public function getNextDueBill(Contract $contract): ?MonthlyPayment
     {
-        return $contract->monthlyBills()
+        return $contract->monthlyPayments()
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->orderBy('due_date', 'asc')
             ->first();
@@ -127,19 +112,19 @@ class MonthlyBillingService
     /**
      * Mark a bill as paid.
      *
-     * @param Transaction $transaction
+     * @param MonthlyPayment $payment
      * @param string $paymentMethod
-     * @return Transaction
+     * @return MonthlyPayment
      */
-    public function markAsPaid(Transaction $transaction, string $paymentMethod): Transaction
+    public function markAsPaid(MonthlyPayment $payment, string $paymentMethod): MonthlyPayment
     {
-        $transaction->update([
+        $payment->update([
             'payment_status' => PaymentStatus::PAID_TO_ESCROW->value,
             'payment_method' => $paymentMethod,
             'paid_at' => now(),
         ]);
         
-        return $transaction->fresh();
+        return $payment->fresh();
     }
     
     /**
@@ -150,7 +135,7 @@ class MonthlyBillingService
      */
     public function hasOverdueBills(Contract $contract): bool
     {
-        return $contract->monthlyBills()
+        return $contract->monthlyPayments()
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->where('due_date', '<', now())
             ->exists();
@@ -164,7 +149,7 @@ class MonthlyBillingService
      */
     public function getPaymentStats(Contract $contract): array
     {
-        $allBills = $contract->monthlyBills;
+        $allBills = $contract->monthlyPayments;
         
         return [
             'total_bills' => $allBills->count(),
@@ -178,9 +163,9 @@ class MonthlyBillingService
             'total_paid_amount' => $allBills->whereIn('payment_status', [
                 PaymentStatus::PAID_TO_ESCROW->value,
                 PaymentStatus::RELEASED_TO_OWNER->value
-            ])->sum('total_amount'),
+            ])->sum('amount'),
             'total_pending_amount' => $allBills->where('payment_status', PaymentStatus::PENDING->value)
-                ->sum('total_amount'),
+                ->sum('amount'),
         ];
     }
 }
