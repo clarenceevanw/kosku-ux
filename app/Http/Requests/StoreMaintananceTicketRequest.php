@@ -23,7 +23,7 @@ class StoreMaintananceTicketRequest extends FormRequest
             'title'       => ['required', 'string', 'max:255'],
             'description' => ['required', 'string', 'max:2000'],
             'priority'    => ['required', new Enum(PriorityLevel::class)],
-            'photo_url'   => ['nullable', 'url', 'max:500'],
+            'photo'       => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
         ];
     }
 
@@ -36,6 +36,9 @@ class StoreMaintananceTicketRequest extends FormRequest
             'description.required' => 'Deskripsi kerusakan wajib diisi.',
             'description.max'      => 'Deskripsi maksimal 2000 karakter.',
             'priority.required'    => 'Prioritas wajib dipilih.',
+            'photo.image'          => 'File harus berupa gambar.',
+            'photo.mimes'          => 'Format gambar harus jpeg, jpg, png, atau webp.',
+            'photo.max'            => 'Ukuran gambar maksimal 5MB.',
         ];
     }
 }

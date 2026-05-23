@@ -218,8 +218,16 @@ class TenantDashboardController extends Controller
     public function storeTicket(StoreMaintananceTicketRequest $request): RedirectResponse
     {
         $tenant = Auth::user();
+        
+        $data = $request->validated();
+        
+        // Handle file upload
+        if ($request->hasFile('photo')) {
+            $path = $request->file('photo')->store('tickets', 'public');
+            $data['photo_url'] = $path;
+        }
 
-        $this->tenantService->createTicket($tenant, $request->validated());
+        $this->tenantService->createTicket($tenant, $data);
 
         return redirect()
             ->route('tenant.tickets')

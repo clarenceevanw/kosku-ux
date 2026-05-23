@@ -85,7 +85,7 @@
         <div>
             <h3 class="font-headline text-lg font-semibold text-on-surface mb-4">Lampiran Foto</h3>
             <div class="rounded-xl overflow-hidden border border-outline-variant/30">
-                <img src="{{ $ticket->photo_url }}" alt="Foto {{ $ticket->title }}" class="w-full h-auto">
+                <img src="{{ asset('storage/' . $ticket->photo_url) }}" alt="Foto {{ $ticket->title }}" class="w-full h-auto">
             </div>
         </div>
         @endif

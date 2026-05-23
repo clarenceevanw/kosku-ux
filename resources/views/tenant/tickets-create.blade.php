@@ -17,7 +17,7 @@
 
     {{-- Form Card --}}
     <div class="bg-surface-container-lowest rounded-[2rem] border border-outline-variant/50 p-8 md:p-12 shadow-sm">
-        <form action="{{ route('tenant.tickets.store') }}" method="POST" class="flex flex-col gap-8">
+        <form action="{{ route('tenant.tickets.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
             @csrf
             <input type="hidden" name="room_id" value="{{ $activeTransaction->room_id }}">
 
@@ -68,23 +68,31 @@
                 @error('description') <span class="text-error text-xs font-semibold">{{ $message }}</span> @enderror
             </div>
 
-            {{-- Dashed Upload Area --}}
+            {{-- Photo Upload --}}
             <div class="flex flex-col gap-2">
-                <label class="font-label text-sm font-semibold tracking-wide text-on-surface" for="photo_url">Foto / Video (Opsional)</label>
-                {{-- Just an input text for URL to simulate for now since we don't have file upload implemented fully --}}
-                <input class="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-300" 
-                       id="photo_url" name="photo_url" placeholder="URL Foto (opsional)" type="url">
+                <label class="font-label text-sm font-semibold tracking-wide text-on-surface" for="photo">Foto / Video (Opsional)</label>
                 
-                <div class="w-full border-2 border-dashed border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 bg-surface-container-lowest mt-2 opacity-50 cursor-not-allowed">
+                <div class="w-full border-2 border-dashed border-outline-variant/50 rounded-2xl p-8 flex flex-col items-center justify-center gap-4 bg-surface-container-lowest hover:border-primary transition-colors cursor-pointer" id="upload-area">
+                    <input type="file" name="photo" id="photo" accept="image/jpeg,image/jpg,image/png,image/webp" class="hidden">
                     <div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-on-surface">
                         <span class="material-symbols-outlined text-2xl">cloud_upload</span>
                     </div>
                     <div class="text-center">
-                        <p class="font-label text-sm font-semibold text-on-surface-variant">Unggah berkas belum tersedia.</p>
-                        <p class="font-body text-xs text-on-surface-variant mt-1">Silakan gunakan link URL foto di atas.</p>
+                        <p class="font-label text-sm font-semibold text-on-surface-variant">Klik untuk unggah foto</p>
+                        <p class="font-body text-xs text-on-surface-variant mt-1">Format: JPG, PNG, WEBP (Maks. 5MB)</p>
                     </div>
                 </div>
-                @error('photo_url') <span class="text-error text-xs font-semibold">{{ $message }}</span> @enderror
+                
+                <div id="preview-container" class="hidden mt-4">
+                    <div class="relative inline-block">
+                        <img id="preview-image" src="" alt="Preview" class="max-w-full h-auto rounded-xl max-h-64 object-cover">
+                        <button type="button" id="remove-image" class="absolute -top-2 -right-2 w-8 h-8 bg-error text-on-error rounded-full flex items-center justify-center hover:bg-error/80 transition-colors">
+                            <span class="material-symbols-outlined text-[18px]">close</span>
+                        </button>
+                    </div>
+                </div>
+                
+                @error('photo') <span class="text-error text-xs font-semibold">{{ $message }}</span> @enderror
             </div>
 
             {{-- Submit Button --}}
@@ -97,5 +105,38 @@
         </form>
     </div>
 </div>
+
+<script>
+    // File upload preview
+    const uploadArea = document.getElementById('upload-area');
+    const photoInput = document.getElementById('photo');
+    const previewContainer = document.getElementById('preview-container');
+    const previewImage = document.getElementById('preview-image');
+    const removeImageBtn = document.getElementById('remove-image');
+
+    uploadArea.addEventListener('click', () => {
+        photoInput.click();
+    });
+
+    photoInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewContainer.classList.remove('hidden');
+                uploadArea.classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    removeImageBtn.addEventListener('click', () => {
+        photoInput.value = '';
+        previewImage.src = '';
+        previewContainer.classList.add('hidden');
+        uploadArea.classList.remove('hidden');
+    });
+</script>
 
 @endsection
