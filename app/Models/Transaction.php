@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 
-#[Fillable(['tenant_id', 'room_id', 'start_date', 'end_date', 'total_amount', 'payment_status', 'payment_method'])]
+#[Fillable(['tenant_id', 'room_id', 'contract_id', 'start_date', 'end_date', 'billing_month', 'due_date', 'total_amount', 'payment_status', 'payment_method', 'paid_at'])]
 #[Guarded(['id', 'created_at', 'updated_at'])]
 #[Hidden([])]
 class Transaction extends Model
@@ -24,6 +24,8 @@ class Transaction extends Model
         return [
             'start_date' => 'date',
             'end_date' => 'date',
+            'due_date' => 'date',
+            'paid_at' => 'datetime',
             'payment_status' => PaymentStatus::class,
         ];
     }

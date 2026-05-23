@@ -35,6 +35,11 @@ class Contract extends Model
         return $this->belongsTo(Transaction::class);
     }
 
+    public function monthlyBills(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Transaction::class, 'contract_id');
+    }
+
     public function review(): HasOne
     {
         return $this->hasOne(Review::class);
