@@ -30,6 +30,10 @@
             </a>
             <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
                 href="#">Untuk Pemilik</a>
+            @if(!auth()->check() || auth()->user()->role->value === 'tenant')
+            <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
+                href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
+            @endif
             <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
                 href="#">Bantuan</a>
         </div>
@@ -79,6 +83,9 @@
             <span class="material-symbols-outlined">smart_toy</span> Cari via KosBot
         </a>
         <a class="text-lg font-bold text-[#111827]" href="#">Untuk Pemilik</a>
+        @if(!auth()->check() || auth()->user()->role->value === 'tenant')
+        <a class="text-lg font-bold text-[#111827]" href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
+        @endif
         <a class="text-lg font-bold text-[#111827]" href="#">Bantuan</a>
         
         <hr class="border-gray-100 my-2">
