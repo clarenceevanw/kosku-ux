@@ -28,27 +28,27 @@
         {{-- Left Column: 3-Step Wizard --}}
         <div class="w-full lg:w-2/3 flex flex-col gap-8">
             {{-- Wizard Progress Indicator --}}
-            <div class="flex items-center justify-between px-4 mb-4">
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label text-sm font-bold">1</div>
-                    <span class="font-label text-sm font-medium text-on-surface hidden sm:inline">Ringkasan</span>
+            <div class="flex items-center justify-between px-2 sm:px-4 mb-4">
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary text-on-primary flex items-center justify-center font-label text-xs sm:text-sm font-bold">1</div>
+                    <span class="font-label text-xs sm:text-sm font-medium text-on-surface hidden sm:inline">Ringkasan</span>
                 </div>
-                <div class="flex-grow border-t border-outline-variant mx-4"></div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-surface-container text-on-surface flex items-center justify-center font-label text-sm font-bold border border-outline">2</div>
-                    <span class="font-label text-sm font-medium text-on-surface hidden sm:inline">Metode</span>
+                <div class="flex-grow border-t border-outline-variant mx-2 sm:mx-4"></div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface-container text-on-surface flex items-center justify-center font-label text-xs sm:text-sm font-bold border border-outline">2</div>
+                    <span class="font-label text-xs sm:text-sm font-medium text-on-surface hidden sm:inline">Metode</span>
                 </div>
-                <div class="flex-grow border-t border-outline-variant mx-4"></div>
-                <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 rounded-full bg-surface-container text-outline flex items-center justify-center font-label text-sm font-bold border border-outline-variant">3</div>
-                    <span class="font-label text-sm font-medium text-outline hidden sm:inline">Konfirmasi</span>
+                <div class="flex-grow border-t border-outline-variant mx-2 sm:mx-4"></div>
+                <div class="flex items-center gap-2 sm:gap-3">
+                    <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-surface-container text-outline flex items-center justify-center font-label text-xs sm:text-sm font-bold border border-outline-variant">3</div>
+                    <span class="font-label text-xs sm:text-sm font-medium text-outline hidden sm:inline">Konfirmasi</span>
                 </div>
             </div>
 
             {{-- Step 1: Summary --}}
-            <section class="bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-sm border border-outline-variant relative overflow-hidden">
-                <div class="flex justify-between items-start mb-8">
-                    <h2 class="font-headline text-2xl font-semibold text-on-surface">Rincian Tagihan</h2>
+            <section class="bg-surface-container-lowest rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-sm border border-outline-variant relative overflow-hidden">
+                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-8">
+                    <h2 class="font-headline text-xl sm:text-2xl font-semibold text-on-surface">Rincian Tagihan</h2>
                     <div class="inline-flex items-center gap-2 bg-primary/10 text-primary rounded-full px-4 py-2 border border-primary/30">
                         <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
                         <span class="font-label text-xs font-semibold tracking-wide uppercase">Bulan ke-{{ $payment->billing_month }}</span>
@@ -69,8 +69,8 @@
                         <span class="font-label text-base font-semibold text-on-surface">Rp 2.000</span>
                     </div>
                     <div class="flex justify-between items-center pt-4">
-                        <span class="font-headline text-xl font-semibold text-on-surface">Total Pembayaran</span>
-                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
+                        <span class="font-headline text-lg sm:text-xl font-semibold text-on-surface">Total Pembayaran</span>
+                        <span class="font-headline text-2xl sm:text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
                     </div>
                     <div class="bg-surface-container p-4 rounded-xl flex gap-4 items-start mt-6 border border-outline-variant">
                         <span class="material-symbols-outlined text-primary mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
@@ -87,8 +87,8 @@
             </section>
 
             {{-- Step 2: Payment Methods (Bento Grid) --}}
-            <section class="bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-sm border border-outline-variant">
-                <h2 class="font-headline text-2xl font-semibold text-on-surface mb-4">Pilih Metode Pembayaran</h2>
+            <section class="bg-surface-container-lowest rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-sm border border-outline-variant">
+                <h2 class="font-headline text-xl sm:text-2xl font-semibold text-on-surface mb-4">Pilih Metode Pembayaran</h2>
                 <p class="font-body text-sm text-on-surface-variant mb-8">Pilih metode yang paling nyaman untuk Anda.</p>
                 <form id="paymentForm" action="{{ route('tenant.payment.process', $payment->id) }}" method="POST">
                     @csrf
@@ -146,8 +146,8 @@
             </section>
 
             {{-- Step 3: Escrow Timeline (Visual Education) --}}
-            <section class="bg-surface-container-lowest rounded-[2rem] p-6 md:p-8 shadow-sm border border-outline-variant">
-                <h2 class="font-headline text-2xl font-semibold text-on-surface mb-8">Bagaimana Escrow Melindungi Anda?</h2>
+            <section class="bg-surface-container-lowest rounded-[2rem] p-4 sm:p-6 md:p-8 shadow-sm border border-outline-variant">
+                <h2 class="font-headline text-xl sm:text-2xl font-semibold text-on-surface mb-8">Bagaimana Escrow Melindungi Anda?</h2>
                 <div class="relative pl-8 border-l border-outline-variant space-y-8 py-2 ml-2">
                     <div class="relative">
                         <div class="absolute -left-[33px] top-0 w-6 h-6 rounded-full bg-primary flex items-center justify-center border-[3px] border-surface-container-lowest shadow-sm">
@@ -183,7 +183,7 @@
 
         {{-- Right Column: Sticky Action Card --}}
         <div class="w-full lg:w-1/3">
-            <div class="sticky top-[88px] bg-surface-container-lowest rounded-[2rem] shadow-sm border border-outline-variant p-6 md:p-8 flex flex-col gap-6">
+            <div class="sticky top-[88px] bg-surface-container-lowest rounded-[2rem] shadow-sm border border-outline-variant p-4 sm:p-6 md:p-8 flex flex-col gap-6">
                 <div>
                     <h3 class="font-headline text-xl font-semibold text-on-surface mb-1">{{ $payment->contract->transaction->room->boardingHouse->name }}</h3>
                     <p class="font-body text-sm text-on-surface-variant mb-4">{{ $payment->contract->transaction->room->type_name }} • Mulai {{ $payment->contract->start_date->translatedFormat('d M Y') }}</p>
@@ -199,9 +199,9 @@
                     </div>
                 </div>
                 <div class="border-t border-outline-variant pt-6">
-                    <div class="flex justify-between items-end mb-2">
-                        <span class="font-body text-lg text-on-surface-variant">Total Bayar</span>
-                        <span class="font-headline text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-end gap-2 mb-2">
+                        <span class="font-body text-base sm:text-lg text-on-surface-variant">Total Bayar</span>
+                        <span class="font-headline text-2xl sm:text-3xl font-bold text-primary">Rp {{ number_format($payment->amount + 2000, 0, ',', '.') }}</span>
                     </div>
                     <p class="font-body text-sm text-outline text-right">Termasuk admin Rp 2.000</p>
                 </div>

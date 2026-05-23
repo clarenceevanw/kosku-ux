@@ -78,28 +78,28 @@
                     <span class="truncate">{{ $activeContract->room->boardingHouse->address }}, {{ $activeContract->room->boardingHouse->city }}</span>
                 </p>
 
-                <div class="grid grid-cols-2 gap-6 pt-6 border-t border-outline-variant/30">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 pt-6 border-t border-outline-variant/30">
                     <div>
-                        <p class="font-label text-sm text-on-surface-variant">Tanggal Mulai Sewa</p>
-                        <p class="font-body text-lg font-semibold text-on-surface mt-1">
+                        <p class="font-label text-xs sm:text-sm text-on-surface-variant">Tanggal Mulai Sewa</p>
+                        <p class="font-body text-base sm:text-lg font-semibold text-on-surface mt-1">
                             {{ $activeContract->contract?->start_date?->translatedFormat('d M Y') ?? '—' }}
                         </p>
                     </div>
                     <div>
-                        <p class="font-label text-sm text-on-surface-variant">Berlaku Hingga</p>
-                        <p class="font-body text-lg font-semibold text-on-surface mt-1">
+                        <p class="font-label text-xs sm:text-sm text-on-surface-variant">Berlaku Hingga</p>
+                        <p class="font-body text-base sm:text-lg font-semibold text-on-surface mt-1">
                             {{ $activeContract->contract?->end_date?->translatedFormat('d M Y') ?? '—' }}
                         </p>
                     </div>
                     <div>
-                        <p class="font-label text-sm text-on-surface-variant">Sisa Waktu Kontrak</p>
-                        <p class="font-body text-lg font-semibold text-on-surface mt-1">
+                        <p class="font-label text-xs sm:text-sm text-on-surface-variant">Sisa Waktu Kontrak</p>
+                        <p class="font-body text-base sm:text-lg font-semibold text-on-surface mt-1">
                             {{ $remainingTime ?? '—' }}
                         </p>
                     </div>
                     <div>
-                        <p class="font-label text-sm text-on-surface-variant">No. Kontrak</p>
-                        <p class="font-body text-base font-semibold text-on-surface mt-1">
+                        <p class="font-label text-xs sm:text-sm text-on-surface-variant">No. Kontrak</p>
+                        <p class="font-body text-sm sm:text-base font-semibold text-on-surface mt-1">
                             {{ $activeContract->contract?->contract_number ?? '—' }}
                         </p>
                     </div>
@@ -207,32 +207,32 @@
     {{-- ──────────────────────────────────────────────────────
          Quick Stats Row (col-span-12)
     ────────────────────────────────────────────────────── --}}
-    <section class="col-span-1 lg:col-span-12 grid grid-cols-3 gap-4">
-        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-5 shadow-sm flex items-center gap-4">
-            <div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
-                <span class="material-symbols-outlined text-[22px]">calendar_month</span>
+    <section class="col-span-1 lg:col-span-12 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+                <span class="material-symbols-outlined text-[20px] sm:text-[22px]">calendar_month</span>
             </div>
-            <div>
-                <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Total Masa Sewa</p>
-                <p class="font-headline text-xl font-bold text-on-surface mt-0.5">{{ $durationMonths ?? '—' }} Bln</p>
-            </div>
-        </div>
-        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-5 shadow-sm flex items-center gap-4">
-            <div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
-                <span class="material-symbols-outlined text-[22px]">report_problem</span>
-            </div>
-            <div>
-                <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Tiket Aktif</p>
-                <p class="font-headline text-xl font-bold text-on-surface mt-0.5">{{ $ticketStats['active'] }}</p>
+            <div class="min-w-0">
+                <p class="font-label text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider">Total Masa Sewa</p>
+                <p class="font-headline text-lg sm:text-xl font-bold text-on-surface mt-0.5">{{ $durationMonths ?? '—' }} Bln</p>
             </div>
         </div>
-        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-5 shadow-sm flex items-center gap-4">
-            <div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
-                <span class="material-symbols-outlined text-[22px]">check_circle</span>
+        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+                <span class="material-symbols-outlined text-[20px] sm:text-[22px]">report_problem</span>
             </div>
-            <div>
-                <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider">Tiket Selesai</p>
-                <p class="font-headline text-xl font-bold text-on-surface mt-0.5">{{ $ticketStats['resolved'] }}</p>
+            <div class="min-w-0">
+                <p class="font-label text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider">Tiket Aktif</p>
+                <p class="font-headline text-lg sm:text-xl font-bold text-on-surface mt-0.5">{{ $ticketStats['active'] }}</p>
+            </div>
+        </div>
+        <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-4 sm:p-5 shadow-sm flex items-center gap-3 sm:gap-4">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+                <span class="material-symbols-outlined text-[20px] sm:text-[22px]">check_circle</span>
+            </div>
+            <div class="min-w-0">
+                <p class="font-label text-[10px] sm:text-xs text-on-surface-variant uppercase tracking-wider">Tiket Selesai</p>
+                <p class="font-headline text-lg sm:text-xl font-bold text-on-surface mt-0.5">{{ $ticketStats['resolved'] }}</p>
             </div>
         </div>
     </section>
