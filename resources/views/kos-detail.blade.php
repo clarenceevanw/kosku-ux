@@ -213,15 +213,15 @@
                     </div>
 
                     {{-- Pilih Tanggal --}}
-                    <div class="border border-gray-200 rounded-2xl p-4 flex justify-between items-center bg-gray-50 cursor-pointer hover:bg-gray-100 transition-colors">
-                        <div>
-                            <span class="text-xs font-bold text-[#111827] block">Mulai Sewa</span>
-                            <span class="text-sm text-gray-400">Pilih Tanggal</span>
-                        </div>
-                        <span class="material-symbols-outlined text-gray-400">calendar_month</span>
+                    <div class="border border-gray-200 rounded-2xl p-4 bg-gray-50">
+                        <label for="detailStartDate" class="text-xs font-bold text-[#111827] block mb-2">Mulai Sewa</label>
+                        <input type="date" id="detailStartDate" 
+                               min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                               value="{{ date('Y-m-d', strtotime('+7 days')) }}"
+                               class="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-[#111827] focus:border-[#111827] transition-all">
                     </div>
 
-                    <button class="w-full bg-[#111827] text-white font-bold py-4 rounded-full hover:bg-opacity-90 transition-colors shadow-lg active:scale-95 text-sm">
+                    <button id="bookingButton" class="w-full bg-[#111827] text-white font-bold py-4 rounded-full hover:bg-opacity-90 transition-colors shadow-lg active:scale-95 text-sm">
                         Booking &amp; Bayar Aman
                     </button>
                     <p class="text-center text-xs text-gray-400">Anda belum dikenakan biaya saat ini</p>
@@ -251,4 +251,18 @@
         </div>
     </div>
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const bookingButton = document.getElementById('bookingButton');
+    const dateInput = document.getElementById('detailStartDate');
+    const boardingHouseId = '{{ $boardingHouse["id"] }}';
+    
+    bookingButton.addEventListener('click', function() {
+        const selectedDate = dateInput.value;
+        const url = '{{ route("booking.show", $boardingHouse["id"]) }}' + '?start_date=' + selectedDate;
+        window.location.href = url;
+    });
+});
+</script>
 @endsection
