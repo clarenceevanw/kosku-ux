@@ -93,7 +93,7 @@ class TenantDashboardService
             ->filter();
         
         if ($contractIds->isEmpty()) {
-            return collect();
+            return new \Illuminate\Database\Eloquent\Collection();
         }
         
         return MonthlyPayment::whereIn('contract_id', $contractIds)
@@ -117,7 +117,7 @@ class TenantDashboardService
         $actualContract = $transaction->contract;
         
         if (!$actualContract) {
-            return collect();
+            return new \Illuminate\Database\Eloquent\Collection();
         }
         
         return MonthlyPayment::where('contract_id', $actualContract->id)
