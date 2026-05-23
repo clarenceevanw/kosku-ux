@@ -21,10 +21,8 @@ return new class extends Migration
             $table->uuid('id')->primary();
 
             // 1-to-1: one transaction → one contract
-            $table->foreignUuid('transaction_id')
+            $table->uuid('transaction_id')
                   ->unique()
-                  ->constrained('transactions')
-                  ->cascadeOnDelete()
                   ->comment('1-to-1 FK to transactions');
 
             $table->string('contract_number')
