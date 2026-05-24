@@ -135,16 +135,20 @@
                                                 class="flex h-full flex-col overflow-y-scroll bg-surface-container-lowest shadow-xl">
                                                 @csrf
                                                 @method('PUT')
-                                                <div class="bg-primary px-4 py-6 sm:px-6">
-                                                    <div class="flex items-center justify-between">
-                                                        <h2 class="text-xl font-display font-bold text-on-primary"
+                                                <div class="px-6 py-6 border-b border-outline-variant/50 bg-white sticky top-0 z-10">
+                                                    <div class="flex items-start justify-between">
+                                                        <h2 class="text-2xl font-display font-extrabold text-on-surface"
                                                             id="slide-over-title">Edit Kos</h2>
-                                                        <button type="button" @click="showEditDrawer = false"
-                                                            class="rounded-full text-on-primary hover:bg-white/20 p-2 focus:outline-none">
-                                                            <span class="material-symbols-outlined">close</span>
-                                                        </button>
+                                                        <div class="ml-3 flex h-7 items-center">
+                                                            <button type="button" @click="showEditDrawer = false"
+                                                                class="relative rounded-md text-on-surface-variant hover:text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+                                                                <span class="absolute -inset-2.5"></span>
+                                                                <span class="sr-only">Tutup panel</span>
+                                                                <span class="material-symbols-outlined">close</span>
+                                                            </button>
+                                                        </div>
                                                     </div>
-                                                    <p class="mt-1 text-sm text-on-primary/80 font-body">Perbarui informasi
+                                                    <p class="mt-2 text-sm text-on-surface-variant">Perbarui informasi
                                                         kos {{ $kos->name }}.</p>
                                                 </div>
                                                 <div class="relative flex-1 px-4 py-6 sm:px-6 space-y-6">
@@ -329,16 +333,20 @@
                                 <form method="POST" action="{{ route('owner.kos.store') }}"
                                     class="flex h-full flex-col overflow-y-scroll bg-surface-container-lowest shadow-xl">
                                     @csrf
-                                    <div class="bg-primary px-4 py-6 sm:px-6">
-                                        <div class="flex items-center justify-between">
-                                            <h2 class="text-xl font-display font-bold text-white" id="slide-over-title">
+                                    <div class="px-6 py-6 border-b border-outline-variant/50 bg-white sticky top-0 z-10">
+                                        <div class="flex items-start justify-between">
+                                            <h2 class="text-2xl font-display font-extrabold text-on-surface" id="slide-over-title">
                                                 Tambah Kos Baru</h2>
-                                            <button type="button" @click="showCreateDrawer = false"
-                                                class="rounded-full text-white hover:bg-white/20 p-2 focus:outline-none">
-                                                <span class="material-symbols-outlined">close</span>
-                                            </button>
+                                            <div class="ml-3 flex h-7 items-center">
+                                                <button type="button" @click="showCreateDrawer = false"
+                                                    class="relative rounded-md text-on-surface-variant hover:text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+                                                    <span class="absolute -inset-2.5"></span>
+                                                    <span class="sr-only">Tutup panel</span>
+                                                    <span class="material-symbols-outlined">close</span>
+                                                </button>
+                                            </div>
                                         </div>
-                                        <p class="mt-1 text-sm text-white/80 font-body">Mulai buat properti kos baru untuk
+                                        <p class="mt-2 text-sm text-on-surface-variant">Mulai buat properti kos baru untuk
                                             portofolio Anda.</p>
                                     </div>
                                     <div class="relative flex-1 px-4 py-6 sm:px-6 space-y-6">

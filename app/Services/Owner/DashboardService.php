@@ -135,5 +135,59 @@ class DashboardService
         return $query->get();
     }
 
+    /**
+     * Get real occupancy trends for the last 3 months.
+     */
+    public function getOccupancyTrends(int|string $ownerId, ?string $kosId = null): array
+    {
+        $trends = [
+            'labels' => [],
+            'values' => []
+        ];
 
+        // Get total rooms capacity
+        $totalRoomsQuery = Room::whereHas('boardingHouse', function ($q) use ($ownerId, $kosId) {
+            $q->byOwner($ownerId);
+            if ($kosId) {
+                $q->where('id', $kosId);
+            }
+        });
+        $totalCapacity = $totalRoomsQuery->sum('stock');
+        $totalCapacity = $totalCapacity > 0 ? $totalCapacity : 1; // Prevent division by zero
+
+        // We want data for: 2 months ago, last month, this month
+        for ($i = 2; $i >= 0; $i--) {
+            $date = Carbon::now()->subMonths($i);
+            $startOfMonth = $date->copy()->startOfMonth();
+            $endOfMonth = $date->copy()->endOfMonth();
+
+            if ($i == 0) {
+                $trends['labels'][] = 'Bulan Ini';
+            } elseif ($i == 1) {
+                $trends['labels'][] = 'Bulan Lalu';
+            } else {
+                $trends['labels'][] = '2 Bulan Lalu';
+            }
+
+            // Count contracts active in that month
+            // A contract is active in a month if: start_date <= endOfMonth AND end_date >= startOfMonth
+            $activeContractsQuery = Contract::whereHas('transaction.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
+                $q->byOwner($ownerId);
+                if ($kosId) {
+                    $q->where('id', $kosId);
+                }
+            })
+            ->where('start_date', '<=', $endOfMonth)
+            ->where('end_date', '>=', $startOfMonth)
+            ->where('status', 'active');
+
+            $activeCount = $activeContractsQuery->count();
+            
+            // Calculate percentage
+            $percentage = round(($activeCount / $totalCapacity) * 100);
+            $trends['values'][] = min(100, $percentage); // cap at 100% just in case
+        }
+
+        return $trends;
+    }
 }
