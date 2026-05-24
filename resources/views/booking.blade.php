@@ -14,6 +14,20 @@
             <p class="font-body text-base text-on-surface-variant">{{ $boardingHouse['name'] }}</p>
         </div>
 
+        {{-- Flash Messages --}}
+        @if(session('error'))
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+                <span class="material-symbols-outlined text-red-500 mt-0.5 flex-shrink-0" style="font-variation-settings: 'FILL' 1;">error</span>
+                <p class="font-body text-sm text-red-700">{{ session('error') }}</p>
+            </div>
+        @endif
+        @if(session('success'))
+            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-start gap-3">
+                <span class="material-symbols-outlined text-green-500 mt-0.5 flex-shrink-0" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                <p class="font-body text-sm text-green-700">{{ session('success') }}</p>
+            </div>
+        @endif
+
         <form action="{{ route('booking.store') }}" method="POST" class="space-y-6">
             @csrf
             <input type="hidden" name="boarding_house_id" value="{{ $boardingHouse['id'] }}">
@@ -80,7 +94,7 @@
             <div class="bg-surface-container-lowest rounded-2xl p-6 md:p-8 shadow-sm border border-outline-variant/50">
                 <h2 class="font-headline text-xl font-semibold text-on-surface mb-6">Tanggal Mulai Sewa</h2>
                 <input type="date" name="start_date" id="startDateInput"
-                       min="{{ date('Y-m-d', strtotime('+1 day')) }}"
+                       min="{{ date('Y-m-d') }}"
                        value="{{ request('start_date', date('Y-m-d', strtotime('+7 days'))) }}"
                        class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all"
                        required>
