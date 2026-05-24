@@ -84,14 +84,14 @@
 <section class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant mb-8">
     <h3 class="text-xl font-headline font-bold text-on-background mb-4">Tindakan Cepat</h3>
     <div class="flex flex-col sm:flex-row gap-4">
-        <button class="flex-1 bg-primary text-on-primary text-base font-headline py-4 px-6 rounded-2xl shadow-sm hover:bg-inverse-surface transition-colors flex items-center justify-center gap-2">
+        <a href="{{ route('owner.keuangan.index') }}" class="flex-1 bg-primary text-on-primary text-base font-headline py-4 px-6 rounded-2xl shadow-sm hover:bg-inverse-surface transition-colors flex items-center justify-center gap-2">
             <span class="material-symbols-outlined">send</span>
             Kirim Pengingat Tagihan
-        </button>
-        <button class="flex-1 bg-surface-container text-on-surface text-base font-headline py-4 px-6 rounded-2xl border border-outline-variant hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
-            <span class="material-symbols-outlined">receipt_long</span>
-            Catat Pengeluaran
-        </button>
+        </a>
+        <a href="{{ route('owner.keuangan.index') }}" class="flex-1 bg-surface-container text-on-surface text-base font-headline py-4 px-6 rounded-2xl border border-outline-variant hover:bg-surface-container-highest transition-colors flex items-center justify-center gap-2">
+            <span class="material-symbols-outlined">payments</span>
+            Kelola Keuangan
+        </a>
     </div>
 </section>
 
@@ -153,7 +153,7 @@
 <section class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant mb-8">
     <div class="flex justify-between items-center mb-6">
         <h3 class="text-xl font-headline font-bold text-on-background">Daftar Komplain &amp; Perbaikan</h3>
-        <a href="#" class="text-sm font-bold text-[#0D9488] hover:underline">Lihat Semua</a>
+        <a href="{{ route('owner.tickets.index') }}" class="text-sm font-bold text-[#0D9488] hover:underline">Lihat Semua</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         @forelse($recentTickets as $ticket)
@@ -174,9 +174,9 @@
                     <span class="material-symbols-outlined text-[16px]">calendar_today</span>
                     <span>{{ $ticket->created_at->diffForHumans() }}</span>
                 </div>
-                <button class="mt-auto w-full bg-primary hover:bg-inverse-surface text-on-primary text-sm font-headline py-3 px-6 rounded-xl transition-colors">
+                <a href="{{ route('owner.tickets.index') }}" class="mt-auto w-full bg-primary hover:bg-inverse-surface text-on-primary text-sm font-headline py-3 px-6 rounded-xl transition-colors text-center block">
                     Follow Up
-                </button>
+                </a>
             </div>
         @empty
             <div class="col-span-full py-8 text-center text-on-surface-variant flex flex-col items-center">
@@ -187,31 +187,82 @@
     </div>
 </section>
 
-<!-- Occupancy Trends (Dummy Data) -->
+<!-- Occupancy Trends (Simulasi Chart.js) -->
 <section class="bg-surface-container-lowest p-6 rounded-3xl shadow-sm border border-outline-variant">
-    <h3 class="text-xl font-headline font-bold text-on-background mb-6">Occupancy Trends (Simulasi)</h3>
-    <div class="flex flex-col gap-4">
-        <div class="flex items-center gap-4">
-            <span class="w-24 text-sm font-headline font-bold text-on-surface-variant">Bulan Ini</span>
-            <div class="flex-1 bg-surface-container-high rounded-full h-4 overflow-hidden">
-                <div class="bg-primary h-full rounded-full" style="width: 84%"></div>
-            </div>
-            <span class="w-12 text-right text-sm font-headline font-bold text-on-background">84%</span>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="w-24 text-sm font-headline font-bold text-on-surface-variant">Bulan Lalu</span>
-            <div class="flex-1 bg-surface-container-high rounded-full h-4 overflow-hidden">
-                <div class="bg-primary h-full rounded-full" style="width: 82%"></div>
-            </div>
-            <span class="w-12 text-right text-sm font-headline font-bold text-on-background">82%</span>
-        </div>
-        <div class="flex items-center gap-4">
-            <span class="w-24 text-sm font-headline font-bold text-on-surface-variant">2 Bulan Lalu</span>
-            <div class="flex-1 bg-surface-container-high rounded-full h-4 overflow-hidden">
-                <div class="bg-primary h-full rounded-full" style="width: 85%"></div>
-            </div>
-            <span class="w-12 text-right text-sm font-headline font-bold text-on-background">85%</span>
-        </div>
+    <h3 class="text-xl font-headline font-bold text-on-background mb-6">Tingkat Okupansi (3 Bulan Terakhir)</h3>
+    <div class="relative h-64 w-full">
+        <canvas id="occupancyChart"></canvas>
     </div>
 </section>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('occupancyChart').getContext('2d');
+        
+        // Data asli trend okupansi
+        const labels = {!! json_encode($occupancyTrends['labels']) !!};
+        const dataValues = {!! json_encode($occupancyTrends['values']) !!};
+
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Tingkat Okupansi (%)',
+                    data: dataValues,
+                    borderColor: '#0D9488', // accent-teal
+                    backgroundColor: 'rgba(13, 148, 136, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#0D9488',
+                    pointBorderColor: '#ffffff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    pointHoverRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        grid: {
+                            color: '#f0edee',
+                            drawBorder: false,
+                        },
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false,
+                            drawBorder: false,
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Okupansi: ' + context.parsed.y + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush
