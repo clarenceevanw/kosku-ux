@@ -45,71 +45,72 @@
                 // Check if overdue
                 $isOverdue = $payment->payment_status->value === 'pending' && $payment->due_date && $payment->due_date->isPast();
             @endphp
-            <div class="bg-surface-container-lowest border {{ $isOverdue ? 'border-red-300' : 'border-outline-variant/50' }} rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow {{ $isOverdue ? 'bg-red-50/30' : '' }}">
+            <div class="bg-surface-container-lowest border {{ $isOverdue ? 'border-red-300' : 'border-outline-variant/50' }} rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow {{ $isOverdue ? 'bg-red-50/30' : '' }}">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div class="flex items-center gap-4">
-                        <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
-                            <span class="material-symbols-outlined">receipt</span>
+                    <div class="flex items-center gap-3 sm:gap-4">
+                        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-surface-container flex items-center justify-center text-on-surface shrink-0">
+                            <span class="material-symbols-outlined text-[20px] sm:text-[24px]">receipt</span>
                         </div>
-                        <div>
-                            <div class="flex items-center gap-2 mb-1">
-                                <p class="font-headline text-base font-semibold text-on-surface">
+                        <div class="min-w-0">
+                            <div class="flex flex-wrap items-center gap-2 mb-1">
+                                <p class="font-headline text-sm sm:text-base font-semibold text-on-surface truncate">
                                     {{ $payment->contract->transaction->room->boardingHouse->name ?? 'Sewa Kos' }}
                                 </p>
-                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold border border-primary/30">
+                                <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold border border-primary/30 whitespace-nowrap">
                                     Bulan ke-{{ $payment->billing_month }}
                                 </span>
                             </div>
-                            <p class="font-body text-sm text-on-surface-variant">
+                            <p class="font-body text-xs sm:text-sm text-on-surface-variant truncate">
                                 {{ $payment->contract->transaction->room->type_name ?? '—' }}
                             </p>
-                            <p class="font-body text-xs text-on-surface-variant mt-1">
+                            <p class="font-body text-[10px] sm:text-xs text-on-surface-variant mt-1 hidden sm:block">
                                 Periode: {{ $payment->contract->start_date->translatedFormat('d M Y') }} — {{ $payment->contract->end_date->translatedFormat('d M Y') }}
                             </p>
-                            <p class="font-label text-xs {{ $isOverdue ? 'text-red-600 font-semibold' : 'text-on-surface-variant' }} mt-1">
+                            <p class="font-label text-[10px] sm:text-xs {{ $isOverdue ? 'text-red-600 font-semibold' : 'text-on-surface-variant' }} mt-1">
                                 @if($isOverdue)
-                                    <span class="material-symbols-outlined text-[14px] align-middle">warning</span>
+                                    <span class="material-symbols-outlined text-[12px] sm:text-[14px] align-middle">warning</span>
                                     Jatuh tempo: {{ $payment->due_date->translatedFormat('d M Y') }} (Terlambat)
                                 @else
                                     Jatuh tempo: {{ $payment->due_date->translatedFormat('d M Y') }}
                                 @endif
                             </p>
-                            <p class="font-label text-xs text-on-surface-variant mt-1">
+                            <p class="font-label text-[10px] sm:text-xs text-on-surface-variant mt-1 hidden sm:block">
                                 No. Kontrak: {{ $payment->contract->contract_number }}
                             </p>
                         </div>
                     </div>
                     <div class="flex flex-col sm:items-end gap-2">
-                        <p class="font-headline text-xl font-bold text-on-surface">
+                        <p class="font-headline text-lg sm:text-xl font-bold text-on-surface">
                             Rp {{ number_format($payment->amount, 0, ',', '.') }}
                         </p>
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border self-start sm:self-auto {{ $statusConfig['class'] }}">
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-xs font-semibold border self-start sm:self-auto {{ $statusConfig['class'] }}">
                             <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
                             {{ $statusConfig['label'] }}
                         </span>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-outline-variant/30 flex items-center justify-between">
-                    <div class="flex items-center gap-2 text-on-surface-variant">
+                <div class="mt-4 pt-4 border-t border-outline-variant/30 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                    <div class="flex flex-wrap items-center gap-2 text-on-surface-variant text-[10px] sm:text-xs">
                         @if($payment->payment_method)
-                        <span class="material-symbols-outlined text-[16px]">credit_card</span>
-                        <span class="font-label text-xs">Metode: {{ strtoupper($payment->payment_method) }}</span>
-                        <span class="mx-2 text-outline-variant">·</span>
+                        <span class="material-symbols-outlined text-[14px] sm:text-[16px]">credit_card</span>
+                        <span class="font-label">Metode: {{ strtoupper($payment->payment_method) }}</span>
+                        <span class="mx-1 sm:mx-2 text-outline-variant hidden sm:inline">·</span>
                         @endif
                         @if($payment->paid_at)
-                        <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                        <span class="font-label text-xs">Dibayar: {{ $payment->paid_at->translatedFormat('d M Y, H:i') }} WIB</span>
+                        <span class="material-symbols-outlined text-[14px] sm:text-[16px]">check_circle</span>
+                        <span class="font-label">Dibayar: {{ $payment->paid_at->translatedFormat('d M Y, H:i') }} WIB</span>
                         @else
-                        <span class="material-symbols-outlined text-[16px]">schedule</span>
-                        <span class="font-label text-xs">Dibuat: {{ $payment->created_at->translatedFormat('d M Y, H:i') }} WIB</span>
+                        <span class="material-symbols-outlined text-[14px] sm:text-[16px]">schedule</span>
+                        <span class="font-label">Dibuat: {{ $payment->created_at->translatedFormat('d M Y, H:i') }} WIB</span>
                         @endif
                     </div>
                     @if($statusConfig['showButton'])
                     <a href="{{ route('tenant.payment.checkout', $payment->id) }}" 
-                       class="inline-flex items-center gap-2 px-4 py-2 {{ $isOverdue ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90' }} text-on-primary rounded-full font-label text-xs font-semibold transition-colors shadow-sm">
-                        <span class="material-symbols-outlined text-[16px]">payment</span>
-                        {{ $isOverdue ? 'Bayar Sekarang (Terlambat)' : 'Bayar Sekarang' }}
+                       class="inline-flex items-center justify-center gap-2 px-4 py-2 {{ $isOverdue ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90' }} text-on-primary rounded-full font-label text-xs font-semibold transition-colors shadow-sm whitespace-nowrap">
+                        <span class="material-symbols-outlined text-[14px] sm:text-[16px]">payment</span>
+                        <span class="hidden sm:inline">{{ $isOverdue ? 'Bayar Sekarang (Terlambat)' : 'Bayar Sekarang' }}</span>
+                        <span class="sm:hidden">Bayar</span>
                     </a>
                     @endif
                 </div>

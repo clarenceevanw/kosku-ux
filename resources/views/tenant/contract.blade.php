@@ -68,7 +68,7 @@
             </div>
 
             {{-- Contract Details Grid --}}
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pb-8 border-b border-outline-variant/30">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 pb-8 border-b border-outline-variant/30">
                 <div>
                     <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-1">Mulai Sewa</p>
                     <p class="font-body text-base font-semibold text-on-surface">
@@ -92,16 +92,16 @@
             </div>
 
             {{-- Financial Details --}}
-            <div class="grid grid-cols-2 gap-6 py-8 border-b border-outline-variant/30">
-                <div class="bg-surface-container rounded-xl p-5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 py-8 border-b border-outline-variant/30">
+                <div class="bg-surface-container rounded-xl p-4 sm:p-5">
                     <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-2">Biaya Bulanan</p>
-                    <p class="font-headline text-2xl font-bold text-on-surface">
+                    <p class="font-headline text-xl sm:text-2xl font-bold text-on-surface">
                         Rp {{ number_format($contract->monthly_fee, 0, ',', '.') }}
                     </p>
                 </div>
-                <div class="bg-surface-container rounded-xl p-5">
+                <div class="bg-surface-container rounded-xl p-4 sm:p-5">
                     <p class="font-label text-xs text-on-surface-variant uppercase tracking-wider mb-2">Deposit</p>
-                    <p class="font-headline text-2xl font-bold text-on-surface">
+                    <p class="font-headline text-xl sm:text-2xl font-bold text-on-surface">
                         Rp {{ number_format($contract->deposit_fee, 0, ',', '.') }}
                     </p>
                 </div>
