@@ -151,10 +151,10 @@
                     <ul class="flex flex-col gap-3">
                         @foreach($boardingHouse['rules'] as $rule)
                         <li class="flex items-start gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                            <span class="material-symbols-outlined text-[#111827] mt-0.5 text-[20px]">do_not_disturb</span>
+                            <span class="material-symbols-outlined text-[#111827] mt-0.5 text-[20px]">{{ $rule['icon'] ?? 'do_not_disturb' }}</span>
                             <div>
                                 <h4 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-1">{{ $rule['category'] }}</h4>
-                                <p class="text-sm text-gray-600">{{ $rule['rule_text'] }}</p>
+                                <p class="text-sm text-gray-600">{{ $rule['name'] }}</p>
                             </div>
                         </li>
                         @endforeach
