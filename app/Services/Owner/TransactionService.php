@@ -3,7 +3,7 @@
 namespace App\Services\Owner;
 
 use App\Models\BoardingHouse;
-use App\Models\Transaction;
+use App\Models\Contract;
 use Illuminate\Http\Request;
 
 class TransactionService
@@ -30,10 +30,10 @@ class TransactionService
             $selectedKos = $boardingHouses->first();
         }
 
-        $transactions = Transaction::whereHas('room.boardingHouse', function($q) use ($ownerId, $selectedKos) {
+        $transactions = Contract::whereHas('room.boardingHouse', function($q) use ($ownerId, $selectedKos) {
             $q->where('owner_id', $ownerId)->where('id', $selectedKos->id);
         })
-        ->with(['tenant', 'room.boardingHouse', 'contract.monthlyPayments'])
+        ->with(['tenant', 'room.boardingHouse', 'monthlyPayments'])
         ->orderBy('created_at', 'desc')
         ->paginate(10);
 

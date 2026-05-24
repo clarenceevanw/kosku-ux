@@ -61,7 +61,7 @@ class FinanceService
         // 1. Total Pendapatan Bulan Ini (Paid in current month)
         $currentMonth = Carbon::now()->startOfMonth();
         
-        $totalIncome = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        $totalIncome = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId)->where('id', $kosId);
         })
         ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
@@ -69,7 +69,7 @@ class FinanceService
         ->sum('amount');
 
         // 2. Tagihan Pending
-        $pendingBillsQuery = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        $pendingBillsQuery = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId)->where('id', $kosId);
         })
         ->where('payment_status', \App\Enum\PaymentStatus::PENDING->value);
@@ -78,7 +78,7 @@ class FinanceService
         $pendingBillsCount = $pendingBillsQuery->count();
 
         // 3. Total Penyewa Aktif
-        $activeTenantsCount = Contract::whereHas('transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        $activeTenantsCount = Contract::whereHas('room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId)->where('id', $kosId);
         })
         ->where('status', \App\Enum\ContractStatus::ACTIVE->value)
@@ -111,7 +111,7 @@ class FinanceService
             $start = $date->copy()->startOfMonth();
             $end = $date->copy()->endOfMonth();
 
-            $income = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+            $income = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
                 $q->where('owner_id', $ownerId)->where('id', $kosId);
             })
             ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
@@ -137,11 +137,11 @@ class FinanceService
 
     private function getPendingBills(string $ownerId, string $kosId)
     {
-        return MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        return MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId)->where('id', $kosId);
         })
         ->where('payment_status', \App\Enum\PaymentStatus::PENDING->value)
-        ->with(['contract.transaction.room', 'contract.transaction.tenant'])
+        ->with(['contract.room', 'contract.tenant'])
         ->orderBy('due_date', 'asc')
         ->paginate(10);
     }

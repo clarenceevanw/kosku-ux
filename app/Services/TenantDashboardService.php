@@ -7,7 +7,7 @@ use App\Enum\PaymentStatus;
 use App\Enum\TicketStatus;
 use App\Models\MaintenanceTicket;
 use App\Models\MonthlyPayment;
-use App\Models\Transaction;
+use App\Models\Contract;
 use App\Models\User;
 use Illuminate\Support\Carbon;
 
@@ -30,7 +30,7 @@ class TenantDashboardService
      * @param  \App\Models\User  $tenant  The authenticated tenant user.
      * @param  \App\Models\Transaction|null  $selectedContract  The selected active contract.
      */
-    public function getDashboardData(User $tenant, ?Transaction $selectedContract = null): array
+    public function getDashboardData(User $tenant, ?Contract $selectedContract = null): array
     {
         $upcomingPayment = $selectedContract ? $this->getUpcomingPaymentForContract($selectedContract) : null;
         $recentTickets   = $selectedContract ? $this->getRecentTicketsForContract($tenant, $selectedContract) : collect();
@@ -43,19 +43,16 @@ class TenantDashboardService
      * Get the tenant's active contract with all eager-loaded relationships needed
      * for the dashboard overview card (room, boarding house, owner).
      */
-    public function getActiveContract(User $tenant): ?Transaction
+    public function getActiveContract(User $tenant): ?Contract
     {
-        return $tenant->transactions()
+        return $tenant->contracts()
             ->with([
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
                 'room.boardingHouse:id,owner_id,name,address,city,province',
                 'room.boardingHouse.owner:id,name,phone_number',
                 'room.boardingHouse.rules:id,category,name',
-                'contract',
             ])
-            ->whereHas('contract', function ($query) {
-                $query->where('status', ContractStatus::ACTIVE->value);
-            })
+            ->where('status', ContractStatus::ACTIVE->value)
             ->latest()
             ->first();
     }
@@ -65,15 +62,12 @@ class TenantDashboardService
      */
     public function getAllActiveContracts(User $tenant): \Illuminate\Database\Eloquent\Collection
     {
-        return $tenant->transactions()
+        return $tenant->contracts()
             ->with([
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
                 'room.boardingHouse:id,owner_id,name,address,city,province',
-                'contract',
             ])
-            ->whereHas('contract', function ($query) {
-                $query->where('status', ContractStatus::ACTIVE->value);
-            })
+            ->where('status', ContractStatus::ACTIVE->value)
             ->latest()
             ->get();
     }
@@ -85,12 +79,7 @@ class TenantDashboardService
     public function getPaymentHistory(User $tenant): \Illuminate\Database\Eloquent\Collection
     {
         // Get all contracts for this tenant
-        $contractIds = $tenant->transactions()
-            ->whereHas('contract')
-            ->with('contract:id')
-            ->get()
-            ->pluck('contract.id')
-            ->filter();
+        $contractIds = $tenant->contracts()->pluck('id')->filter();
         
         if ($contractIds->isEmpty()) {
             return new \Illuminate\Database\Eloquent\Collection();
@@ -98,10 +87,9 @@ class TenantDashboardService
         
         return MonthlyPayment::whereIn('contract_id', $contractIds)
             ->with([
-                'contract:id,transaction_id,contract_number,start_date,end_date,status,monthly_fee',
-                'contract.transaction:id,room_id',
-                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.transaction.room.boardingHouse:id,name,city',
+                'contract:id,room_id,contract_number,start_date,end_date,status,monthly_fee',
+                'contract.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.room.boardingHouse:id,name,city',
             ])
             ->orderBy('due_date', 'desc')
             ->get();
@@ -111,21 +99,13 @@ class TenantDashboardService
      * Get payment history for a specific contract.
      * Returns monthly payments for the selected contract.
      */
-    public function getPaymentHistoryForContract(Transaction $transaction): \Illuminate\Database\Eloquent\Collection
+    public function getPaymentHistoryForContract(Contract $contract): \Illuminate\Database\Eloquent\Collection
     {
-        // Get the actual contract from the transaction
-        $actualContract = $transaction->contract;
-        
-        if (!$actualContract) {
-            return new \Illuminate\Database\Eloquent\Collection();
-        }
-        
-        return MonthlyPayment::where('contract_id', $actualContract->id)
+        return MonthlyPayment::where('contract_id', $contract->id)
             ->with([
-                'contract:id,transaction_id,contract_number,start_date,end_date,status,monthly_fee',
-                'contract.transaction:id,room_id',
-                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.transaction.room.boardingHouse:id,name,city',
+                'contract:id,room_id,contract_number,start_date,end_date,status,monthly_fee',
+                'contract.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.room.boardingHouse:id,name,city',
             ])
             ->orderBy('due_date', 'desc')
             ->get();
@@ -141,12 +121,7 @@ class TenantDashboardService
         $thirtyOneDaysFromNow = Carbon::now()->addDays(31);
         
         // Get all contracts for this tenant
-        $contractIds = $tenant->transactions()
-            ->whereHas('contract')
-            ->with('contract:id')
-            ->get()
-            ->pluck('contract.id')
-            ->filter();
+        $contractIds = $tenant->contracts()->pluck('id')->filter();
         
         if ($contractIds->isEmpty()) {
             return null;
@@ -154,10 +129,9 @@ class TenantDashboardService
         
         return MonthlyPayment::whereIn('contract_id', $contractIds)
             ->with([
-                'contract:id,transaction_id,contract_number,start_date,end_date,monthly_fee',
-                'contract.transaction:id,room_id',
-                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.transaction.room.boardingHouse:id,name',
+                'contract:id,room_id,contract_number,start_date,end_date,monthly_fee',
+                'contract.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.room.boardingHouse:id,name',
             ])
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->where('due_date', '<=', $thirtyOneDaysFromNow)
@@ -170,23 +144,15 @@ class TenantDashboardService
      * Returns the next due monthly payment for this contract.
      * Only returns payments due within 31 days.
      */
-    public function getUpcomingPaymentForContract(Transaction $transaction): ?MonthlyPayment
+    public function getUpcomingPaymentForContract(Contract $contract): ?MonthlyPayment
     {
-        // Get the actual contract from the transaction
-        $actualContract = $transaction->contract;
-        
-        if (!$actualContract) {
-            return null;
-        }
-        
         $thirtyOneDaysFromNow = Carbon::now()->addDays(31);
         
-        return MonthlyPayment::where('contract_id', $actualContract->id)
+        return MonthlyPayment::where('contract_id', $contract->id)
             ->with([
-                'contract:id,transaction_id,contract_number,start_date,end_date,monthly_fee',
-                'contract.transaction:id,room_id',
-                'contract.transaction.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.transaction.room.boardingHouse:id,name',
+                'contract:id,room_id,contract_number,start_date,end_date,monthly_fee',
+                'contract.room:id,boarding_house_id,type_name,price_per_month',
+                'contract.room.boardingHouse:id,name',
             ])
             ->where('payment_status', PaymentStatus::PENDING->value)
             ->where('due_date', '<=', $thirtyOneDaysFromNow)
@@ -217,7 +183,7 @@ class TenantDashboardService
     /**
      * Get maintenance tickets for a specific contract.
      */
-    public function getTicketsForContract(User $tenant, Transaction $contract, ?string $status = null): \Illuminate\Database\Eloquent\Collection
+    public function getTicketsForContract(User $tenant, Contract $contract, ?string $status = null): \Illuminate\Database\Eloquent\Collection
     {
         $query = $tenant->maintenanceTickets()
             ->where('room_id', $contract->room_id)
@@ -250,7 +216,7 @@ class TenantDashboardService
     /**
      * Get the 3 most recent maintenance tickets for a specific contract.
      */
-    public function getRecentTicketsForContract(User $tenant, Transaction $contract): \Illuminate\Database\Eloquent\Collection
+    public function getRecentTicketsForContract(User $tenant, Contract $contract): \Illuminate\Database\Eloquent\Collection
     {
         return $tenant->maintenanceTickets()
             ->where('room_id', $contract->room_id)
@@ -280,7 +246,7 @@ class TenantDashboardService
     /**
      * Get aggregated ticket statistics for a specific contract.
      */
-    public function getTicketStatsForContract(User $tenant, Transaction $contract): array
+    public function getTicketStatsForContract(User $tenant, Contract $contract): array
     {
         $base = $tenant->maintenanceTickets()->where('room_id', $contract->room_id);
 
@@ -309,13 +275,13 @@ class TenantDashboardService
      * Calculate the remaining time on a contract in a human-readable format.
      * Returns null if no active contract exists.
      */
-    public function getRemainingTime(?Transaction $transaction): ?string
+    public function getRemainingTime(?Contract $contract): ?string
     {
-        if (! $transaction?->contract) {
+        if (! $contract) {
             return null;
         }
 
-        $endDate = Carbon::parse($transaction->contract->end_date);
+        $endDate = Carbon::parse($contract->end_date);
         $now     = Carbon::now();
 
         if ($endDate->isPast()) {
@@ -336,14 +302,14 @@ class TenantDashboardService
      * Calculate the total duration of a contract in months.
      * Uses ceiling to count partial months as full months.
      */
-    public function getContractDurationMonths(?Transaction $transaction): ?int
+    public function getContractDurationMonths(?Contract $contract): ?int
     {
-        if (! $transaction?->contract) {
+        if (! $contract) {
             return null;
         }
 
-        $start = Carbon::parse($transaction->contract->start_date);
-        $end   = Carbon::parse($transaction->contract->end_date);
+        $start = Carbon::parse($contract->start_date);
+        $end   = Carbon::parse($contract->end_date);
 
         // Add 1 day to end date to include the last day in calculation
         $end = $end->copy()->addDay();
