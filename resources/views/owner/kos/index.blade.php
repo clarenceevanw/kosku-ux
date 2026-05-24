@@ -98,7 +98,7 @@
                                 Terisi</p>
                         </div>
                         <div class="flex gap-3 pt-2">
-                            <a href="#"
+                            <a href="{{ route('owner.rooms.index', ['kos_id' => $kos->id]) }}"
                                 class="flex-grow bg-primary text-on-primary py-3.5 rounded-full font-bold text-sm hover:bg-black/80 transition-all flex items-center justify-center gap-2">
                                 <span class="material-symbols-outlined text-sm">room_preferences</span>
                                 Kelola Kamar
