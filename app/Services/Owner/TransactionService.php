@@ -43,4 +43,37 @@ class TransactionService
             'transactions' => $transactions,
         ];
     }
+
+    public function approveContract(string $ownerId, string $contractId): Contract
+    {
+        $contract = Contract::whereHas('room.boardingHouse', function($q) use ($ownerId) {
+            $q->where('owner_id', $ownerId);
+        })->findOrFail($contractId);
+
+        if ($contract->status->value !== 'pending' && $contract->status !== 'pending') {
+            throw new \Exception('Hanya kontrak pending yang dapat disetujui.');
+        }
+
+        // Get the first monthly payment
+        $firstPayment = $contract->monthlyPayments()->where('billing_month', 1)->first();
+        
+        if (!$firstPayment || !in_array($firstPayment->payment_status->value ?? $firstPayment->payment_status, ['paid_to_escrow'])) {
+            throw new \Exception('Pembayaran awal harus berstatus Escrow sebelum disetujui.');
+        }
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($contract, $firstPayment) {
+            // Update contract
+            $contract->update([
+                'status' => \App\Enum\ContractStatus::ACTIVE->value,
+                'owner_signature_date' => now(),
+            ]);
+
+            // Release escrow
+            $firstPayment->update([
+                'payment_status' => \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value,
+            ]);
+        });
+
+        return $contract;
+    }
 }

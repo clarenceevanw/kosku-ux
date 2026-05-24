@@ -174,13 +174,20 @@
                 {{-- Payment status badge --}}
                 <div class="mt-3">
                     @php
-                        $statusLabel = match($upcomingPayment->payment_status->value ?? $upcomingPayment->payment_status) {
-                            'pending'           => ['label' => 'Menunggu Pembayaran', 'class' => 'bg-amber-50 text-amber-700 border-amber-200'],
-                            'paid_to_escrow'    => ['label' => 'Dalam Escrow', 'class' => 'bg-blue-50 text-blue-700 border-blue-200'],
-                            'released_to_owner' => ['label' => 'Lunas', 'class' => 'bg-green-50 text-green-700 border-green-200'],
-                            'cancelled'         => ['label' => 'Dibatalkan', 'class' => 'bg-red-50 text-red-700 border-red-200'],
-                            default             => ['label' => 'Tidak Diketahui', 'class' => 'bg-gray-50 text-gray-700 border-gray-200'],
-                        };
+                        $paymentStatus = $upcomingPayment->payment_status->value ?? $upcomingPayment->payment_status;
+                        $contractStatus = $upcomingPayment->contract->status->value ?? $upcomingPayment->contract->status;
+                        
+                        if ($paymentStatus === 'paid_to_escrow' && $contractStatus === 'pending') {
+                            $statusLabel = ['label' => 'Menunggu Persetujuan Owner', 'class' => 'bg-blue-50 text-blue-700 border-blue-200'];
+                        } else {
+                            $statusLabel = match($paymentStatus) {
+                                'pending'           => ['label' => 'Menunggu Pembayaran', 'class' => 'bg-amber-50 text-amber-700 border-amber-200'],
+                                'paid_to_escrow'    => ['label' => 'Dalam Escrow', 'class' => 'bg-blue-50 text-blue-700 border-blue-200'],
+                                'released_to_owner' => ['label' => 'Lunas', 'class' => 'bg-green-50 text-green-700 border-green-200'],
+                                'cancelled'         => ['label' => 'Dibatalkan', 'class' => 'bg-red-50 text-red-700 border-red-200'],
+                                default             => ['label' => 'Tidak Diketahui', 'class' => 'bg-gray-50 text-gray-700 border-gray-200'],
+                            };
+                        }
                     @endphp
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border {{ $statusLabel['class'] }}">
                         <span class="w-1.5 h-1.5 rounded-full bg-current"></span>

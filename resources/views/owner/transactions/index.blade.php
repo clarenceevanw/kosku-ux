@@ -4,6 +4,16 @@
 
 @section('content')
     <div class="space-y-10" x-data="transactionManager()">
+        @if(session('success'))
+            <div class="mb-4 p-4 bg-green-100 text-green-800 rounded-xl font-bold">
+                {{ session('success') }}
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="mb-4 p-4 bg-red-100 text-red-800 rounded-xl font-bold">
+                {{ session('error') }}
+            </div>
+        @endif
         <!-- Page Header & Filter -->
         <header class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
             <div class="flex-grow">
@@ -369,6 +379,16 @@
                                     class="px-6 py-4 border-t border-outline-variant/50 bg-surface-container-lowest sticky bottom-0 z-10 flex gap-3">
                                     <button @click="closeDetails()"
                                         class="flex-1 px-4 py-3 border border-outline-variant rounded-xl font-bold text-on-surface hover:bg-surface-container transition-colors">Tutup</button>
+                                    
+                                    <template x-if="selectedTransaction?.contract_status === 'pending' && selectedTransaction?.payment_status === 'paid_to_escrow'">
+                                        <form :action="`/owner/pemesanan/${selectedTransaction.id}/approve`" method="POST" class="flex-1">
+                                            @csrf
+                                            <button type="submit"
+                                                class="w-full h-full px-4 py-3 bg-primary text-on-primary rounded-xl font-bold hover:bg-primary/90 transition-colors shadow-sm">
+                                                Setujui & Tanda Tangan
+                                            </button>
+                                        </form>
+                                    </template>
                                 </div>
                             </div>
                         </div>

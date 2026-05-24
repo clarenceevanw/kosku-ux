@@ -126,9 +126,7 @@ class TenantDashboardController extends Controller
         // Use billing service to mark as paid
         $this->billingService->markAsPaid($payment, $paymentMethod);
 
-        if ($payment->billing_month === 1) {
-            $payment->contract->update(['status' => \App\Enum\ContractStatus::ACTIVE->value]);
-        }
+        // Remove auto-activation. Contract stays PENDING until Owner approves it.
 
         return redirect()
             ->route('tenant.payments')

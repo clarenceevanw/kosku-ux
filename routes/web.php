@@ -88,6 +88,7 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     
     // Pemesanan
     Route::get('/pemesanan', [\App\Http\Controllers\Owner\TransactionController::class, 'index'])->name('transactions.index');
+    Route::post('/pemesanan/{id}/approve', [\App\Http\Controllers\Owner\TransactionController::class, 'approve'])->name('transactions.approve');
 
     // Keuangan
     Route::get('/keuangan', [\App\Http\Controllers\Owner\FinanceController::class, 'index'])->name('keuangan.index');
