@@ -140,7 +140,7 @@
                     Rp {{ number_format($upcomingPayment->amount, 0, ',', '.') }}
                 </p>
                 <p class="font-body text-base text-on-surface-variant">
-                    {{ $upcomingPayment->contract->transaction->room->boardingHouse->name ?? 'Sewa Bulanan' }}
+                    {{ $upcomingPayment->contract->room->boardingHouse->name ?? 'Sewa Bulanan' }}
                     <span class="inline-block ml-2 bg-primary/10 text-primary px-2 py-0.5 rounded-full text-xs font-bold border border-primary/30">
                         Bulan ke-{{ $upcomingPayment->billing_month }}
                     </span>

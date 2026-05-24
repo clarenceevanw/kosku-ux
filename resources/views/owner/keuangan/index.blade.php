@@ -141,7 +141,7 @@
                                     ->startOfDay()
                                     ->greaterThan($bill->due_date->startOfDay());
                                 $initials = collect(
-                                    explode(' ', $bill->contract->transaction->tenant->name ?? 'Unknown'),
+                                    explode(' ', $bill->contract->tenant->name ?? 'Unknown'),
                                 )
                                     ->map(fn($n) => substr($n, 0, 1))
                                     ->take(2)
@@ -156,11 +156,11 @@
                                             {{ strtoupper($initials) }}
                                         </div>
                                         <p class="font-bold text-on-surface">
-                                            {{ $bill->contract->transaction->tenant->name ?? 'Unknown' }}</p>
+                                            {{ $bill->contract->tenant->name ?? 'Unknown' }}</p>
                                     </div>
                                 </td>
                                 <td class="px-6 py-5 text-on-surface-variant">
-                                    {{ $bill->contract->transaction->room->type_name ?? '-' }}</td>
+                                    {{ $bill->contract->room->type_name ?? '-' }}</td>
                                 <td class="px-6 py-5 text-on-surface-variant">{{ $bill->due_date->format('d M Y') }}</td>
                                 <td class="px-6 py-5 font-bold text-on-surface">Rp
                                     {{ number_format($bill->amount, 0, ',', '.') }}</td>

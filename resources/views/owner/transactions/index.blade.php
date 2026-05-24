@@ -58,6 +58,13 @@
                     </thead>
                     <tbody class="divide-y divide-surface-container">
                         @forelse ($transactions as $transaction)
+                            @php
+                                $firstPayment = $transaction->monthlyPayments->first();
+                                $totalAmount = $firstPayment ? $firstPayment->amount : ($transaction->deposit_fee + $transaction->monthly_fee);
+                                $paymentStatus = $firstPayment ? ($firstPayment->payment_status->value ?? $firstPayment->payment_status) : 'pending';
+                                $paymentMethod = $firstPayment ? $firstPayment->payment_method : null;
+                                $contractStatus = $transaction->status->value ?? $transaction->status;
+                            @endphp
                             <tr class="hover:bg-surface-container-lowest/80 transition-colors group">
                                 <td class="px-6 py-4">
                                     <div class="flex items-center gap-3">
@@ -81,9 +88,7 @@
                                         $duration = \Carbon\Carbon::parse($transaction->start_date)->diffInMonths(
                                             \Carbon\Carbon::parse($transaction->end_date)->addDay(),
                                         );
-                                        if ($duration == 0) {
-                                            $duration = 1;
-                                        }
+                                        $duration = max(1, (int) round($duration));
                                     @endphp
                                     <p class="text-xs text-on-surface-variant">Durasi:
                                         {{ $duration }} Bulan</p>
@@ -94,19 +99,19 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <p class="font-bold text-on-surface">Rp
-                                        {{ number_format($transaction->total_amount, 0, ',', '.') }}</p>
+                                        {{ number_format($totalAmount, 0, ',', '.') }}</p>
                                     <p class="text-xs text-on-surface-variant capitalize">
-                                        {{ str_replace('_', ' ', $transaction->payment_method ?? 'transfer') }}</p>
+                                        {{ str_replace('_', ' ', $paymentMethod ?? 'transfer') }}</p>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if ($transaction->payment_status->value === 'pending')
+                                    @if ($paymentStatus === 'pending')
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-error-container text-error">
                                             Belum Bayar
                                         </span>
                                     @elseif (
-                                        $transaction->payment_status->value === 'paid_to_escrow' ||
-                                            $transaction->payment_status->value === 'released_to_owner')
+                                        $paymentStatus === 'paid_to_escrow' ||
+                                            $paymentStatus === 'released_to_owner')
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800">
                                             Sudah Bayar
@@ -114,7 +119,7 @@
                                     @else
                                         <span
                                             class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-surface-container-high text-on-surface">
-                                            {{ ucfirst(str_replace('_', ' ', $transaction->payment_status->value)) }}
+                                            {{ ucfirst(str_replace('_', ' ', $paymentStatus)) }}
                                         </span>
                                     @endif
                                 </td>
@@ -127,16 +132,16 @@
                                             'room_name' => $transaction->room->type_name ?? 'Unknown',
                                             'start_date' => $transaction->start_date->format('d M Y'),
                                             'end_date' => $transaction->end_date->format('d M Y'),
-                                            'total_amount' => 'Rp ' . number_format($transaction->total_amount, 0, ',', '.'),
-                                            'payment_status' => $transaction->payment_status->value,
-                                            'payment_method' => $transaction->payment_method,
-                                            'contract_status' => $transaction->contract ? $transaction->contract->status : 'Belum Dibuat',
-                                            'monthly_payments' => $transaction->contract
-                                                ? $transaction->contract->monthlyPayments->map(
+                                            'total_amount' => 'Rp ' . number_format($totalAmount, 0, ',', '.'),
+                                            'payment_status' => $paymentStatus,
+                                            'payment_method' => $paymentMethod,
+                                            'contract_status' => $contractStatus,
+                                            'monthly_payments' => $transaction->monthlyPayments
+                                                ? $transaction->monthlyPayments->map(
                                                         fn($mp) => [
-                                                            'month' => \Carbon\Carbon::parse($mp->month)->format('M Y'),
+                                                            'month' => \Carbon\Carbon::parse($mp->due_date ?? now())->format('M Y'),
                                                             'amount' => 'Rp ' . number_format($mp->amount, 0, ',', '.'),
-                                                            'status' => $mp->payment_status->value,
+                                                            'status' => $mp->payment_status->value ?? $mp->payment_status,
                                                         ],
                                                     )->toArray()
                                                 : [],

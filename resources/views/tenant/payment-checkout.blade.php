@@ -13,7 +13,7 @@
             </a>
             <div class="flex flex-col">
                 <span class="font-headline text-lg font-semibold text-on-surface">Pembayaran</span>
-                <span class="font-body text-sm text-on-surface-variant">{{ $payment->contract->transaction->room->boardingHouse->name }} - {{ $payment->contract->transaction->room->type_name }}</span>
+                <span class="font-body text-sm text-on-surface-variant">{{ $payment->contract->room->boardingHouse->name }} - {{ $payment->contract->room->type_name }}</span>
             </div>
         </div>
         <div class="hidden md:flex items-center gap-2 bg-surface-container px-4 py-2 rounded-full">
@@ -185,8 +185,8 @@
         <div class="w-full lg:w-1/3">
             <div class="sticky top-[88px] bg-surface-container-lowest rounded-[2rem] shadow-sm border border-outline-variant p-4 sm:p-6 md:p-8 flex flex-col gap-6">
                 <div>
-                    <h3 class="font-headline text-xl font-semibold text-on-surface mb-1">{{ $payment->contract->transaction->room->boardingHouse->name }}</h3>
-                    <p class="font-body text-sm text-on-surface-variant mb-4">{{ $payment->contract->transaction->room->type_name }} • Mulai {{ $payment->contract->start_date->translatedFormat('d M Y') }}</p>
+                    <h3 class="font-headline text-xl font-semibold text-on-surface mb-1">{{ $payment->contract->room->boardingHouse->name }}</h3>
+                    <p class="font-body text-sm text-on-surface-variant mb-4">{{ $payment->contract->room->type_name }} • Mulai {{ $payment->contract->start_date->translatedFormat('d M Y') }}</p>
                     <div class="bg-primary/10 border border-primary/30 rounded-lg p-3 mb-4">
                         <p class="font-label text-xs text-primary font-semibold mb-1">TAGIHAN BULAN KE-{{ $payment->billing_month }}</p>
                         <p class="font-body text-xs text-on-surface-variant">

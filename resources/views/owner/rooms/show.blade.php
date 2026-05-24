@@ -14,7 +14,7 @@
                 <h2 class="font-display text-4xl md:text-5xl font-extrabold tracking-tighter text-primary">Kelola Unit: {{ $room->type_name }}</h2>
             </div>
             <p class="font-body text-base text-on-surface-variant mt-2 ml-14">
-                {{ $room->boardingHouse->name }} &bull; Rp {{ number_format($room->price_per_month, 0, ',', '.') }}/bulan &bull; {{ $room->transactions->count() }}/{{ $room->stock }} Unit Terisi
+                {{ $room->boardingHouse->name }} &bull; Rp {{ number_format($room->price_per_month, 0, ',', '.') }}/bulan &bull; {{ $room->contracts->count() }}/{{ $room->stock }} Unit Terisi
             </p>
         </div>
     </header>
@@ -39,20 +39,20 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-outline-variant/30">
-                        @forelse($room->transactions as $transaction)
+                        @forelse($room->contracts as $contract)
                             <tr class="hover:bg-surface-container-low transition-colors">
                                 <td class="px-6 py-6">
-                                    <span class="font-display font-bold text-lg text-primary">{{ $transaction->tenant->name }}</span>
-                                    <p class="text-xs text-on-surface-variant font-body">{{ $transaction->tenant->email }}</p>
+                                    <span class="font-display font-bold text-lg text-primary">{{ $contract->tenant->name }}</span>
+                                    <p class="text-xs text-on-surface-variant font-body">{{ $contract->tenant->email }}</p>
                                 </td>
                                 <td class="px-6 py-6 font-body font-semibold text-primary">
-                                    {{ $transaction->contract->contract_number ?? '-' }}
+                                    {{ $contract->contract_number ?? '-' }}
                                 </td>
                                 <td class="px-6 py-6 font-body text-on-surface">
-                                    {{ $transaction->start_date ? $transaction->start_date->format('d M Y') : '-' }}
+                                    {{ $contract->start_date ? $contract->start_date->format('d M Y') : '-' }}
                                 </td>
                                 <td class="px-6 py-6 font-body text-on-surface">
-                                    {{ $transaction->end_date ? $transaction->end_date->format('d M Y') : '-' }}
+                                    {{ $contract->end_date ? $contract->end_date->format('d M Y') : '-' }}
                                 </td>
                                 <td class="px-6 py-6 text-right">
                                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-700">

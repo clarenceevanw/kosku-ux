@@ -54,14 +54,14 @@
                         <div class="min-w-0">
                             <div class="flex flex-wrap items-center gap-2 mb-1">
                                 <p class="font-headline text-sm sm:text-base font-semibold text-on-surface truncate">
-                                    {{ $payment->contract->transaction->room->boardingHouse->name ?? 'Sewa Kos' }}
+                                    {{ $payment->contract->room->boardingHouse->name ?? 'Sewa Kos' }}
                                 </p>
                                 <span class="bg-primary/10 text-primary px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-bold border border-primary/30 whitespace-nowrap">
                                     Bulan ke-{{ $payment->billing_month }}
                                 </span>
                             </div>
                             <p class="font-body text-xs sm:text-sm text-on-surface-variant truncate">
-                                {{ $payment->contract->transaction->room->type_name ?? '—' }}
+                                {{ $payment->contract->room->type_name ?? '—' }}
                             </p>
                             <p class="font-body text-[10px] sm:text-xs text-on-surface-variant mt-1 hidden sm:block">
                                 Periode: {{ $payment->contract->start_date->translatedFormat('d M Y') }} — {{ $payment->contract->end_date->translatedFormat('d M Y') }}

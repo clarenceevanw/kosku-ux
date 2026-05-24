@@ -1,4 +1,4 @@
-@extends('layouts.tenant', ['activeContract' => $activeTransaction ?? null])
+@extends('layouts.tenant', ['activeContract' => $activeContract ?? null])
 
 @section('title', 'Buat Laporan Perbaikan')
 
@@ -19,7 +19,7 @@
     <div class="bg-surface-container-lowest rounded-[2rem] border border-outline-variant/50 p-8 md:p-12 shadow-sm">
         <form action="{{ route('tenant.tickets.store') }}" method="POST" enctype="multipart/form-data" class="flex flex-col gap-8">
             @csrf
-            <input type="hidden" name="room_id" value="{{ $activeTransaction->room_id }}">
+            <input type="hidden" name="room_id" value="{{ $activeContract->room_id }}">
 
             {{-- Title Input --}}
             <div class="flex flex-col gap-2">
@@ -34,7 +34,7 @@
                 <label class="font-label text-sm font-semibold tracking-wide text-on-surface" for="location">Properti / Unit</label>
                 <div class="relative">
                     <input type="text" class="w-full bg-surface-container-highest border-none rounded-xl px-4 py-3 text-on-surface font-semibold focus:outline-none cursor-not-allowed" 
-                           value="{{ $activeTransaction->room->boardingHouse->name }} - Kamar {{ $activeTransaction->room->type_name }}" disabled>
+                           value="{{ $activeContract->room->boardingHouse->name }} - Kamar {{ $activeContract->room->type_name }}" disabled>
                 </div>
             </div>
 
