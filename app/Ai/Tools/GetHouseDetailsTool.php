@@ -43,7 +43,7 @@ class GetHouseDetailsTool implements Tool
             $house = BoardingHouse::with([
                 'rooms.facilities:id,name',
                 'facilities:id,name',
-                'rules:id,boarding_house_id,category,rule_text',
+                'rules:id,category,name,icon',
                 'reviews:id,boarding_house_id,rating,comment',
                 'owner:id,name,phone_number',
             ])->findOrFail($boarding_house_id);
@@ -67,7 +67,7 @@ class GetHouseDetailsTool implements Tool
             'owner'       => $house->owner?->name,
             'owner_phone' => $house->owner?->phone_number,
             'facilities'  => $house->facilities->pluck('name'),
-            'rules'       => $house->rules->map(fn($r) => ['category' => $r->category, 'rule' => $r->rule_text]),
+            'rules'       => $house->rules->map(fn($r) => ['category' => $r->category, 'rule' => $r->name]),
             'rooms'       => $house->rooms->map(fn($room) => [
                 'type'         => $room->type_name,
                 'price'        => $room->price_per_month,
