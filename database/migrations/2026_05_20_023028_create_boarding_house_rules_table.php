@@ -9,10 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      * Table: boarding_house_rules
-     * Depends on: boarding_houses
      *
-     * 1-to-many: one boarding_house can have many categorised rules.
-     * Rules are grouped by category for UI display (e.g. "Akses & Keamanan").
+     * Many-to-many pivot linking boarding_houses → rules (master table).
+     * Replaces the old free-text category/rule_text approach.
+     *
+     * One boarding house can adopt many standard rules.
+     * The same rule can apply to many boarding houses.
      */
     public function up(): void
     {
@@ -23,10 +25,14 @@ return new class extends Migration
                   ->constrained('boarding_houses')
                   ->cascadeOnDelete();
 
-            $table->string('category')->comment('e.g. Akses & Keamanan, Tamu, Kebersihan');
-            $table->text('rule_text')->comment('Full detail of the rule');
+            $table->foreignUuid('rule_id')
+                  ->constrained('rules')
+                  ->cascadeOnDelete();
 
             $table->timestamps();
+
+            // Prevent the same rule from being attached twice
+            $table->unique(['boarding_house_id', 'rule_id']);
         });
     }
 

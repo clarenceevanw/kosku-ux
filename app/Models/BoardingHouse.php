@@ -24,8 +24,8 @@ class BoardingHouse extends Model
     {
         return [
             'gender_type' => GenderType::class,
-            'latitude' => 'decimal:7',
-            'longitude' => 'decimal:7',
+            'latitude'    => 'decimal:7',
+            'longitude'   => 'decimal:7',
         ];
     }
 
@@ -39,9 +39,15 @@ class BoardingHouse extends Model
         return $this->hasMany(Room::class);
     }
 
-    public function rules(): HasMany
+    /**
+     * Many-to-many: boarding house links to master Rule records via boarding_house_rules pivot.
+     */
+    public function rules(): BelongsToMany
     {
-        return $this->hasMany(BoardingHouseRule::class);
+        return $this->belongsToMany(Rule::class, 'boarding_house_rules')
+                    ->using(BoardingHouseRule::class)
+                    ->withPivot('id')
+                    ->withTimestamps();
     }
 
     public function facilities(): BelongsToMany
@@ -54,5 +60,13 @@ class BoardingHouse extends Model
     public function reviews(): HasMany
     {
         return $this->hasMany(Review::class);
+    }
+
+    /**
+     * Scope a query to only include boarding houses owned by a specific user.
+     */
+    public function scopeByOwner($query, int|string $ownerId)
+    {
+        return $query->where('owner_id', $ownerId);
     }
 }
