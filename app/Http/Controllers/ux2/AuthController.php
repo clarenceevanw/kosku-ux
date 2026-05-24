@@ -35,7 +35,7 @@ class AuthController extends Controller
         $role = Auth::user()->role->value;
 
         return match ($role) {
-            'owner'  => redirect()->intended(route('owner.dashboard')),
+            'owner'  => redirect()->intended(route('ux2.owner.dashboard')),
             'admin'  => redirect()->intended(route('admin.dashboard')),
             'tenant' => redirect()->intended(route('ux2.tenant.dashboard')),
             default  => redirect()->intended(route('ux2.home')),
@@ -44,7 +44,7 @@ class AuthController extends Controller
 
     /**
      * GET /login
-     * Show the combined Login / Register auth form.
+     * Show the Login form.
      */
     public function showAuthForm(): View|RedirectResponse
     {
@@ -56,17 +56,30 @@ class AuthController extends Controller
     }
 
     /**
+     * GET /signup
+     * Show the Signup form.
+     */
+    public function showSignupForm(): View|RedirectResponse
+    {
+        if (Auth::check()) {
+            return $this->redirectBasedOnRole();
+        }
+
+        return view('ux2.auth.signup');
+    }
+
+    /**
      * POST /register
-     * Validate → register → redirect home.
+     * Validate → register → redirect to login.
      */
     public function register(RegisterUserRequest $request): RedirectResponse
     {
         $this->authService->registerUser($request->validated());
 
-        $request->session()->regenerate();
+        Auth::logout();
 
-        return $this->redirectBasedOnRole()
-            ->with('success', 'Akun berhasil dibuat! Selamat datang di KosKu.');
+        return redirect()->route('ux2.login')
+            ->with('success', 'Akun berhasil dibuat! Silakan masuk dengan akun Anda.');
     }
 
     /**

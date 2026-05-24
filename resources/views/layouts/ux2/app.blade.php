@@ -144,7 +144,7 @@
                 <a class="h-full flex items-center {{ request()->routeIs('ux2.bot') ? 'text-secondary dark:text-secondary-container font-bold border-b-2 border-secondary' : 'text-on-surface-variant dark:text-on-primary-container hover:text-secondary dark:hover:text-secondary-fixed' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80" href="{{ route('ux2.bot') }}">
                     KosBot AI
                 </a>
-                <a class="h-full flex items-center text-on-surface-variant dark:text-on-primary-container font-body-md text-body-md hover:text-secondary dark:hover:text-secondary-fixed transition-colors cursor-pointer active:opacity-80" href="{{ route('owner.dashboard') }}">
+                <a class="h-full flex items-center text-on-surface-variant dark:text-on-primary-container font-body-md text-body-md hover:text-secondary dark:hover:text-secondary-fixed transition-colors cursor-pointer active:opacity-80" href="{{ route('ux2.owner.dashboard') }}">
                     Untuk Pemilik
                 </a>
                 <a class="h-full flex items-center text-on-surface-variant dark:text-on-primary-container font-body-md text-body-md hover:text-secondary dark:hover:text-secondary-fixed transition-colors cursor-pointer active:opacity-80" href="{{ route('ux2.tenant.dashboard') }}">
@@ -160,7 +160,7 @@
                     </form>
                 @else
                     <a class="font-label-md text-label-md text-primary hover:text-secondary transition-colors cursor-pointer" href="{{ route('ux2.login') }}">Sign In</a>
-                    <a class="font-label-md text-label-md bg-primary-container text-on-primary hover:bg-inverse-surface px-md py-sm rounded-lg transition-colors cursor-pointer" href="{{ route('ux2.login') }}">Sign Up</a>
+                    <a class="font-label-md text-label-md bg-primary-container text-on-primary hover:bg-inverse-surface px-md py-sm rounded-lg transition-colors cursor-pointer" href="{{ route('ux2.signup') }}">Sign Up</a>
                 @endauth
             </div>
             <!-- Mobile Menu Toggle -->
