@@ -28,11 +28,13 @@
                 href="{{ route('bot') }}">
                 <span class="material-symbols-outlined text-[16px]">smart_toy</span> Cari via KosBot
             </a>
-            <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
-                href="#">Untuk Pemilik</a>
-            @if(!auth()->check() || auth()->user()->role->value === 'tenant')
-            <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
-                href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
+            @if (!auth()->check() || auth()->user()->role->value === 'owner')
+                <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 {{ request()->routeIs('owner.*') ? 'text-[#111827] after:w-full' : 'text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full' }}"
+                    href="{{ route('owner.dashboard') }}">Untuk Pemilik</a>
+            @endif
+            @if (!auth()->check() || auth()->user()->role->value === 'tenant')
+                <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
+                    href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
             @endif
             <a class="relative text-sm font-medium pb-1 transition-colors duration-300 after:content-[''] after:absolute after:h-[2px] after:bg-[#111827] after:bottom-0 after:left-1/2 after:-translate-x-1/2 after:transition-all after:duration-300 text-gray-500 hover:text-[#111827] after:w-0 hover:after:w-full"
                 href="#">Bantuan</a>
@@ -55,13 +57,16 @@
             @else
                 {{-- Guest: Masuk + Daftar --}}
                 <a href="{{ route('login') }}"
-                    class="hidden md:inline-flex px-4 py-2 text-[#111827] font-bold hover:bg-gray-100 rounded-full transition-colors active:scale-95 text-sm">Sign In</a>
+                    class="hidden md:inline-flex px-4 py-2 text-[#111827] font-bold hover:bg-gray-100 rounded-full transition-colors active:scale-95 text-sm">Sign
+                    In</a>
                 <a href="{{ route('login') }}?tab=register"
-                    class="hidden md:inline-flex px-6 py-2 bg-[#111827] text-white font-bold rounded-full hover:bg-opacity-90 transition-colors active:scale-95 text-sm">Sign Up</a>
+                    class="hidden md:inline-flex px-6 py-2 bg-[#111827] text-white font-bold rounded-full hover:bg-opacity-90 transition-colors active:scale-95 text-sm">Sign
+                    Up</a>
             @endauth
-            
+
             {{-- Hamburger menu button --}}
-            <button id="mobile-menu-btn" class="md:hidden text-[#111827] focus:outline-none flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
+            <button id="mobile-menu-btn"
+                class="md:hidden text-[#111827] focus:outline-none flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors">
                 <span class="material-symbols-outlined">menu</span>
             </button>
         </div>
@@ -69,27 +74,32 @@
 </nav>
 
 {{-- Mobile Menu Overlay --}}
-<div id="mobile-menu" class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
+<div id="mobile-menu"
+    class="fixed inset-0 bg-white z-[60] flex flex-col transform translate-x-full transition-transform duration-300 ease-in-out md:hidden">
     <div class="flex justify-between items-center px-6 h-20 border-b border-gray-100">
         <span class="font-display text-2xl font-black text-[#111827] tracking-tighter">KosKu</span>
-        <button id="close-menu-btn" class="text-[#111827] focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition-colors">
+        <button id="close-menu-btn"
+            class="text-[#111827] focus:outline-none p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <span class="material-symbols-outlined">close</span>
         </button>
     </div>
-    
+
     <div class="flex flex-col px-6 py-8 gap-6 overflow-y-auto">
         <a class="text-lg font-bold text-[#111827]" href="{{ route('search') }}">Cari Kos</a>
         <a class="text-lg font-bold text-[#111827] flex items-center gap-2" href="{{ route('bot') }}">
             <span class="material-symbols-outlined">smart_toy</span> Cari via KosBot
         </a>
-        <a class="text-lg font-bold text-[#111827]" href="#">Untuk Pemilik</a>
-        @if(!auth()->check() || auth()->user()->role->value === 'tenant')
-        <a class="text-lg font-bold text-[#111827]" href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
+        @if (!auth()->check() || auth()->user()->role->value === 'owner')
+            <a class="text-lg font-bold {{ request()->routeIs('owner.*') ? 'text-primary' : 'text-[#111827]' }}"
+                href="{{ route('owner.dashboard') }}">Untuk Pemilik</a>
+        @endif
+        @if (!auth()->check() || auth()->user()->role->value === 'tenant')
+            <a class="text-lg font-bold text-[#111827]" href="{{ route('tenant.dashboard') }}">Untuk Penghuni</a>
         @endif
         <a class="text-lg font-bold text-[#111827]" href="#">Bantuan</a>
-        
+
         <hr class="border-gray-100 my-2">
-        
+
         @auth
             <span class="text-sm font-semibold text-gray-500">Halo, {{ auth()->user()->name }}</span>
             <form method="POST" action="{{ route('logout') }}" class="w-full">
@@ -99,8 +109,11 @@
                 </button>
             </form>
         @else
-            <a href="{{ route('login') }}" class="w-full py-3 text-center rounded-full border border-[#111827] text-[#111827] font-bold text-lg">Sign In</a>
-            <a href="{{ route('login') }}?tab=register" class="w-full py-3 text-center rounded-full bg-[#111827] text-white font-bold text-lg">Sign Up</a>
+            <a href="{{ route('login') }}"
+                class="w-full py-3 text-center rounded-full border border-[#111827] text-[#111827] font-bold text-lg">Sign
+                In</a>
+            <a href="{{ route('login') }}?tab=register"
+                class="w-full py-3 text-center rounded-full bg-[#111827] text-white font-bold text-lg">Sign Up</a>
         @endauth
     </div>
 </div>
@@ -116,7 +129,7 @@
             document.body.classList.toggle('overflow-hidden');
         }
 
-        if(mobileMenuBtn && closeMenuBtn && mobileMenu) {
+        if (mobileMenuBtn && closeMenuBtn && mobileMenu) {
             mobileMenuBtn.addEventListener('click', toggleMenu);
             closeMenuBtn.addEventListener('click', toggleMenu);
         }
