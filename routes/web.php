@@ -86,7 +86,12 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
     Route::get('/laporan/{id}', [TicketController::class, 'show'])->name('tickets.show');
     Route::put('/laporan/{id}', [TicketController::class, 'updateStatus'])->name('tickets.update');
     
-    Route::get('/keuangan', function() { return 'Keuangan & Tagihan'; })->name('keuangan.index');
+    // Pemesanan
+    Route::get('/pemesanan', [\App\Http\Controllers\Owner\TransactionController::class, 'index'])->name('transactions.index');
+
+    // Keuangan
+    Route::get('/keuangan', [\App\Http\Controllers\Owner\FinanceController::class, 'index'])->name('keuangan.index');
+    Route::post('/keuangan/tagihan/{id}/remind', [\App\Http\Controllers\Owner\FinanceController::class, 'remind'])->name('keuangan.remind');
 });
 
 // ──────────────────────────────────────────────────────────────
