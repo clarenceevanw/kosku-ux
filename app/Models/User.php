@@ -35,9 +35,9 @@ class User extends Authenticatable
         return $this->hasMany(BoardingHouse::class, 'owner_id');
     }
 
-    public function transactions(): HasMany
+    public function contracts(): HasMany
     {
-        return $this->hasMany(Transaction::class, 'tenant_id');
+        return $this->hasMany(Contract::class, 'tenant_id');
     }
 
     public function maintenanceTickets(): HasMany
