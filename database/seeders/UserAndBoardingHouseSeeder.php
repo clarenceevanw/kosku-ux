@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Enum\ContractStatus;
+use App\Enum\FacilityType;
 use App\Enum\PaymentStatus;
 use App\Enum\UserRole;
 use App\Models\BoardingHouse;
@@ -10,9 +11,9 @@ use App\Models\Contract;
 use App\Models\Facility;
 use App\Models\Review;
 use App\Models\Room;
+use App\Models\Rule;
 use App\Models\Transaction;
 use App\Models\User;
-use Database\Factories\BoardingHouseFactory;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -172,8 +173,11 @@ class UserAndBoardingHouseSeeder extends Seeder
 
     public function run(): void
     {
-        $allFacilities = Facility::all();
-        $faker = \Faker\Factory::create('id_ID');
+        // Pre-load facilities split by type for accurate seeding
+        $sharedFacilities = Facility::where('type', FacilityType::BERSAMA->value)->get();
+        $roomFacilities   = Facility::where('type', FacilityType::RUANG->value)->get();
+        $allRules         = Rule::all();
+        $faker            = \Faker\Factory::create('id_ID');
 
         // Create 10 tenant users for reviews
         $tenants = collect($this->indonesianNames)->map(function ($name) {
@@ -214,9 +218,19 @@ class UserAndBoardingHouseSeeder extends Seeder
                 'gender_type'  => $data['gender_type'],
             ]);
 
-            // Attach 4–6 random facilities to boarding house (via custom pivot)
-            $houseFacilities = $allFacilities->random(min(6, $allFacilities->count()))->pluck('id')->toArray();
-            $house->facilities()->attach($houseFacilities);
+            // Attach 3–5 shared/area facilities to the boarding house
+            $houseSharedFacilities = $sharedFacilities->count() > 0
+                ? $sharedFacilities->random(min(5, $sharedFacilities->count()))->pluck('id')->toArray()
+                : [];
+            if ($houseSharedFacilities) {
+                $house->facilities()->attach($houseSharedFacilities);
+            }
+
+            // Attach 3–5 rules from the master rules table
+            if ($allRules->count() > 0) {
+                $selectedRuleIds = $allRules->random(min(rand(3, 6), $allRules->count()))->pluck('id')->toArray();
+                $house->rules()->attach($selectedRuleIds);
+            }
 
             // Create 2–3 room types per house
             $imageUrls = $data['images'];
@@ -238,9 +252,13 @@ class UserAndBoardingHouseSeeder extends Seeder
                     'image_url'         => $imageUrls[array_rand($imageUrls)],
                 ]);
 
-                // Attach 3–5 random facilities to each room
-                $roomFacilities = $allFacilities->random(min(5, $allFacilities->count()))->pluck('id')->toArray();
-                $room->facilities()->attach($roomFacilities);
+                // Attach 3–5 in-room facilities to each room
+                $roomFacilityIds = $roomFacilities->count() > 0
+                    ? $roomFacilities->random(min(5, $roomFacilities->count()))->pluck('id')->toArray()
+                    : [];
+                if ($roomFacilityIds) {
+                    $room->facilities()->attach($roomFacilityIds);
+                }
             }
 
             // Create 3–5 reviews per boarding house using contracts chain

@@ -11,12 +11,15 @@ class FacilitySeeder extends Seeder
     public function run(): void
     {
         $facilities = FacilityFactory::allPredefined();
+
         foreach ($facilities as $facilityData) {
             Facility::create([
                 'name' => $facilityData['name'],
+                'type' => $facilityData['type']->value,    // FacilityType enum
                 'icon' => $facilityData['icon'],
             ]);
         }
+
         $this->command->info('✓ Facilities seeded: ' . count($facilities));
     }
 }

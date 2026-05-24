@@ -122,7 +122,7 @@ class BoardingHouseResource extends JsonResource
             // Rules (detail page)
             'rules' => $this->when(
                 $this->relationLoaded('rules'),
-                fn () => $this->rules->map(fn ($rule) => ['category' => $rule->category, 'rule_text' => $rule->rule_text])
+                fn () => $this->rules->map(fn ($rule) => ['category' => $rule->category, 'name' => $rule->name, 'icon' => $rule->icon])
             ),
         ];
     }
