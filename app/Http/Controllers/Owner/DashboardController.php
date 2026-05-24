@@ -28,6 +28,8 @@ class DashboardController extends Controller
             $visualRooms = $this->dashboardService->getRoomsByKos($kosId, $ownerId);
         }
 
+        $occupancyTrends = $this->dashboardService->getOccupancyTrends($ownerId, $kosId);
+
         return view('owner.dashboard', [
             'boardingHouses'    => $boardingHouses,
             'selectedKosId'     => $kosId,
@@ -37,6 +39,7 @@ class DashboardController extends Controller
             'tagihanBelumLunas' => $stats['tagihanBelumLunas'],
             'recentTickets'     => $recentTickets,
             'visualRooms'       => $visualRooms,
+            'occupancyTrends'   => $occupancyTrends,
         ]);
     }
 }

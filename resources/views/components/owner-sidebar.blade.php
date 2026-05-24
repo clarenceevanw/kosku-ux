@@ -48,12 +48,20 @@
             <span class="font-semibold">Laporan Kerusakan</span>
         </a>
 
+        <a href="{{ route('owner.transactions.index') }}"
+            class="flex items-center gap-4 px-4 py-3 rounded-full font-label text-sm transition-all duration-200
+                  {{ request()->routeIs('owner.transactions.*') ? 'nav-item-active' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
+            <span class="material-symbols-outlined text-[22px]"
+                @if (request()->routeIs('owner.transactions.*')) style="font-variation-settings:'FILL' 1" @endif>shopping_cart</span>
+            <span class="font-semibold">Pemesanan</span>
+        </a>
+
         <a href="{{ route('owner.keuangan.index') }}"
             class="flex items-center gap-4 px-4 py-3 rounded-full font-label text-sm transition-all duration-200
                   {{ request()->routeIs('owner.keuangan.*') ? 'nav-item-active' : 'text-secondary hover:bg-surface-container hover:text-on-surface' }}">
             <span class="material-symbols-outlined text-[22px]"
                 @if (request()->routeIs('owner.keuangan.*')) style="font-variation-settings:'FILL' 1" @endif>payments</span>
-            <span class="font-semibold">Keuangan & Tagihan</span>
+            <span class="font-semibold">Keuangan</span>
         </a>
     </div>
 
@@ -116,6 +124,13 @@
         <span class="material-symbols-outlined"
             @if (request()->routeIs('owner.tickets.*')) style="font-variation-settings:'FILL' 1" @endif>report_problem</span>
         <span class="font-label text-[10px] mt-0.5 font-semibold">Laporan</span>
+    </a>
+    <a href="{{ route('owner.transactions.index') }}"
+        class="flex flex-col items-center justify-center p-2 rounded-xl transition-colors min-w-0
+              {{ request()->routeIs('owner.transactions.*') ? 'text-primary' : 'text-on-surface-variant hover:bg-surface-container hover:text-on-surface' }}">
+        <span class="material-symbols-outlined"
+            @if (request()->routeIs('owner.transactions.*')) style="font-variation-settings:'FILL' 1" @endif>shopping_cart</span>
+        <span class="font-label text-[10px] mt-0.5 font-semibold">Pemesanan</span>
     </a>
     <a href="{{ route('owner.keuangan.index') }}"
         class="flex flex-col items-center justify-center p-2 rounded-xl transition-colors min-w-0
