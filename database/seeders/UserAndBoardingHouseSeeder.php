@@ -12,7 +12,7 @@ use App\Models\Facility;
 use App\Models\Review;
 use App\Models\Room;
 use App\Models\Rule;
-use App\Models\Transaction;
+
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -269,23 +269,16 @@ class UserAndBoardingHouseSeeder extends Seeder
             foreach ($shuffledTenants as $tenant) {
                 $room = $roomsForHouse->random();
 
-                // Transaction
-                $transaction = Transaction::create([
-                    'tenant_id'      => $tenant->id,
-                    'room_id'        => $room->id,
-                    'start_date'     => now()->subMonths(rand(3, 18))->toDateString(),
-                    'end_date'       => now()->subMonths(rand(0, 2))->toDateString(),
-                    'total_amount'   => $room->price_per_month,
-                    'payment_status' => PaymentStatus::RELEASED_TO_OWNER->value,
-                    'payment_method' => collect(['BCA', 'Mandiri', 'QRIS', 'GoPay'])->random(),
-                ]);
+                $startDate = now()->subMonths(rand(3, 18))->toDateString();
+                $endDate   = now()->subMonths(rand(0, 2))->toDateString();
 
                 // Contract
                 $contract = Contract::create([
-                    'transaction_id'      => $transaction->id,
+                    'tenant_id'           => $tenant->id,
+                    'room_id'             => $room->id,
                     'contract_number'     => '#KOS-' . now()->year . '-' . strtoupper(Str::random(8)),
-                    'start_date'          => $transaction->start_date,
-                    'end_date'            => $transaction->end_date,
+                    'start_date'          => $startDate,
+                    'end_date'            => $endDate,
                     'monthly_fee'         => $room->price_per_month,
                     'deposit_fee'         => $room->price_per_month,
                     'tenant_signature_date' => now()->subMonths(rand(3, 18)),
