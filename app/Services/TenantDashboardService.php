@@ -50,7 +50,7 @@ class TenantDashboardService
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
                 'room.boardingHouse:id,owner_id,name,address,city,province',
                 'room.boardingHouse.owner:id,name,phone_number',
-                'room.boardingHouse.rules:id,boarding_house_id,category,rule_text',
+                'room.boardingHouse.rules:id,category,name',
                 'contract',
             ])
             ->whereHas('contract', function ($query) {

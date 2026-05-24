@@ -75,7 +75,7 @@
                     @foreach($rules as $rule)
                         <li class="flex items-start gap-2 sm:gap-3">
                             <span class="material-symbols-outlined {{ $cfg['text_color'] }} text-[16px] sm:text-[18px] mt-0.5">{{ $cfg['bullet'] }}</span>
-                            <span>{{ $rule->rule_text }}</span>
+                            <span>{{ $rule->name }}</span>
                         </li>
                     @endforeach
                 </ul>
