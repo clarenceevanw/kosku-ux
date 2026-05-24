@@ -41,21 +41,31 @@ class GuestBoardingHouseController extends Controller
     }
 
     /**
-     * GET /search?q={keyword}
-     * Search results page with pagination.
+     * GET /search?q={keyword}&city={city}&gender_type={type}&min_price={min}&max_price={max}
+     *          &facilities[]={id}&room_facilities[]={id}&rule_categories[]={cat}
+     * Search results page with full multi-filter support.
      */
     public function search(SearchBoardingHouseRequest $request): View
     {
-        $filters  = $request->filters();
+        $filters   = $request->filters();
         $paginator = $this->boardingHouseService->searchBoardingHouses($filters);
 
         // Transform each item through the resource while preserving pagination metadata
         $boardingHouses = BoardingHouseResource::collection($paginator)->resolve();
 
+        // All lookup data — zero Eloquent in this controller
+        $cities            = $this->boardingHouseService->getAllCities();
+        $facilitiesByType  = $this->boardingHouseService->getAllFacilitiesByType();
+        $rules             = $this->boardingHouseService->getAllRules();  // SupportCollection keyed by category
+
         return view('search', [
-            'boardingHouses' => $boardingHouses,
-            'paginator'      => $paginator,
-            'keyword'        => $filters['q'] ?? null,
+            'boardingHouses'   => $boardingHouses,
+            'paginator'        => $paginator,
+            'keyword'          => $filters['q'] ?? null,
+            'cities'           => $cities,
+            'facilitiesByType' => $facilitiesByType,   // ['bersama' => Collection, 'ruang' => Collection]
+            'rules'            => $rules,              // Collection grouped by category
+            'activeFilters'    => $filters,
         ]);
     }
 
