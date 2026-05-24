@@ -3,6 +3,10 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GuestBoardingHouseController;
+use App\Http\Controllers\Owner\DashboardController;
+use App\Http\Controllers\Owner\KosController;
+use App\Http\Controllers\Owner\RoomController;
+use App\Http\Controllers\Owner\TicketController;
 use App\Http\Controllers\TenantDashboardController;
 use Illuminate\Support\Facades\Route;
 
@@ -56,10 +60,33 @@ Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->group(function () 
 // ──────────────────────────────────────────────────────────────
 // Owner routes (Protected by RoleMiddleware)
 // ──────────────────────────────────────────────────────────────
-Route::middleware(['auth', 'role:owner'])->prefix('owner')->group(function () {
-    Route::get('/dashboard', function () {
-        return 'Welcome to Owner Dashboard';
-    })->name('owner.dashboard');
+Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
+    // Manajemen Kos
+    Route::prefix('kos')->name('kos.')->group(function () {
+        Route::get('/', [KosController::class, 'index'])->name('index');
+        Route::post('/', [KosController::class, 'store'])->name('store');
+        Route::get('/{id}', [KosController::class, 'show'])->name('show');
+        Route::put('/{id}', [KosController::class, 'update'])->name('update');
+        Route::delete('/{id}', [KosController::class, 'destroy'])->name('destroy');
+    });
+    
+    // Manajemen Kamar
+    Route::prefix('kamar')->name('rooms.')->group(function () {
+        Route::get('/', [RoomController::class, 'index'])->name('index');
+        Route::post('/', [RoomController::class, 'store'])->name('store');
+        Route::get('/{id}', [RoomController::class, 'show'])->name('show');
+        Route::put('/{id}', [RoomController::class, 'update'])->name('update');
+        Route::delete('/{id}', [RoomController::class, 'destroy'])->name('destroy');
+    });
+    
+    // Laporan Kerusakan
+    Route::get('/laporan', [TicketController::class, 'index'])->name('tickets.index');
+    Route::get('/laporan/{id}', [TicketController::class, 'show'])->name('tickets.show');
+    Route::put('/laporan/{id}', [TicketController::class, 'updateStatus'])->name('tickets.update');
+    
+    Route::get('/keuangan', function() { return 'Keuangan & Tagihan'; })->name('keuangan.index');
 });
 
 // ──────────────────────────────────────────────────────────────
