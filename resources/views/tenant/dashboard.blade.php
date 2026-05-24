@@ -61,10 +61,17 @@
             {{-- Room Details --}}
             <div class="flex-1 z-10 min-w-0">
                 <div class="flex flex-wrap items-center gap-3 mb-4">
-                    <span class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-label text-sm font-semibold flex items-center gap-1.5 border border-green-200">
-                        <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">check_circle</span>
-                        Check-in Aktif
-                    </span>
+                    @if(($activeContract->status->value ?? $activeContract->status) === 'pending')
+                        <span class="bg-amber-100 text-amber-700 px-4 py-1.5 rounded-full font-label text-sm font-semibold flex items-center gap-1.5 border border-amber-200">
+                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">hourglass_empty</span>
+                            Menunggu Konfirmasi
+                        </span>
+                    @else
+                        <span class="bg-green-100 text-green-700 px-4 py-1.5 rounded-full font-label text-sm font-semibold flex items-center gap-1.5 border border-green-200">
+                            <span class="material-symbols-outlined text-[16px]" style="font-variation-settings:'FILL' 1">check_circle</span>
+                            Check-in Aktif
+                        </span>
+                    @endif
                     <span class="bg-surface-container text-on-surface-variant px-4 py-1.5 rounded-full font-label text-sm font-medium border border-outline-variant/30">
                         {{ $activeContract->room->type_name }}
                     </span>

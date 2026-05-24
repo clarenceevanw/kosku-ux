@@ -52,7 +52,7 @@ class TenantDashboardService
                 'room.boardingHouse.owner:id,name,phone_number',
                 'room.boardingHouse.rules:id,category,name',
             ])
-            ->where('status', ContractStatus::ACTIVE->value)
+            ->whereIn('status', [ContractStatus::ACTIVE->value, ContractStatus::PENDING->value])
             ->latest()
             ->first();
     }
@@ -67,7 +67,7 @@ class TenantDashboardService
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
                 'room.boardingHouse:id,owner_id,name,address,city,province',
             ])
-            ->where('status', ContractStatus::ACTIVE->value)
+            ->whereIn('status', [ContractStatus::ACTIVE->value, ContractStatus::PENDING->value])
             ->latest()
             ->get();
     }
