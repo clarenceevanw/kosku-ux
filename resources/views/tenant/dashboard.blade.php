@@ -46,7 +46,7 @@
 
         @if($activeContract)
             {{-- Room Image --}}
-            <div class="w-full md:w-56 h-48 md:h-56 rounded-xl overflow-hidden flex-shrink-0 bg-surface-container border border-outline-variant/30 shadow-sm">
+            <div class="w-full md:w-56 h-48 md:h-56 rounded-xl overflow-hidden shrink-0 bg-surface-container border border-outline-variant/30 shadow-sm">
                 @if($activeContract->room?->image_url)
                     <img src="{{ $activeContract->room->image_url }}"
                          alt="Foto Kamar {{ $activeContract->room->type_name }}"
@@ -89,13 +89,13 @@
                     <div>
                         <p class="font-label text-xs sm:text-sm text-on-surface-variant">Tanggal Mulai Sewa</p>
                         <p class="font-body text-base sm:text-lg font-semibold text-on-surface mt-1">
-                            {{ $activeContract->contract?->start_date?->translatedFormat('d M Y') ?? '—' }}
+                            {{ $activeContract?->start_date?->translatedFormat('d M Y') ?? '—' }}
                         </p>
                     </div>
                     <div>
                         <p class="font-label text-xs sm:text-sm text-on-surface-variant">Berlaku Hingga</p>
                         <p class="font-body text-base sm:text-lg font-semibold text-on-surface mt-1">
-                            {{ $activeContract->contract?->end_date?->translatedFormat('d M Y') ?? '—' }}
+                            {{ $activeContract?->end_date?->translatedFormat('d M Y') ?? '—' }}
                         </p>
                     </div>
                     <div>
@@ -107,7 +107,7 @@
                     <div>
                         <p class="font-label text-xs sm:text-sm text-on-surface-variant">No. Kontrak</p>
                         <p class="font-body text-sm sm:text-base font-semibold text-on-surface mt-1">
-                            {{ $activeContract->contract?->contract_number ?? '—' }}
+                            {{ $activeContract?->contract_number ?? '—' }}
                         </p>
                     </div>
                 </div>

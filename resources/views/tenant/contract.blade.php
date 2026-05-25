@@ -15,7 +15,7 @@
 {{-- Kos Selector --}}
 <x-kos-selector :activeContracts="$allActiveContracts" :selectedContract="$activeContract" />
 
-@if(!$activeContract || !$activeContract->contract)
+@if(!$activeContract)
     {{-- No Contract Empty State --}}
     <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-16 flex flex-col items-center justify-center text-center shadow-sm">
         <span class="material-symbols-outlined text-on-surface-variant text-7xl mb-6">description</span>
@@ -26,8 +26,8 @@
     </div>
 @else
     @php
-        $contract = $activeContract->contract;
-        $room     = $activeContract->room;
+        $contract = $activeContract;
+        $room     = $contract?->room;
         $house    = $room?->boardingHouse;
         $owner    = $house?->owner;
     @endphp
