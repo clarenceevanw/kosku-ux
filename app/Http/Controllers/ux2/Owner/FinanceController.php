@@ -36,7 +36,7 @@ class FinanceController extends Controller
     {
         $ownerId = auth()->id();
         
-        $payment = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId) {
+        $payment = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->findOrFail($id);
 

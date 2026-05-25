@@ -23,7 +23,7 @@
                 
                 <div class="space-y-4">
                     <!-- Virtual Account -->
-                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-[:checked]:border-secondary has-[:checked]:bg-secondary-container/10 transition-all">
+                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-checked:border-secondary has-checked:bg-secondary-container/10 transition-all">
                         <label class="flex items-center gap-4 p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="bca_va" class="w-5 h-5 text-secondary focus:ring-secondary border-outline-variant" checked>
                             <div class="flex-1">
@@ -37,7 +37,7 @@
                     </div>
 
                     <!-- E-Wallet -->
-                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-[:checked]:border-secondary has-[:checked]:bg-secondary-container/10 transition-all">
+                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-checked:border-secondary has-checked:bg-secondary-container/10 transition-all">
                         <label class="flex items-center gap-4 p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="gopay" class="w-5 h-5 text-secondary focus:ring-secondary border-outline-variant">
                             <div class="flex-1">
@@ -51,7 +51,7 @@
                     </div>
 
                     <!-- QRIS -->
-                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-[:checked]:border-secondary has-[:checked]:bg-secondary-container/10 transition-all">
+                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-checked:border-secondary has-checked:bg-secondary-container/10 transition-all">
                         <label class="flex items-center gap-4 p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="qris" class="w-5 h-5 text-secondary focus:ring-secondary border-outline-variant">
                             <div class="flex-1">
@@ -65,7 +65,7 @@
                     </div>
 
                     <!-- Manual Transfer -->
-                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-[:checked]:border-secondary has-[:checked]:bg-secondary-container/10 transition-all">
+                    <div class="border border-outline-variant/50 rounded-xl overflow-hidden has-checked:border-secondary has-checked:bg-secondary-container/10 transition-all">
                         <label class="flex items-center gap-4 p-4 cursor-pointer">
                             <input type="radio" name="payment_method" value="manual" class="w-5 h-5 text-secondary focus:ring-secondary border-outline-variant">
                             <div class="flex-1">
@@ -92,8 +92,8 @@
                 <h2 class="font-headline-sm text-headline-sm font-semibold text-primary mb-6 border-b border-outline-variant/30 pb-4">Ringkasan Biaya</h2>
                 
                 @php
-                    $boardingHouse = $payment->contract->transaction->room->boardingHouse;
-                    $room = $payment->contract->transaction->room;
+                    $boardingHouse = $payment->contract->room->boardingHouse;
+                    $room = $payment->contract->room;
                     $contract = $payment->contract;
                     $adminFee = 2000;
                     $total = $payment->amount + $adminFee;

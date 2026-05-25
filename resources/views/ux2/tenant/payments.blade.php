@@ -91,14 +91,14 @@
                             <div class="min-w-0">
                                 <div class="flex flex-wrap items-center gap-2 mb-1">
                                     <h3 class="font-headline-sm text-headline-sm font-semibold text-primary truncate">
-                                        {{ $payment->contract->transaction->room->boardingHouse->name ?? 'Sewa Kos' }}
+                                        {{ $payment->contract->room->boardingHouse->name ?? 'Sewa Kos' }}
                                     </h3>
                                     <span class="bg-primary-container text-on-primary-container px-2 py-0.5 rounded text-[10px] font-bold border border-primary/20 whitespace-nowrap">
                                         Bulan ke-{{ $payment->billing_month }}
                                     </span>
                                 </div>
                                 <p class="font-body-md text-body-md text-on-surface-variant truncate">
-                                    {{ $payment->contract->transaction->room->type_name ?? '—' }}
+                                    {{ $payment->contract->room->type_name ?? '—' }}
                                 </p>
                                 <p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
                                     Periode: {{ \Carbon\Carbon::parse($payment->contract->start_date)->translatedFormat('d M Y') }} — {{ \Carbon\Carbon::parse($payment->contract->end_date)->translatedFormat('d M Y') }}

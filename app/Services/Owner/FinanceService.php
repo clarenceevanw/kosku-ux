@@ -189,7 +189,7 @@ class FinanceService
 
     private function getReportSummary(string $ownerId, ?string $kosId, string $startDate, string $endDate): array
     {
-        $query = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        $query = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId);
             if ($kosId) {
                 $q->where('id', $kosId);
@@ -226,7 +226,7 @@ class FinanceService
             $monthStart = $current->copy()->startOfMonth();
             $monthEnd = $current->copy()->endOfMonth();
 
-            $income = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+            $income = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
                 $q->where('owner_id', $ownerId);
                 if ($kosId) {
                     $q->where('id', $kosId);
@@ -251,7 +251,7 @@ class FinanceService
 
     private function getIncomeTransactions(string $ownerId, ?string $kosId, string $startDate, string $endDate)
     {
-        return MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+        return MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId, $kosId) {
             $q->where('owner_id', $ownerId);
             if ($kosId) {
                 $q->where('id', $kosId);
@@ -259,13 +259,13 @@ class FinanceService
         })
         ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
         ->whereBetween('paid_at', [Carbon::parse($startDate), Carbon::parse($endDate)])
-        ->with(['contract.transaction.room', 'contract.transaction.tenant'])
+        ->with(['contract.room', 'contract.tenant'])
         ->orderBy('paid_at', 'desc')
         ->limit(10)
         ->get()
         ->map(function($payment) {
             return (object)[
-                'description' => 'Pembayaran dari ' . ($payment->contract->transaction->tenant->name ?? 'Unknown'),
+                'description' => 'Pembayaran dari ' . ($payment->contract->tenant->name ?? 'Unknown'),
                 'amount' => $payment->amount,
                 'date' => $payment->paid_at,
             ];

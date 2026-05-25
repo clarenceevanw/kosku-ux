@@ -126,7 +126,7 @@
             @if($upcomingPayment)
                 <div class="{{ ($upcomingPayment->payment_status->value ?? $upcomingPayment->payment_status) === 'pending' ? 'bg-error-container text-on-error-container' : 'bg-surface-container text-on-surface' }} p-4 rounded-lg mb-6">
                     <p class="font-label-sm text-label-sm uppercase tracking-wider mb-1">
-                        {{ $upcomingPayment->contract->transaction->room->boardingHouse->name ?? 'Sewa Bulanan' }}
+                        {{ $upcomingPayment->contract->room->boardingHouse->name ?? 'Sewa Bulanan' }}
                         (Bulan ke-{{ $upcomingPayment->billing_month }})
                     </p>
                     <p class="font-display-lg text-headline-lg md:text-display-lg font-bold">Rp {{ number_format($upcomingPayment->amount, 0, ',', '.') }}</p>

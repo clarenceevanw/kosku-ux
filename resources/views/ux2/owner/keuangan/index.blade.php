@@ -6,7 +6,7 @@
 <div class="space-y-8">
     <!-- Header & Filter -->
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div class="flex-grow">
+        <div class="grow">
             <h2 class="font-headline-lg text-headline-lg text-primary mb-xs">Keuangan & Tagihan</h2>
             <p class="font-body-md text-body-md text-on-surface-variant mb-md">Pantau arus kas properti Anda secara real-time</p>
             
@@ -36,7 +36,7 @@
     <!-- Metrics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-md">
         <!-- Total Pendapatan -->
-        <div class="bg-gradient-to-br from-secondary-container to-secondary-container/70 p-lg rounded-3xl shadow-lg">
+        <div class="bg-linear-to-br from-secondary-container to-secondary-container/70 p-lg rounded-3xl shadow-lg">
             <div class="flex items-start justify-between mb-md">
                 <div>
                     <p class="font-label-sm text-label-sm text-on-secondary-container/70 uppercase tracking-wider">Total Pendapatan</p>
@@ -106,7 +106,7 @@
                     @forelse($pendingBills as $bill)
                         @php
                             $isOverdue = \Carbon\Carbon::now()->startOfDay()->greaterThan($bill->due_date->startOfDay());
-                            $initials = collect(explode(' ', $bill->contract->transaction->tenant->name ?? 'Unknown'))
+                            $initials = collect(explode(' ', $bill->contract->tenant->name ?? 'Unknown'))
                                 ->map(fn($n) => substr($n, 0, 1))
                                 ->take(2)
                                 ->join('');
@@ -118,12 +118,12 @@
                                         {{ strtoupper($initials) }}
                                     </div>
                                     <p class="font-label-md text-label-md font-semibold text-on-surface">
-                                        {{ $bill->contract->transaction->tenant->name ?? 'Unknown' }}
+                                        {{ $bill->contract->tenant->name ?? 'Unknown' }}
                                     </p>
                                 </div>
                             </td>
                             <td class="px-md py-md font-body-md text-body-md text-on-surface-variant">
-                                {{ $bill->contract->transaction->room->type_name ?? '-' }}
+                                {{ $bill->contract->room->type_name ?? '-' }}
                             </td>
                             <td class="px-md py-md font-body-md text-body-md text-on-surface-variant">
                                 {{ $bill->due_date->format('d M Y') }}

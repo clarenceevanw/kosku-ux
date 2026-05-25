@@ -10,8 +10,8 @@
             <h1 class="font-headline-md text-headline-md font-bold text-primary mb-2">Kontrak Digital</h1>
             <p class="font-body-md text-body-md text-on-surface-variant">Kelola dan lihat dokumen kontrak sewa Anda.</p>
         </div>
-        @if(isset($activeContract) && $activeContract->contract && $activeContract->contract->pdf_url)
-        <a href="{{ $activeContract->contract->pdf_url }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-label-md text-label-md font-medium hover:bg-secondary-container/80 transition-colors shadow-sm">
+        @if(isset($activeContract) && $activeContract->pdf_url)
+        <a href="{{ $activeContract->pdf_url }}" target="_blank" class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-label-md text-label-md font-medium hover:bg-secondary-container/80 transition-colors shadow-sm">
             <span class="material-symbols-outlined">download</span>
             Unduh PDF
         </a>
@@ -31,7 +31,7 @@
             @foreach($allActiveContracts as $contract)
             <a href="?kos={{ $contract->id }}" 
                class="group relative flex items-center gap-4 p-4 border-2 {{ (isset($activeContract) && $activeContract->id == $contract->id) ? 'border-primary bg-primary/5' : 'border-outline-variant hover:border-outline' }} rounded-xl transition-all cursor-pointer">
-                <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container flex-shrink-0">
+                <div class="w-16 h-16 rounded-lg overflow-hidden bg-surface-container shrink-0">
                     @if($contract->room?->image_url)
                     <img src="{{ $contract->room->image_url }}" alt="{{ $contract->room->boardingHouse->name }}" class="w-full h-full object-cover">
                     @else
@@ -46,7 +46,7 @@
                     <p class="font-label-md text-label-md text-on-surface-variant mt-1">{{ $contract->room->boardingHouse->city }}</p>
                 </div>
                 @if(isset($activeContract) && $activeContract->id == $contract->id)
-                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center flex-shrink-0">
+                <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center shrink-0">
                     <span class="material-symbols-outlined text-on-primary text-[16px]" style="font-variation-settings: 'FILL' 1;">check</span>
                 </div>
                 @endif
@@ -56,7 +56,7 @@
     </div>
     @endif
 
-    @if(!$activeContract || !$activeContract->contract)
+    @if(!$activeContract)
         {{-- No Contract Empty State --}}
         <div class="bg-surface-container-lowest border border-outline-variant/50 rounded-2xl p-16 flex flex-col items-center justify-center text-center shadow-sm">
             <span class="material-symbols-outlined text-on-surface-variant text-7xl mb-6">description</span>
@@ -67,7 +67,7 @@
         </div>
     @else
         @php
-            $contractData = $activeContract->contract;
+            $contractData = $activeContract;
             $room     = $activeContract->room;
             $house    = $room?->boardingHouse;
             $owner    = $house?->owner;

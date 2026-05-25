@@ -5,7 +5,6 @@ namespace App\Http\Controllers\ux2;
 use App\Http\Requests\StoreMaintananceTicketRequest;
 use App\Models\MaintenanceTicket;
 use App\Models\MonthlyPayment;
-use App\Models\Transaction;
 use App\Services\MonthlyBillingService;
 use App\Services\TenantDashboardService;
 use Illuminate\Http\RedirectResponse;
@@ -103,13 +102,13 @@ class TenantDashboardController extends Controller
     {
         $tenant = Auth::user();
         
-        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
+        if ($payment->contract->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 
         return view('ux2.payment-checkout', [
             'tenant'  => $tenant,
-            'payment' => $payment->load(['contract.transaction.room.boardingHouse']),
+            'payment' => $payment->load(['contract.room.boardingHouse']),
         ]);
     }
 
@@ -117,7 +116,7 @@ class TenantDashboardController extends Controller
     {
         $tenant = Auth::user();
         
-        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
+        if ($payment->contract->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 

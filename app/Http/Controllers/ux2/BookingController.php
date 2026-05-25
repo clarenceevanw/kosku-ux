@@ -8,7 +8,6 @@ use App\Http\Resources\BoardingHouseResource;
 use App\Models\BoardingHouse;
 use App\Models\Contract;
 use App\Models\Room;
-use App\Models\Transaction;
 use App\Services\BoardingHouseService;
 use App\Services\MonthlyBillingService;
 use Carbon\Carbon;
@@ -66,28 +65,18 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create initial transaction (for contract reference only)
-            $initialTransaction = Transaction::create([
+            // Create contract directly; tenant and room now live on contracts.
+            $contractNumber = 'KOS-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
+
+            $contract = Contract::create([
                 'tenant_id' => $tenant->id,
                 'room_id' => $room->id,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'total_amount' => $depositFee,
-                'payment_status' => PaymentStatus::PENDING->value,
-                'payment_method' => null,
-            ]);
-
-            // Create contract
-            $contractNumber = 'KOS-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
-            
-            $contract = Contract::create([
-                'transaction_id' => $initialTransaction->id,
                 'contract_number' => $contractNumber,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
                 'monthly_fee' => $monthlyFee,
                 'deposit_fee' => $depositFee,
-                'status' => ContractStatus::ACTIVE->value,
+                'status' => ContractStatus::PENDING->value,
                 'tenant_signature_date' => now(),
                 'owner_signature_date' => null,
             ]);
@@ -119,9 +108,9 @@ class BookingController extends Controller
         $tenant = Auth::user();
         $paymentId = $request->query('payment_id');
         
-        $payment = \App\Models\MonthlyPayment::with(['contract.transaction.room.boardingHouse'])->findOrFail($paymentId);
+        $payment = \App\Models\MonthlyPayment::with(['contract.room.boardingHouse'])->findOrFail($paymentId);
 
-        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
+        if ($payment->contract->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 
