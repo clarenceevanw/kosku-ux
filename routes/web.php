@@ -109,4 +109,66 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
 // ──────────────────────────────────────────────────────────────
 // UX2 routes
 // ──────────────────────────────────────────────────────────────
+Route::prefix('ux2')->name('ux2.')->group(function () {
+    Route::get('/', [App\Http\Controllers\ux2\GuestBoardingHouseController::class, 'index'])->name('home');
+    Route::get('/search', [App\Http\Controllers\ux2\GuestBoardingHouseController::class, 'search'])->name('search');
+    Route::get('/kos/{id}', [App\Http\Controllers\ux2\GuestBoardingHouseController::class, 'show'])->name('kos.show');
+    Route::get('/kos/{id}/booking', [App\Http\Controllers\ux2\BookingController::class, 'show'])->name('booking.show')->middleware('auth');
+    Route::post('/booking', [App\Http\Controllers\ux2\BookingController::class, 'store'])->name('booking.store')->middleware('auth');
+    Route::get('/booking/checkout', [App\Http\Controllers\ux2\BookingController::class, 'checkout'])->name('booking.checkout')->middleware('auth');
+    Route::get('/bot', [App\Http\Controllers\ux2\GuestBoardingHouseController::class, 'bot'])->name('bot');
 
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [App\Http\Controllers\ux2\AuthController::class, 'showAuthForm'])->name('login');
+        Route::get('/signup', [App\Http\Controllers\ux2\AuthController::class, 'showSignupForm'])->name('signup');
+        Route::post('/login', [App\Http\Controllers\ux2\AuthController::class, 'login'])->name('login.store');
+        Route::post('/register', [App\Http\Controllers\ux2\AuthController::class, 'register'])->name('register');
+        Route::get('/auth/google', [App\Http\Controllers\ux2\AuthController::class, 'redirectToGoogle'])->name('auth.google');
+        Route::get('/auth/google/callback', [App\Http\Controllers\ux2\AuthController::class, 'handleGoogleCallback'])->name('auth.google.callback');
+    });
+
+    Route::middleware('auth')->group(function () {
+        Route::post('/logout', [App\Http\Controllers\ux2\AuthController::class, 'logout'])->name('logout');
+    });
+
+    Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\ux2\TenantDashboardController::class, 'index'])->name('dashboard');
+        Route::get('/tagihan', [App\Http\Controllers\ux2\TenantDashboardController::class, 'payments'])->name('payments');
+        Route::get('/tagihan/{payment}/checkout', [App\Http\Controllers\ux2\TenantDashboardController::class, 'paymentCheckout'])->name('payment.checkout');
+        Route::post('/tagihan/{payment}/process', [App\Http\Controllers\ux2\TenantDashboardController::class, 'processPayment'])->name('payment.process');
+        Route::get('/laporan', [App\Http\Controllers\ux2\TenantDashboardController::class, 'tickets'])->name('tickets');
+        Route::get('/laporan/buat', [App\Http\Controllers\ux2\TenantDashboardController::class, 'createTicket'])->name('tickets.create');
+        Route::post('/laporan', [App\Http\Controllers\ux2\TenantDashboardController::class, 'storeTicket'])->name('tickets.store');
+        Route::get('/laporan/{ticket}', [App\Http\Controllers\ux2\TenantDashboardController::class, 'showTicket'])->name('tickets.show');
+        Route::get('/kontrak', [App\Http\Controllers\ux2\TenantDashboardController::class, 'contract'])->name('contract');
+        Route::get('/peraturan', [App\Http\Controllers\ux2\TenantDashboardController::class, 'rules'])->name('rules');
+        Route::get('/pengaturan', [App\Http\Controllers\ux2\TenantDashboardController::class, 'settings'])->name('settings');
+    });
+
+    Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->group(function () {
+        Route::get('/dashboard', [App\Http\Controllers\ux2\Owner\DashboardController::class, 'index'])->name('dashboard');
+        
+        // Kelola Kos
+        Route::get('/kos', [App\Http\Controllers\ux2\Owner\KosController::class, 'index'])->name('kos.index');
+        Route::post('/kos', [App\Http\Controllers\ux2\Owner\KosController::class, 'store'])->name('kos.store');
+        Route::put('/kos/{id}', [App\Http\Controllers\ux2\Owner\KosController::class, 'update'])->name('kos.update');
+        Route::delete('/kos/{id}', [App\Http\Controllers\ux2\Owner\KosController::class, 'destroy'])->name('kos.destroy');
+        
+        // Kelola Kamar
+        Route::get('/rooms', [App\Http\Controllers\ux2\Owner\RoomController::class, 'index'])->name('rooms.index');
+        Route::post('/rooms', [App\Http\Controllers\ux2\Owner\RoomController::class, 'store'])->name('rooms.store');
+        Route::get('/rooms/{id}', [App\Http\Controllers\ux2\Owner\RoomController::class, 'show'])->name('rooms.show');
+        Route::put('/rooms/{id}', [App\Http\Controllers\ux2\Owner\RoomController::class, 'update'])->name('rooms.update');
+        Route::delete('/rooms/{id}', [App\Http\Controllers\ux2\Owner\RoomController::class, 'destroy'])->name('rooms.destroy');
+        
+        // Laporan Kerusakan
+        Route::get('/tickets', [App\Http\Controllers\ux2\Owner\TicketController::class, 'index'])->name('tickets.index');
+        Route::get('/tickets/{id}', [App\Http\Controllers\ux2\Owner\TicketController::class, 'show'])->name('tickets.show');
+        Route::put('/tickets/{id}', [App\Http\Controllers\ux2\Owner\TicketController::class, 'updateStatus'])->name('tickets.update');
+        
+        // Keuangan
+        Route::get('/keuangan', [App\Http\Controllers\ux2\Owner\FinanceController::class, 'index'])->name('keuangan.index');
+        Route::get('/keuangan/laporan', [App\Http\Controllers\ux2\Owner\FinanceController::class, 'laporan'])->name('keuangan.laporan');
+        Route::post('/keuangan/tagihan/{id}/remind', [App\Http\Controllers\ux2\Owner\FinanceController::class, 'remind'])->name('keuangan.remind');
+    });
+});

@@ -56,6 +56,47 @@ class FinanceService
         ];
     }
 
+    public function getReportData(string $ownerId, \Illuminate\Http\Request $request): array
+    {
+        $boardingHouses = \App\Models\BoardingHouse::byOwner($ownerId)->get();
+        
+        if ($boardingHouses->isEmpty()) {
+            return [
+                'boardingHouses' => collect(),
+                'summary' => [
+                    'totalIncome' => 0,
+                    'totalExpense' => 0,
+                    'netProfit' => 0,
+                    'profitMargin' => 0,
+                ],
+                'chartData' => [
+                    'labels' => [],
+                    'income' => [],
+                    'expense' => []
+                ],
+                'incomeTransactions' => collect(),
+                'expenseTransactions' => collect(),
+            ];
+        }
+
+        $kosId = $request->input('kos_id');
+        $startDate = $request->input('start_date', Carbon::now()->startOfMonth()->format('Y-m-d'));
+        $endDate = $request->input('end_date', Carbon::now()->format('Y-m-d'));
+
+        $summary = $this->getReportSummary($ownerId, $kosId, $startDate, $endDate);
+        $chartData = $this->getReportChartData($ownerId, $kosId, $startDate, $endDate);
+        $incomeTransactions = $this->getIncomeTransactions($ownerId, $kosId, $startDate, $endDate);
+        $expenseTransactions = $this->getExpenseTransactions($ownerId, $kosId, $startDate, $endDate);
+
+        return [
+            'boardingHouses' => $boardingHouses,
+            'summary' => $summary,
+            'chartData' => $chartData,
+            'incomeTransactions' => $incomeTransactions,
+            'expenseTransactions' => $expenseTransactions,
+        ];
+    }
+
     private function getMetrics(string $ownerId, string $kosId): array
     {
         // 1. Total Pendapatan Bulan Ini (Paid in current month)
@@ -144,5 +185,96 @@ class FinanceService
         ->with(['contract.room', 'contract.tenant'])
         ->orderBy('due_date', 'asc')
         ->paginate(10);
+    }
+
+    private function getReportSummary(string $ownerId, ?string $kosId, string $startDate, string $endDate): array
+    {
+        $query = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+            $q->where('owner_id', $ownerId);
+            if ($kosId) {
+                $q->where('id', $kosId);
+            }
+        })
+        ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
+        ->whereBetween('paid_at', [Carbon::parse($startDate), Carbon::parse($endDate)]);
+
+        $totalIncome = $query->sum('amount');
+        $totalExpense = 0; // Placeholder - implement expense tracking if needed
+        $netProfit = $totalIncome - $totalExpense;
+        $profitMargin = $totalIncome > 0 ? ($netProfit / $totalIncome) * 100 : 0;
+
+        return [
+            'totalIncome' => $totalIncome,
+            'totalExpense' => $totalExpense,
+            'netProfit' => $netProfit,
+            'profitMargin' => $profitMargin,
+        ];
+    }
+
+    private function getReportChartData(string $ownerId, ?string $kosId, string $startDate, string $endDate): array
+    {
+        $start = Carbon::parse($startDate);
+        $end = Carbon::parse($endDate);
+        $months = [];
+        $incomeData = [];
+        $expenseData = [];
+
+        $current = $start->copy()->startOfMonth();
+        while ($current->lte($end)) {
+            $months[] = $current->translatedFormat('M Y');
+            
+            $monthStart = $current->copy()->startOfMonth();
+            $monthEnd = $current->copy()->endOfMonth();
+
+            $income = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+                $q->where('owner_id', $ownerId);
+                if ($kosId) {
+                    $q->where('id', $kosId);
+                }
+            })
+            ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
+            ->whereBetween('paid_at', [$monthStart, $monthEnd])
+            ->sum('amount');
+
+            $incomeData[] = $income;
+            $expenseData[] = 0; // Placeholder
+
+            $current->addMonth();
+        }
+
+        return [
+            'labels' => $months,
+            'income' => $incomeData,
+            'expense' => $expenseData,
+        ];
+    }
+
+    private function getIncomeTransactions(string $ownerId, ?string $kosId, string $startDate, string $endDate)
+    {
+        return MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId, $kosId) {
+            $q->where('owner_id', $ownerId);
+            if ($kosId) {
+                $q->where('id', $kosId);
+            }
+        })
+        ->whereIn('payment_status', [\App\Enum\PaymentStatus::PAID_TO_ESCROW->value, \App\Enum\PaymentStatus::RELEASED_TO_OWNER->value])
+        ->whereBetween('paid_at', [Carbon::parse($startDate), Carbon::parse($endDate)])
+        ->with(['contract.transaction.room', 'contract.transaction.tenant'])
+        ->orderBy('paid_at', 'desc')
+        ->limit(10)
+        ->get()
+        ->map(function($payment) {
+            return (object)[
+                'description' => 'Pembayaran dari ' . ($payment->contract->transaction->tenant->name ?? 'Unknown'),
+                'amount' => $payment->amount,
+                'date' => $payment->paid_at,
+            ];
+        });
+    }
+
+    private function getExpenseTransactions(string $ownerId, ?string $kosId, string $startDate, string $endDate)
+    {
+        // Placeholder - implement expense tracking if needed
+        return collect();
     }
 }
