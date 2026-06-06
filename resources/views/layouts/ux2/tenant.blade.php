@@ -127,6 +127,7 @@
             background-color: #f9f9ff;
         }
     </style>
+    @include('layouts.ux2.theme')
     @yield('styles')
 </head>
 <body class="flex flex-col md:flex-row h-screen font-body-md text-on-surface antialiased">
@@ -136,10 +137,12 @@
     @endphp
 
     <!-- SideNavBar (Desktop) -->
-    <nav class="hidden md:flex flex-col py-6 gap-2 bg-primary-container shadow-sm h-screen w-64 fixed left-0 top-0 overflow-y-auto">
+    <nav class="hidden md:flex flex-col py-6 gap-2 ux2-dark-panel shadow-sm h-screen w-64 fixed left-0 top-0 overflow-y-auto">
         <div class="px-6 mb-8">
             <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-on-primary hover:text-secondary-container transition-colors">
-                <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                <span class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </span>
                 KosKu
             </a>
         </div>
@@ -150,7 +153,7 @@
             </div>
             <div class="overflow-hidden">
                 <p class="font-label-md text-label-md text-on-primary font-semibold truncate">{{ $tenant->name ?? 'Penghuni' }}</p>
-                <p class="font-label-sm text-label-sm text-on-primary-container truncate">{{ $roomName }}</p>
+                <p class="font-label-sm text-label-sm text-white/70 truncate">{{ $roomName }}</p>
             </div>
         </div>
         
@@ -171,8 +174,8 @@
                 @php
                     $isActive = request()->is("ux2/tenant/{$item['match']}*");
                     $activeClass = $isActive 
-                        ? 'bg-secondary text-on-secondary' 
-                        : 'text-on-primary-container hover:bg-surface-variant hover:text-primary';
+                        ? 'bg-secondary-container text-on-secondary-container' 
+                        : 'text-white/75 hover:bg-white/10 hover:text-white';
                 @endphp
                 <a class="flex items-center gap-3 rounded-lg px-4 py-3 mx-2 transition-all active:scale-95 duration-150 {{ $activeClass }}"
                     href="{{ route($item['route']) }}">
@@ -182,7 +185,7 @@
             @endforeach
         </div>
         
-        <div class="px-4 mt-auto pt-4 border-t border-on-primary-container/20">
+        <div class="px-4 mt-auto pt-4 border-t border-white/10">
             <a class="w-full bg-error text-on-error font-label-md text-label-md py-3 rounded-lg flex justify-center items-center gap-2 hover:bg-opacity-90 transition-colors mb-4"
                 href="{{ route('ux2.tenant.tickets.create') }}">
                 <span class="material-symbols-outlined text-[18px]">report_problem</span>
@@ -191,7 +194,7 @@
             
             <form method="POST" action="{{ route('ux2.logout') }}" class="w-full">
                 @csrf
-                <button type="submit" class="w-full flex items-center justify-center gap-2 text-on-primary-container hover:text-error py-2 font-label-sm transition-colors">
+                <button type="submit" class="w-full flex items-center justify-center gap-2 text-white/70 hover:text-error py-2 font-label-sm transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
                     Keluar
                 </button>
@@ -202,9 +205,11 @@
     <!-- Main Content Area -->
     <main class="flex-1 md:ml-64 overflow-y-auto pb-20 md:pb-0">
         <!-- Top App Bar (Mobile) -->
-        <div class="md:hidden flex justify-between items-center bg-primary-container p-4 sticky top-0 z-50 shadow-sm">
-            <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-on-primary">
-                <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">home_work</span>
+        <div class="md:hidden flex justify-between items-center bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant p-4 sticky top-0 z-50 shadow-sm">
+            <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-primary">
+                <span class="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </span>
                 KosKu
             </a>
             <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container overflow-hidden flex items-center justify-center font-label-sm font-bold">
@@ -236,7 +241,7 @@
         
         <!-- Minimal Footer for Main Canvas -->
         <footer class="mt-8 py-6 border-t border-outline-variant/50 text-center px-margin-mobile">
-            <p class="font-body-md text-body-md text-on-surface-variant opacity-70">© {{ now()->year }} KosKu. All rights reserved.</p>
+            <p class="font-body-md text-body-md text-on-surface-variant opacity-70">&copy; {{ now()->year }} KosKu. All rights reserved.</p>
         </footer>
     </main>
 

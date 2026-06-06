@@ -79,14 +79,12 @@
                     $isHighPriority = str_contains(strtolower($category), 'larangan');
                     $cfg = $isHighPriority ? [
                         'bg' => 'bg-error-container text-on-error-container border border-error/20 hover:shadow-md',
-                        'blob' => 'bg-error/10',
                         'icon_bg' => 'bg-error text-on-error',
                         'text_color' => 'text-on-error-container',
                         'bullet' => 'close',
                         'bullet_color' => 'text-error'
                     ] : [
                         'bg' => 'bg-surface-container-lowest border border-outline-variant/50 hover:shadow-md',
-                        'blob' => 'bg-surface-container',
                         'icon_bg' => 'bg-secondary-container text-on-secondary-container',
                         'text_color' => 'text-primary',
                         'bullet' => 'check_circle',
@@ -95,7 +93,6 @@
                     $icon = $icons[$category] ?? 'gavel';
                 @endphp
                 <div class="{{ $cfg['bg'] }} rounded-2xl p-6 md:p-8 shadow-sm relative overflow-hidden transition-all duration-300">
-                    <div class="absolute -top-10 -right-10 w-40 h-40 {{ $cfg['blob'] }} rounded-full blur-2xl -z-10"></div>
                     <div class="flex items-center gap-4 mb-6">
                         <div class="w-12 h-12 rounded-xl {{ $cfg['icon_bg'] }} flex items-center justify-center shrink-0">
                             <span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">{{ $icon }}</span>

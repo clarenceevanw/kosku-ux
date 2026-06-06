@@ -124,32 +124,47 @@
             direction: ltr;
         }
     </style>
+    @include('layouts.ux2.theme')
     @yield('styles')
 </head>
 <body class="bg-background text-on-background font-body-md text-body-md antialiased selection:bg-secondary-container selection:text-on-secondary-container min-h-screen flex flex-col">
     <!-- TopNavBar (Shared Component) -->
-    <nav class="bg-background dark:bg-primary-container w-full top-0 sticky z-50 border-b border-outline-variant dark:border-outline transition-all duration-300" id="global-nav">
+    <nav class="bg-surface-container-lowest/95 backdrop-blur-xl w-full top-0 sticky z-50 border-b border-outline-variant transition-all duration-300" id="global-nav">
         <div class="flex justify-between items-center h-20 px-margin-mobile md:px-margin-desktop max-w-[1440px] mx-auto">
             <!-- Brand -->
-            <a class="font-headline-md text-headline-md font-bold text-primary dark:text-on-primary flex items-center gap-2" href="{{ route('ux2.home') }}">
-                <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">home_work</span>
+            <a class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-2" href="{{ route('ux2.home') }}">
+                <span class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </span>
                 KosKu
             </a>
             <!-- Navigation Links (Desktop) -->
-            <div class="hidden md:flex items-center gap-lg h-full">
+            <div class="hidden md:flex items-center gap-sm">
                 <!-- Active Item -->
-                <a class="h-full flex items-center {{ request()->routeIs('ux2.search') ? 'text-secondary dark:text-secondary-container font-bold border-b-2 border-secondary' : 'text-on-surface-variant dark:text-on-primary-container hover:text-secondary dark:hover:text-secondary-fixed' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80" href="{{ route('ux2.search') }}">
+                <a class="px-md py-sm rounded-full {{ request()->routeIs('ux2.search') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80" href="{{ route('ux2.search') }}">
                     Cari Kos
                 </a>
-                <a class="h-full flex items-center {{ request()->routeIs('ux2.bot') ? 'text-secondary dark:text-secondary-container font-bold border-b-2 border-secondary' : 'text-on-surface-variant dark:text-on-primary-container hover:text-secondary dark:hover:text-secondary-fixed' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80" href="{{ route('ux2.bot') }}">
+                <a class="px-md py-sm rounded-full {{ request()->routeIs('ux2.bot') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80" href="{{ route('ux2.bot') }}">
                     KosBot AI
                 </a>
-                <a class="h-full flex items-center text-on-surface-variant dark:text-on-primary-container font-body-md text-body-md hover:text-secondary dark:hover:text-secondary-fixed transition-colors cursor-pointer active:opacity-80" href="{{ route('ux2.owner.dashboard') }}">
-                    Untuk Pemilik
-                </a>
-                <a class="h-full flex items-center text-on-surface-variant dark:text-on-primary-container font-body-md text-body-md hover:text-secondary dark:hover:text-secondary-fixed transition-colors cursor-pointer active:opacity-80" href="{{ route('ux2.tenant.dashboard') }}">
-                    Untuk Penghuni
-                </a>
+                @auth
+                    @php
+                        $dashboardRoute = match(auth()->user()->role->value) {
+                            'owner'  => route('ux2.owner.dashboard'),
+                            'tenant' => route('ux2.tenant.dashboard'),
+                            default  => route('ux2.home'),
+                        };
+                    @endphp
+                    <a href="{{ $dashboardRoute }}"
+                        class="px-md py-sm rounded-full {{ request()->routeIs('ux2.owner.*') || request()->routeIs('ux2.tenant.*') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors active:opacity-80">
+                        Dashboard
+                    </a>
+                @else
+                    <a href="{{ route('ux2.login') }}"
+                        class="px-md py-sm rounded-full text-on-surface-variant font-body-md text-body-md hover:bg-surface-container hover:text-secondary transition-colors cursor-pointer active:opacity-80">
+                        Dashboard
+                    </a>
+                @endauth
             </div>
             <!-- Trailing Actions -->
             <div class="hidden md:flex items-center gap-md">
@@ -160,13 +175,43 @@
                     </form>
                 @else
                     <a class="font-label-md text-label-md text-primary hover:text-secondary transition-colors cursor-pointer" href="{{ route('ux2.login') }}">Sign In</a>
-                    <a class="font-label-md text-label-md bg-primary-container text-on-primary hover:bg-inverse-surface px-md py-sm rounded-lg transition-colors cursor-pointer" href="{{ route('ux2.signup') }}">Sign Up</a>
+                    <a class="font-label-md text-label-md bg-primary text-on-primary hover:bg-inverse-surface px-md py-sm rounded-lg transition-colors cursor-pointer" href="{{ route('ux2.signup') }}">Sign Up</a>
                 @endauth
             </div>
-            <!-- Mobile Menu Toggle -->
-            <button class="md:hidden text-primary">
-                <span class="material-symbols-outlined">menu</span>
-            </button>
+            <!-- Mobile Menu -->
+            <details class="ux2-mobile-menu md:hidden relative">
+                <summary class="w-10 h-10 rounded-lg border border-outline-variant bg-surface-container-lowest flex items-center justify-center text-primary cursor-pointer">
+                    <span class="material-symbols-outlined">menu</span>
+                </summary>
+                <div class="absolute right-0 mt-3 w-64 bg-surface-container-lowest border border-outline-variant rounded-lg shadow-lg p-sm flex flex-col gap-xs">
+                    <a class="px-md py-sm rounded-lg text-on-surface hover:bg-surface-container" href="{{ route('ux2.search') }}">Cari Kos</a>
+                    <a class="px-md py-sm rounded-lg text-on-surface hover:bg-surface-container" href="{{ route('ux2.bot') }}">KosBot AI</a>
+                    @auth
+                        @php
+                            $dashboardRoute = match(auth()->user()->role->value) {
+                                'owner'  => route('ux2.owner.dashboard'),
+                                'tenant' => route('ux2.tenant.dashboard'),
+                                default  => route('ux2.home'),
+                            };
+                        @endphp
+                        <a class="px-md py-sm rounded-lg text-on-surface hover:bg-surface-container" href="{{ $dashboardRoute }}">
+                            Dashboard
+                        </a>
+                    @else
+                        <a class="px-md py-sm rounded-lg text-on-surface hover:bg-surface-container" href="{{ route('ux2.login') }}">
+                            Dashboard
+                        </a>
+                    @endauth
+                    @auth
+                        <form method="POST" action="{{ route('ux2.logout') }}">
+                            @csrf
+                            <button type="submit" class="w-full text-left px-md py-sm rounded-lg text-error hover:bg-error-container">Logout</button>
+                        </form>
+                    @else
+                        <a class="px-md py-sm rounded-lg bg-primary text-on-primary text-center" href="{{ route('ux2.login') }}">Sign In</a>
+                    @endauth
+                </div>
+            </details>
         </div>
     </nav>
 
@@ -176,7 +221,7 @@
     </main>
 
     <!-- Shared Footer -->
-    <footer class="bg-primary-container dark:bg-primary text-on-primary w-full py-xl px-margin-mobile md:px-margin-desktop flat no shadows">
+    <footer class="ux2-dark-panel w-full py-xl px-margin-mobile md:px-margin-desktop">
         <div class="flex flex-col md:flex-row justify-between items-start max-w-[1440px] mx-auto gap-lg">
             <div class="flex flex-col gap-4 max-w-sm">
                 <a class="font-headline-md text-headline-md font-bold text-on-primary flex items-center gap-2" href="{{ route('ux2.home') }}">
@@ -203,7 +248,7 @@
             </div>
         </div>
         <div class="max-w-[1440px] mx-auto mt-xl pt-md border-t border-on-primary-container/20 flex justify-between items-center">
-            <p class="font-body-md text-body-md text-on-primary-container opacity-80">© {{ now()->year }} KosKu. All rights reserved.</p>
+            <p class="font-body-md text-body-md text-on-primary-container opacity-80">&copy; {{ now()->year }} KosKu. All rights reserved.</p>
         </div>
     </footer>
 
