@@ -27,6 +27,10 @@
 @php
     $rooms = collect($boardingHouse['rooms'] ?? []);
     $firstRoom = $rooms->first();
+    $requestedRoomId = old('room_id', request('room_id'));
+    $selectedRoomId = $rooms->contains(fn ($room) => $room['id'] === $requestedRoomId && $room['is_available'])
+        ? $requestedRoomId
+        : ($rooms->firstWhere('is_available', true)['id'] ?? $firstRoom['id'] ?? null);
 @endphp
 
 <main class="max-w-[960px] mx-auto px-margin-mobile md:px-margin-desktop py-lg">
@@ -82,6 +86,7 @@
                            data-price="{{ $room['price_per_month'] }}"
                            data-name="{{ $room['type_name'] }}"
                            required
+                           {{ $room['id'] === $selectedRoomId ? 'checked' : '' }}
                            {{ !$room['is_available'] ? 'disabled' : '' }}>
                     <div class="room-card flex-1 flex items-center gap-4 p-4 border-2 border-outline-variant rounded-xl transition-all hover:border-outline {{ !$room['is_available'] ? '' : 'hover:shadow-sm' }}">
                         @if($room['image_url'])

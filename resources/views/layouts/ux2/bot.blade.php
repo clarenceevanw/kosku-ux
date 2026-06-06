@@ -116,19 +116,19 @@
 <body class="bg-background text-on-background h-screen flex overflow-hidden">
     <!-- TopNavBar (Mobile Only) -->
     <header class="md:hidden w-full top-0 sticky z-50 border-b border-outline-variant bg-background flex justify-between items-center h-20 px-margin-mobile">
-        <div class="font-headline-md text-headline-md font-bold text-primary">KosKu</div>
+        <a href="{{ route('ux2.home') }}" class="font-headline-md text-headline-md font-bold text-primary">KosKu</a>
         <button class="material-symbols-outlined text-primary text-3xl">menu</button>
     </header>
     
     <!-- SideNavBar (Desktop Only) -->
     <aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-surface shadow-sm flex-col py-6 gap-2 z-40">
         <div class="px-6 mb-6">
-            <div class="font-headline-md text-headline-md font-bold text-primary">KosKu</div>
+            <a href="{{ route('ux2.home') }}" class="font-headline-md text-headline-md font-bold text-primary">KosKu</a>
         </div>
         <nav class="flex-1 overflow-y-auto px-2">
             <!-- Navigation items mapping from JSON, but prioritizing KosBot AI context -->
             <a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
-                href="{{ route('ux2.home') }}">
+                href="{{ route('ux2.search') }}">
                 <span class="material-symbols-outlined">search</span>
                 Cari Kos
             </a>

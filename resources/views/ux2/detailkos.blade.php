@@ -8,6 +8,7 @@
     $roomImages = $rooms->pluck('image_url')->filter()->values();
     $primaryImage = $boardingHouse['primary_image'] ?? $roomImages->first();
     $firstRoom = $rooms->first();
+    $displayPrice = $firstRoom['price_formatted'] ?? ($boardingHouse['min_price_formatted'] ?? 'Hubungi pemilik');
 @endphp
 <main class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-lg grid grid-cols-1 md:grid-cols-12 gap-gutter">
 <!-- Breadcrumbs -->
@@ -110,29 +111,26 @@
 <div class="sticky top-28 bg-surface-container-lowest rounded-xl border border-outline-variant shadow-sm p-md flex flex-col gap-6">
 <div class="flex justify-between items-end border-b border-outline-variant pb-4">
 <div>
-<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Mulai dari</p>
-<p class="font-headline-lg text-headline-lg text-primary">{{ $boardingHouse['min_price_formatted'] ?? ($firstRoom['price_formatted'] ?? 'Hubungi pemilik') }}<span class="font-body-md text-body-md text-on-surface-variant font-normal"> / bulan</span></p>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-1">Harga per bulan</p>
+<p class="font-headline-lg text-headline-lg text-primary"><span data-room-price>{{ $displayPrice }}</span><span class="font-body-md text-body-md text-on-surface-variant font-normal"> / bulan</span></p>
 </div>
 </div>
 <div class="flex flex-col gap-4">
-<div class="border border-outline-variant rounded-lg p-3 hover:border-secondary transition-colors cursor-pointer focus-within:border-secondary focus-within:ring-2 focus-within:ring-secondary/20">
-<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Tanggal Masuk</label>
-<div class="flex items-center justify-between">
-<input class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-primary" type="date" value="{{ now()->toDateString() }}"/>
-</div>
-</div>
 <div class="border border-outline-variant rounded-lg p-3 hover:border-secondary transition-colors cursor-pointer">
-<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Durasi Sewa</label>
-<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-primary cursor-pointer">
-<option>1 Bulan</option>
-<option>3 Bulan</option>
-<option>6 Bulan</option>
-<option>1 Tahun</option>
+<label class="block font-label-sm text-label-sm text-on-surface-variant mb-1">Tipe Kamar</label>
+<select class="w-full bg-transparent border-none p-0 focus:ring-0 font-body-md text-body-md text-primary cursor-pointer" data-room-selector>
+@forelse ($rooms as $room)
+<option value="{{ $room['id'] }}" data-price="{{ $room['price_formatted'] }}">
+{{ $room['type_name'] }}
+</option>
+@empty
+<option data-price="Hubungi pemilik">Hubungi pemilik</option>
+@endforelse
 </select>
 </div>
 </div>
 <div class="flex flex-col gap-3">
-<a class="w-full bg-secondary text-on-secondary font-label-md text-label-md font-bold py-3 rounded-lg hover:bg-secondary/90 transition-colors flex justify-center items-center gap-2" href="{{ route('ux2.booking.show', $boardingHouse['id']) }}">
+<a class="w-full bg-secondary text-on-secondary font-label-md text-label-md font-bold py-3 rounded-lg hover:bg-secondary/90 transition-colors flex justify-center items-center gap-2" href="{{ route('ux2.booking.show', $boardingHouse['id']) }}" data-booking-link data-booking-base-url="{{ route('ux2.booking.show', $boardingHouse['id']) }}">
                         Ajukan Sewa
                     </a>
 <button class="w-full bg-surface text-primary border border-primary font-label-md text-label-md font-bold py-3 rounded-lg hover:bg-surface-variant transition-colors flex justify-center items-center gap-2">
@@ -149,4 +147,29 @@
 </div>
 </div>
 </main>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const roomSelector = document.querySelector('[data-room-selector]');
+    const roomPrice = document.querySelector('[data-room-price]');
+    const bookingLink = document.querySelector('[data-booking-link]');
+
+    if (!roomSelector || !roomPrice) {
+        return;
+    }
+
+    const syncRoomPrice = () => {
+        const selectedRoom = roomSelector.options[roomSelector.selectedIndex];
+        roomPrice.textContent = selectedRoom?.dataset.price || 'Hubungi pemilik';
+
+        if (bookingLink && selectedRoom?.value) {
+            const bookingUrl = new URL(bookingLink.dataset.bookingBaseUrl, window.location.origin);
+            bookingUrl.searchParams.set('room_id', selectedRoom.value);
+            bookingLink.href = bookingUrl.toString();
+        }
+    };
+
+    roomSelector.addEventListener('change', syncRoomPrice);
+    syncRoomPrice();
+});
+</script>
 @endsection

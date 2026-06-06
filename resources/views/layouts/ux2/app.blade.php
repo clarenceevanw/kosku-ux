@@ -154,7 +154,7 @@
             <!-- Trailing Actions -->
             <div class="hidden md:flex items-center gap-md">
                 @auth
-                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                    <form method="POST" action="{{ route('ux2.logout') }}" class="inline">
                         @csrf
                         <button type="submit" class="font-label-md text-label-md text-primary bg-surface-container hover:bg-surface-container-high px-4 py-2 rounded-lg transition-colors">Logout</button>
                     </form>

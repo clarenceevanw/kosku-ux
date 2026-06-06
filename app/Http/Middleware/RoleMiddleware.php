@@ -17,7 +17,7 @@ class RoleMiddleware
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
         if (! $request->user()) {
-            return redirect()->route('login');
+            return redirect()->route($request->is('ux2/*') ? 'ux2.login' : 'login');
         }
 
         // Compare the user's role (Enum value) with the allowed roles array
