@@ -4,15 +4,36 @@
 
 @section('content')
 <div class="w-full max-w-md mx-auto">
-<!-- Mobile Logo Header -->
-<div class="md:hidden text-center mb-lg">
-<h1 class="font-headline-md text-headline-md font-bold text-primary">KosKu</h1>
-</div>
-<!-- Form Header -->
-<div class="mb-lg">
-<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Selamat Datang</h2>
-<p class="font-body-md text-body-md text-on-surface-variant">Silakan masuk ke akun Anda untuk melanjutkan.</p>
-</div>
+    <!-- Mobile Logo Header -->
+    <div class="md:hidden text-center mb-lg">
+        <h1 class="font-headline-md text-headline-md font-bold text-primary">KosKu</h1>
+    </div>
+
+    <!-- Success Message -->
+    @if(session('success'))
+    <div class="mb-md p-sm bg-secondary-container/20 border border-secondary-container rounded-lg">
+        <p class="font-body-md text-body-md text-on-surface flex items-center gap-2">
+            <span class="material-symbols-outlined text-secondary-container">check_circle</span>
+            {{ session('success') }}
+        </p>
+    </div>
+    @endif
+
+    <!-- Error Messages -->
+    @if($errors->any())
+    <div class="mb-md p-sm bg-error-container/20 border border-error rounded-lg">
+        <p class="font-body-md text-body-md text-on-error-container flex items-center gap-2">
+            <span class="material-symbols-outlined text-error">error</span>
+            {{ $errors->first() }}
+        </p>
+    </div>
+    @endif
+
+    <!-- Form Header -->
+    <div class="mb-lg">
+        <h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-primary mb-xs">Selamat Datang</h2>
+        <p class="font-body-md text-body-md text-on-surface-variant">Silakan masuk ke akun Anda untuk melanjutkan.</p>
+    </div>
 <!-- Social Login -->
 <a class="w-full flex items-center justify-center gap-sm py-sm px-md border border-outline-variant rounded-lg hover:bg-surface-container-low transition-colors mb-md font-label-md text-label-md text-on-surface" href="{{ route('ux2.auth.google') }}">
 <span class="w-5 h-5 rounded-full border border-outline-variant flex items-center justify-center text-[12px] font-bold">G</span>
@@ -50,7 +71,7 @@
 </div>
 <!-- Options -->
 <div class="flex items-center gap-xs">
-<input class="w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container" id="remember" name="remember" type="checkbox"/>
+<input class="w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container" id="remember" name="remember" type="checkbox" value="1"/>
 <label class="font-label-md text-label-md text-on-surface-variant cursor-pointer" for="remember">Ingat saya</label>
 </div>
 <!-- Submit Button -->
@@ -63,7 +84,7 @@
 <div class="mt-lg text-center">
 <p class="font-body-md text-body-md text-on-surface-variant">
                         Belum punya akun? 
-                        <a class="font-label-md text-label-md text-secondary hover:text-secondary-fixed transition-colors font-semibold ml-xs" href="{{ route('ux2.login') }}">Daftar sekarang</a>
+                        <a class="font-label-md text-label-md text-secondary hover:text-secondary-fixed transition-colors font-semibold ml-xs" href="{{ route('ux2.signup') }}">Daftar sekarang</a>
 </p>
 </div>
 </div>

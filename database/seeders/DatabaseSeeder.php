@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         // Truncate in reverse dependency order
         DB::table('reviews')->truncate();
         DB::table('contracts')->truncate();
-        DB::table('transactions')->truncate();
+
         DB::table('room_facility')->truncate();
         DB::table('boarding_house_facility')->truncate();
         DB::table('boarding_house_rules')->truncate();  // pivot (now rule_id based)

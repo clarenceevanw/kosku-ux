@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Owner;
+namespace App\Http\Controllers\ux2\Owner;
 
 use App\Http\Controllers\Controller;
 use App\Models\MonthlyPayment;
@@ -20,19 +20,25 @@ class FinanceController extends Controller
 
         $data = $this->financeService->getFinanceData($ownerId, $request);
 
-        return view('owner.keuangan.index', $data);
+        return view('ux2.owner.keuangan.index', $data);
+    }
+
+    public function laporan(Request $request): View
+    {
+        $ownerId = auth()->id();
+
+        $data = $this->financeService->getReportData($ownerId, $request);
+
+        return view('ux2.owner.keuangan.laporan', $data);
     }
 
     public function remind(string $id)
     {
         $ownerId = auth()->id();
         
-        $payment = MonthlyPayment::whereHas('contract.room.boardingHouse', function($q) use ($ownerId) {
+        $payment = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })->findOrFail($id);
-
-        // Simulasi pengiriman notifikasi pengingat ke tenant (misal via email/WA/in-app notif)
-        // \Illuminate\Support\Facades\Log::info("Pengingat tagihan #{$payment->id} dikirim ke tenant.");
 
         return back()->with('success', 'Pengingat berhasil dikirim ke tenant.');
     }

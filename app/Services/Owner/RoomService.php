@@ -39,16 +39,14 @@ class RoomService
             ->when($request->input('search'), function($query, $search) {
                 $query->where('type_name', 'like', "%{$search}%");
             })
-            ->with(['facilities', 'transactions' => function($q) {
-                $q->whereHas('contract', function($q2) {
-                    $q2->where('status', 'active');
-                });
+            ->with(['facilities', 'contracts' => function($q) {
+                $q->where('status', 'active');
             }])
             ->get();
 
         // Add dynamic properties for view
         foreach ($rooms as $room) {
-            $activeCount = $room->transactions->count();
+            $activeCount = $room->contracts->count();
             
             if ($activeCount >= $room->stock) {
                 $room->dynamic_status = 'Terisi Penuh';
@@ -95,10 +93,8 @@ class RoomService
         return Room::whereHas('boardingHouse', function($q) use ($ownerId) {
             $q->where('owner_id', $ownerId);
         })
-        ->with(['boardingHouse', 'transactions' => function($q) {
-            $q->whereHas('contract', function($q2) {
-                $q2->where('status', 'active');
-            })->with('tenant', 'contract');
+        ->with(['boardingHouse', 'contracts' => function($q) {
+            $q->where('status', 'active')->with('tenant');
         }])
         ->findOrFail($id);
     }
@@ -127,9 +123,7 @@ class RoomService
         })->findOrFail($id);
 
         // Prevent deletion if there are active contracts
-        $activeContractsCount = $room->transactions()->whereHas('contract', function($q) {
-            $q->where('status', 'active');
-        })->count();
+        $activeContractsCount = $room->contracts()->where('status', 'active')->count();
 
         if ($activeContractsCount > 0) {
             throw new \Exception('Kamar tidak dapat dihapus karena masih ada penyewa aktif.');

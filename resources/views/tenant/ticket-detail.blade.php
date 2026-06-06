@@ -1,4 +1,4 @@
-@extends('layouts.tenant', ['activeContract' => $activeTransaction ?? null])
+@extends('layouts.tenant', ['activeContract' => $activeContract ?? null])
 
 @section('title', 'Detail Laporan')
 

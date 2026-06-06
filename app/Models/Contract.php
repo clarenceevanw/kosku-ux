@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
-#[Fillable(['transaction_id', 'contract_number', 'start_date', 'end_date', 'monthly_fee', 'deposit_fee', 'tenant_signature_date', 'owner_signature_date', 'pdf_url', 'status'])]
+#[Fillable(['tenant_id', 'room_id', 'contract_number', 'start_date', 'end_date', 'monthly_fee', 'deposit_fee', 'tenant_signature_date', 'owner_signature_date', 'pdf_url', 'status'])]
 #[Guarded(['id', 'created_at', 'updated_at'])]
 #[Hidden([])]
 class Contract extends Model
@@ -30,9 +31,14 @@ class Contract extends Model
         ];
     }
 
-    public function transaction(): BelongsTo
+    public function tenant(): BelongsTo
     {
-        return $this->belongsTo(Transaction::class);
+        return $this->belongsTo(User::class, 'tenant_id');
+    }
+
+    public function room(): BelongsTo
+    {
+        return $this->belongsTo(Room::class);
     }
 
     public function monthlyPayments(): HasMany

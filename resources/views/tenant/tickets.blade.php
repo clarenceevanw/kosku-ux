@@ -1,4 +1,4 @@
-@extends('layouts.tenant', ['activeContract' => $activeTransaction ?? null])
+@extends('layouts.tenant', ['activeContract' => $activeContract ?? null])
 
 @section('title', 'Laporan Kerusakan')
 
@@ -10,8 +10,8 @@
         <h1 class="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-primary tracking-tight mb-2 sm:mb-3">Laporan Kerusakan</h1>
         <p class="font-body text-sm sm:text-base md:text-lg text-on-surface-variant">Pantau status perbaikan fasilitas kamar Anda.</p>
     </div>
-    @if($activeTransaction)
-    <a href="{{ route('tenant.tickets.create', ['kos' => $activeTransaction->id]) }}" class="bg-primary text-on-primary font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-full hover:bg-inverse-surface transition-transform hover:scale-[0.98] flex items-center justify-center gap-2 self-start md:self-auto shadow-sm text-sm sm:text-base">
+    @if($activeContract)
+    <a href="{{ route('tenant.tickets.create', ['kos' => $activeContract->id]) }}" class="bg-primary text-on-primary font-bold py-2.5 sm:py-3 px-5 sm:px-6 rounded-full hover:bg-inverse-surface transition-transform hover:scale-[0.98] flex items-center justify-center gap-2 self-start md:self-auto shadow-sm text-sm sm:text-base">
         <span class="material-symbols-outlined text-[20px]">add</span>
         <span class="hidden sm:inline">Buat Laporan Baru</span>
         <span class="sm:hidden">Buat Laporan</span>
@@ -20,7 +20,7 @@
 </div>
 
 {{-- Kos Selector --}}
-<x-kos-selector :activeContracts="$allActiveContracts" :selectedContract="$activeTransaction" />
+<x-kos-selector :activeContracts="$allActiveContracts" :selectedContract="$activeContract" />
 
 {{-- Filters --}}
 <div class="flex items-center gap-4 sm:gap-8 mb-8 border-b border-surface-container-high overflow-x-auto">
@@ -36,7 +36,7 @@
         <p class="font-body text-base text-on-surface-variant max-w-sm mb-6">
             Anda belum pernah mengajukan laporan kerusakan. Jika ada masalah pada kamar, laporkan sekarang.
         </p>
-        @if($activeTransaction)
+        @if($activeContract)
         <a href="{{ route('tenant.tickets.create') }}" class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-on-primary rounded-full font-label text-sm font-semibold hover:bg-primary/90 transition-colors shadow-sm">
             <span class="material-symbols-outlined text-[18px]">add</span>
             Buat Laporan Pertama

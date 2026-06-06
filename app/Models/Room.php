@@ -31,9 +31,9 @@ class Room extends Model
             ->withPivot('id');
     }
 
-    public function transactions(): HasMany
+    public function contracts(): HasMany
     {
-        return $this->hasMany(Transaction::class);
+        return $this->hasMany(Contract::class);
     }
 
     public function maintenanceTickets(): HasMany

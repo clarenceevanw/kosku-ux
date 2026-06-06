@@ -20,10 +20,8 @@ return new class extends Migration
         Schema::create('contracts', function (Blueprint $table) {
             $table->uuid('id')->primary();
 
-            // 1-to-1: one transaction → one contract
-            $table->uuid('transaction_id')
-                  ->unique()
-                  ->comment('1-to-1 FK to initial transaction');
+            $table->foreignUuid('tenant_id')->constrained('users')->cascadeOnDelete();
+            $table->foreignUuid('room_id')->constrained('rooms')->cascadeOnDelete();
 
             $table->string('contract_number')
                   ->unique()

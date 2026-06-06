@@ -138,7 +138,7 @@
                 KosBot AI
             </a>
             <a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
-                href="{{ route('owner.dashboard') }}">
+                href="{{ route('ux2.owner.dashboard') }}">
                 <span class="material-symbols-outlined">home_work</span>
                 Untuk Pemilik
             </a>

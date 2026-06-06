@@ -17,7 +17,7 @@ class DashboardService
     public function getSummaryStats(int|string $ownerId, ?string $kosId = null): array
     {
         // 1. Total Pendapatan Bulan Ini
-        $totalPendapatanQuery = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
+        $totalPendapatanQuery = MonthlyPayment::whereHas('contract.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
             $q->byOwner($ownerId);
             if ($kosId) {
                 $q->where('id', $kosId);
@@ -38,7 +38,7 @@ class DashboardService
         });
         $totalRooms = $totalRoomsQuery->sum('stock'); 
         
-        $occupiedRoomsQuery = Contract::whereHas('transaction.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
+        $occupiedRoomsQuery = Contract::whereHas('room.boardingHouse', function ($q) use ($ownerId, $kosId) {
             $q->byOwner($ownerId);
             if ($kosId) {
                 $q->where('id', $kosId);
@@ -56,7 +56,7 @@ class DashboardService
         $laporanAktif = $laporanAktifQuery->count();
 
         // 4. Tagihan Belum Lunas (Pending Monthly Payments)
-        $tagihanBelumLunasQuery = MonthlyPayment::whereHas('contract.transaction.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
+        $tagihanBelumLunasQuery = MonthlyPayment::whereHas('contract.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
             $q->byOwner($ownerId);
             if ($kosId) {
                 $q->where('id', $kosId);
@@ -82,43 +82,53 @@ class DashboardService
     {
         if (!$kosId) return collect();
 
-        // Ensure the kos is owned by the user
         $kos = BoardingHouse::byOwner($ownerId)->find($kosId);
         if (!$kos) return collect();
 
-        // Fetch rooms and determine their status based on active contracts/payments
-        // Since we don't have a direct "Room Number" entity (stock means multiple units per type),
-        // we will generate a visual map based on stock for the dashboard layout.
+        // Fetch rooms with active contracts and their latest monthly payment status
         $rooms = Room::where('boarding_house_id', $kosId)
-            ->with(['transactions.contract.monthlyPayments' => function ($q) {
-                $q->where('payment_status', 'pending')->orWhereIn('payment_status', ['paid_to_escrow', 'released_to_owner']);
+            ->with(['contracts' => function ($q) {
+                $q->where('status', 'active')
+                  ->with(['monthlyPayments' => function ($q2) {
+                      $q2->orderBy('due_date', 'desc');
+                  }]);
             }])
             ->get();
 
         $visualRooms = collect();
         $roomNumber = 101;
+
         foreach ($rooms as $room) {
+            // Collect active contracts for this room type
+            $activeContracts = $room->contracts;
+            $occupiedCount   = $activeContracts->count();
+
+            // For each "slot" in stock, assign real status
             for ($i = 0; $i < $room->stock; $i++) {
-                // Determine mock status based on active contracts (This is simplified for visual map)
-                $status = 'kosong'; // kosong, lunas, menunggak
-                
-                // If it's an occupied room (hypothetical, we'll assign status randomly or based on actual data if we tracked individual room numbers)
-                // Since `stock` represents quantity of un-numbered rooms in schema, we mock the status for the visual map
-                // In a real app with `RoomUnit`, we'd query the exact status of each unit.
-                
-                // Just to make the map functional based on the data:
-                // We will fill 'occupied' slots first based on active contracts count
+                if ($i < $occupiedCount) {
+                    $contract       = $activeContracts[$i];
+                    $latestPayment  = $contract->monthlyPayments->first();
+
+                    // Check if overdue: latest payment is pending and past due
+                    $isOverdue = $latestPayment
+                        && $latestPayment->payment_status === 'pending'
+                        && \Carbon\Carbon::parse($latestPayment->due_date)->isPast();
+
+                    $status = $isOverdue ? 'menunggak' : 'lunas';
+                } else {
+                    $status = 'kosong';
+                }
+
                 $visualRooms->push([
                     'number' => $roomNumber++,
-                    'status' => 'lunas' // Placeholder, will calculate properly below
+                    'status' => $status,
                 ]);
             }
         }
 
-        // We know how many are occupied from the summary stats
-        // We'll distribute 'lunas' and 'menunggak' statuses based on total Tagihan Belum Lunas vs Occupied
-        return $visualRooms; // we'll handle the logic properly
+        return $visualRooms;
     }
+
 
     /**
      * Get recent tickets.
@@ -171,7 +181,7 @@ class DashboardService
 
             // Count contracts active in that month
             // A contract is active in a month if: start_date <= endOfMonth AND end_date >= startOfMonth
-            $activeContractsQuery = Contract::whereHas('transaction.room.boardingHouse', function ($q) use ($ownerId, $kosId) {
+            $activeContractsQuery = Contract::whereHas('room.boardingHouse', function ($q) use ($ownerId, $kosId) {
                 $q->byOwner($ownerId);
                 if ($kosId) {
                     $q->where('id', $kosId);
@@ -183,9 +193,10 @@ class DashboardService
 
             $activeCount = $activeContractsQuery->count();
             
-            // Calculate percentage
-            $percentage = round(($activeCount / $totalCapacity) * 100);
-            $trends['values'][] = min(100, $percentage); // cap at 100% just in case
+            // Calculate percentage based on slots used (each contract = 1 slot)
+            // Cap at totalCapacity in case of data inconsistency
+            $percentage = round((min($activeCount, $totalCapacity) / $totalCapacity) * 100);
+            $trends['values'][] = min(100, $percentage);
         }
 
         return $trends;

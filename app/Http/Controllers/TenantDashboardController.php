@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreMaintananceTicketRequest;
 use App\Models\MaintenanceTicket;
 use App\Models\MonthlyPayment;
-use App\Models\Transaction;
+use App\Models\Contract;
 use App\Services\MonthlyBillingService;
 use App\Services\TenantDashboardService;
 use Illuminate\Http\RedirectResponse;
@@ -103,13 +103,13 @@ class TenantDashboardController extends Controller
     {
         $tenant = Auth::user();
         
-        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
+        if ($payment->contract->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 
         return view('tenant.payment-checkout', [
             'tenant'  => $tenant,
-            'payment' => $payment->load(['contract.transaction.room.boardingHouse']),
+            'payment' => $payment->load(['contract.room.boardingHouse']),
         ]);
     }
 
@@ -117,7 +117,7 @@ class TenantDashboardController extends Controller
     {
         $tenant = Auth::user();
         
-        if ($payment->contract->transaction->tenant_id !== $tenant->id) {
+        if ($payment->contract->tenant_id !== $tenant->id) {
             abort(403, 'Unauthorized access');
         }
 
@@ -125,6 +125,8 @@ class TenantDashboardController extends Controller
         
         // Use billing service to mark as paid
         $this->billingService->markAsPaid($payment, $paymentMethod);
+
+        // Remove auto-activation. Contract stays PENDING until Owner approves it.
 
         return redirect()
             ->route('tenant.payments')
@@ -144,25 +146,25 @@ class TenantDashboardController extends Controller
             $selectedKosId = session('selected_kos_id');
         }
         
-        $activeTransaction = $selectedKosId 
+        $activeContract = $selectedKosId 
             ? $allActiveContracts->firstWhere('id', $selectedKosId)
             : $allActiveContracts->first();
         
-        if (!$activeTransaction && $allActiveContracts->isNotEmpty()) {
-            $activeTransaction = $allActiveContracts->first();
-            session(['selected_kos_id' => $activeTransaction->id]);
+        if (!$activeContract && $allActiveContracts->isNotEmpty()) {
+            $activeContract = $allActiveContracts->first();
+            session(['selected_kos_id' => $activeContract->id]);
         }
         
         $status  = request('status');
-        $tickets = $activeTransaction 
-            ? $this->tenantService->getTicketsForContract($tenant, $activeTransaction, $status)
+        $tickets = $activeContract 
+            ? $this->tenantService->getTicketsForContract($tenant, $activeContract, $status)
             : collect();
 
         return view('tenant.tickets', [
             'tenant'             => $tenant,
             'tickets'            => $tickets,
             'allActiveContracts' => $allActiveContracts,
-            'activeTransaction'  => $activeTransaction,
+            'activeContract'     => $activeContract,
         ]);
     }
 
@@ -174,12 +176,12 @@ class TenantDashboardController extends Controller
             abort(403, 'Unauthorized access');
         }
 
-        $activeTransaction = $this->tenantService->getActiveContract($tenant);
+        $activeContract = $this->tenantService->getActiveContract($tenant);
 
         return view('tenant.ticket-detail', [
             'tenant'            => $tenant,
             'ticket'            => $ticket->load(['room.boardingHouse']),
-            'activeTransaction' => $activeTransaction,
+            'activeContract'    => $activeContract,
         ]);
     }
 
@@ -196,22 +198,22 @@ class TenantDashboardController extends Controller
             $selectedKosId = session('selected_kos_id');
         }
         
-        $activeTransaction = $selectedKosId 
+        $activeContract = $selectedKosId 
             ? $allActiveContracts->firstWhere('id', $selectedKosId)
             : $allActiveContracts->first();
         
-        if (!$activeTransaction && $allActiveContracts->isNotEmpty()) {
-            $activeTransaction = $allActiveContracts->first();
-            session(['selected_kos_id' => $activeTransaction->id]);
+        if (!$activeContract && $allActiveContracts->isNotEmpty()) {
+            $activeContract = $allActiveContracts->first();
+            session(['selected_kos_id' => $activeContract->id]);
         }
 
-        if (!$activeTransaction) {
+        if (!$activeContract) {
             abort(403, 'Anda harus memiliki hunian aktif untuk membuat laporan.');
         }
 
         return view('tenant.tickets-create', [
             'tenant'            => $tenant,
-            'activeTransaction' => $activeTransaction,
+            'activeContract'    => $activeContract,
         ]);
     }
 

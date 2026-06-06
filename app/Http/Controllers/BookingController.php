@@ -8,7 +8,7 @@ use App\Http\Resources\BoardingHouseResource;
 use App\Models\BoardingHouse;
 use App\Models\Contract;
 use App\Models\Room;
-use App\Models\Transaction;
+
 use App\Services\BoardingHouseService;
 use App\Services\MonthlyBillingService;
 use Carbon\Carbon;
@@ -46,7 +46,7 @@ class BookingController extends Controller
             'boarding_house_id' => 'required|uuid|exists:boarding_houses,id',
             'room_id' => 'required|uuid|exists:rooms,id',
             'duration_months' => 'required|integer|min:1|max:12',
-            'start_date' => 'required|date|after:today',
+            'start_date' => 'required|date|after_or_equal:today',
         ]);
 
         $tenant = Auth::user();
@@ -66,28 +66,18 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create initial transaction (for contract reference only)
-            $initialTransaction = Transaction::create([
-                'tenant_id' => $tenant->id,
-                'room_id' => $room->id,
-                'start_date' => $startDate,
-                'end_date' => $endDate,
-                'total_amount' => $depositFee,
-                'payment_status' => PaymentStatus::PENDING->value,
-                'payment_method' => null,
-            ]);
-
             // Create contract
             $contractNumber = 'KOS-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
             
             $contract = Contract::create([
-                'transaction_id' => $initialTransaction->id,
+                'tenant_id' => $tenant->id,
+                'room_id' => $room->id,
                 'contract_number' => $contractNumber,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
                 'monthly_fee' => $monthlyFee,
                 'deposit_fee' => $depositFee,
-                'status' => ContractStatus::ACTIVE->value,
+                'status' => ContractStatus::PENDING->value,
                 'tenant_signature_date' => now(),
                 'owner_signature_date' => null,
             ]);
@@ -110,7 +100,8 @@ class BookingController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat booking. Silakan coba lagi.');
+            \Illuminate\Support\Facades\Log::error('Booking error: ' . $e->getMessage() . "\n" . $e->getTraceAsString());
+            return back()->with('error', 'Terjadi kesalahan saat booking: ' . $e->getMessage());
         }
     }
 }
