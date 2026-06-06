@@ -64,18 +64,20 @@ class BookingController extends Controller
         DB::beginTransaction();
         try {
             $contractNumber = 'KOS-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
-            
+
             $contract = Contract::create([
                 'tenant_id' => $tenant->id,
                 'room_id' => $room->id,
                 'contract_number' => $contractNumber,
+                'start_date' => $startDate,
+                'end_date' => $endDate,
                 'monthly_fee' => $monthlyFee,
                 'deposit_fee' => $depositFee,
                 'status' => ContractStatus::PENDING->value,
                 'tenant_signature_date' => now(),
                 'owner_signature_date' => null,
             ]);
-
+            
             // Generate monthly billing transactions
             $monthlyBills = $this->billingService->generateMonthlyBills($contract);
             
