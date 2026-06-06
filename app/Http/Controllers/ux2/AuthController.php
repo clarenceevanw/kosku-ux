@@ -34,12 +34,19 @@ class AuthController extends Controller
     {
         $role = Auth::user()->role->value;
 
-        return match ($role) {
-            'owner'  => redirect()->intended(route('ux2.owner.dashboard')),
-            'admin'  => redirect()->intended(route('admin.dashboard')),
-            'tenant' => redirect()->intended(route('ux2.tenant.dashboard')),
-            default  => redirect()->intended(route('ux2.home')),
-        };
+        if ($role === 'tenant') {
+            return redirect()->route('ux2.tenant.dashboard');
+        }
+
+        if ($role === 'owner') {
+            return redirect()->route('ux2.owner.dashboard');
+        }
+
+        if ($role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        return redirect()->route('ux2.home');
     }
 
     /**
@@ -103,7 +110,7 @@ class AuthController extends Controller
 
     /**
      * POST /logout
-     * Invalidate session and redirect to login.
+     * Invalidate session and redirect to the UX2 homepage.
      */
     public function logout(Request $request): RedirectResponse
     {
@@ -112,7 +119,7 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect()->route('ux2.login');
+        return redirect()->route('ux2.home');
     }
 
     /**

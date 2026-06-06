@@ -92,8 +92,8 @@
                 <h2 class="font-headline-sm text-headline-sm font-semibold text-primary mb-6 border-b border-outline-variant/30 pb-4">Ringkasan Biaya</h2>
                 
                 @php
-                    $boardingHouse = $payment->contract->transaction->room->boardingHouse;
-                    $room = $payment->contract->transaction->room;
+                    $boardingHouse = $payment->contract->room->boardingHouse;
+                    $room = $payment->contract->room;
                     $contract = $payment->contract;
                     $adminFee = 2000;
                     $total = $payment->amount + $adminFee;
@@ -101,8 +101,8 @@
 
                 <div class="flex gap-4 mb-6">
                     <div class="w-20 h-20 rounded-xl bg-surface-variant shrink-0 overflow-hidden">
-                        @if($boardingHouse->main_image)
-                            <img src="{{ Storage::url($boardingHouse->main_image) }}" alt="Kos Image" class="w-full h-full object-cover">
+                        @if($room->image_url)
+                            <img src="{{ $room->image_url }}" alt="{{ $room->type_name }}" class="w-full h-full object-cover">
                         @else
                             <div class="w-full h-full bg-secondary-container flex items-center justify-center">
                                 <span class="material-symbols-outlined text-on-secondary-container">home</span>
@@ -112,7 +112,7 @@
                     <div>
                         <p class="font-label-sm text-label-sm text-on-surface-variant mb-1 uppercase tracking-wider">{{ $boardingHouse->category ?? 'Kos' }}</p>
                         <h3 class="font-headline-sm text-headline-sm font-bold text-primary leading-tight">{{ $boardingHouse->name }}</h3>
-                        <p class="font-body-sm text-body-sm text-on-surface-variant">Kamar {{ $room->name }}</p>
+                        <p class="font-body-sm text-body-sm text-on-surface-variant">Kamar {{ $room->type_name }}</p>
                     </div>
                 </div>
 

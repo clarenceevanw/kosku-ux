@@ -106,7 +106,7 @@
                     @forelse($pendingBills as $bill)
                         @php
                             $isOverdue = \Carbon\Carbon::now()->startOfDay()->greaterThan($bill->due_date->startOfDay());
-                            $initials = collect(explode(' ', $bill->contract->transaction->tenant->name ?? 'Unknown'))
+                            $initials = collect(explode(' ', $bill->contract->tenant->name ?? 'Unknown'))
                                 ->map(fn($n) => substr($n, 0, 1))
                                 ->take(2)
                                 ->join('');
@@ -118,12 +118,12 @@
                                         {{ strtoupper($initials) }}
                                     </div>
                                     <p class="font-label-md text-label-md font-semibold text-on-surface">
-                                        {{ $bill->contract->transaction->tenant->name ?? 'Unknown' }}
+                                        {{ $bill->contract->tenant->name ?? 'Unknown' }}
                                     </p>
                                 </div>
                             </td>
                             <td class="px-md py-md font-body-md text-body-md text-on-surface-variant">
-                                {{ $bill->contract->transaction->room->type_name ?? '-' }}
+                                {{ $bill->contract->room->type_name ?? '-' }}
                             </td>
                             <td class="px-md py-md font-body-md text-body-md text-on-surface-variant">
                                 {{ $bill->due_date->format('d M Y') }}

@@ -138,7 +138,10 @@
     <!-- SideNavBar (Desktop) -->
     <nav class="hidden md:flex flex-col py-6 gap-2 bg-primary-container shadow-sm h-screen w-64 fixed left-0 top-0 overflow-y-auto">
         <div class="px-6 mb-8">
-            <h1 class="font-headline-md text-headline-md font-bold text-on-primary">KosKu</h1>
+            <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-on-primary hover:text-secondary-container transition-colors">
+                <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                KosKu
+            </a>
         </div>
         <!-- User Profile -->
         <div class="px-6 mb-6 flex items-center gap-3">
@@ -186,7 +189,7 @@
                 Report Issue
             </a>
             
-            <form method="POST" action="{{ route('logout') }}" class="w-full">
+            <form method="POST" action="{{ route('ux2.logout') }}" class="w-full">
                 @csrf
                 <button type="submit" class="w-full flex items-center justify-center gap-2 text-on-primary-container hover:text-error py-2 font-label-sm transition-colors">
                     <span class="material-symbols-outlined text-[18px]">logout</span>
@@ -200,7 +203,10 @@
     <main class="flex-1 md:ml-64 overflow-y-auto pb-20 md:pb-0">
         <!-- Top App Bar (Mobile) -->
         <div class="md:hidden flex justify-between items-center bg-primary-container p-4 sticky top-0 z-50 shadow-sm">
-            <h1 class="font-headline-md text-headline-md font-bold text-on-primary">KosKu</h1>
+            <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-on-primary">
+                <span class="material-symbols-outlined text-secondary-container" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                KosKu
+            </a>
             <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container overflow-hidden flex items-center justify-center font-label-sm font-bold">
                 {{ strtoupper(substr($tenant->name ?? 'P', 0, 1)) }}
             </div>
