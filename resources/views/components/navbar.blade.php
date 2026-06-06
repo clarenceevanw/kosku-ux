@@ -44,6 +44,18 @@
         <div class="flex items-center gap-4">
             @auth
                 {{-- Authenticated: show user name + logout --}}
+                {{-- Verification nudge for unverified users --}}
+                @if(!auth()->user()->is_verified)
+                <a href="{{ route('verification.index') }}"
+                   class="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold
+                          border border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 transition-colors">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                    </span>
+                    Verifikasi Akun
+                </a>
+                @endif
                 <span class="hidden md:inline text-sm font-semibold text-gray-600">
                     Halo, {{ Str::words(auth()->user()->name, 1, '') }}
                 </span>
@@ -102,6 +114,17 @@
 
         @auth
             <span class="text-sm font-semibold text-gray-500">Halo, {{ auth()->user()->name }}</span>
+            @if(!auth()->user()->is_verified)
+            <a href="{{ route('verification.index') }}"
+               class="flex items-center gap-3 w-full px-4 py-3 rounded-2xl bg-amber-50 border border-amber-200 text-amber-800">
+                <span class="relative flex h-2.5 w-2.5 shrink-0">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                </span>
+                <span class="font-bold text-sm">Verifikasi Akun</span>
+                <span class="ml-auto text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-800">Belum</span>
+            </a>
+            @endif
             <form method="POST" action="{{ route('logout') }}" class="w-full">
                 @csrf
                 <button type="submit" class="w-full text-left text-lg font-bold text-red-600">
