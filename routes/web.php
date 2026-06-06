@@ -98,10 +98,28 @@ Route::middleware(['auth', 'role:owner'])->prefix('owner')->name('owner.')->grou
 // ──────────────────────────────────────────────────────────────
 // Admin routes (Protected by RoleMiddleware)
 // ──────────────────────────────────────────────────────────────
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', function () {
         return 'Welcome to Admin Dashboard';
-    })->name('admin.dashboard');
+    })->name('dashboard');
+
+    // Verifikasi Identitas
+    Route::prefix('verifications')->name('verifications.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\VerificationController::class, 'index'])->name('index');
+        Route::get('/user/{user}', [\App\Http\Controllers\Admin\VerificationController::class, 'show'])->name('show');
+        Route::post('/{verification}/approve', [\App\Http\Controllers\Admin\VerificationController::class, 'approve'])->name('approve');
+        Route::post('/{verification}/reject', [\App\Http\Controllers\Admin\VerificationController::class, 'reject'])->name('reject');
+        Route::get('/{verification}/file', [\App\Http\Controllers\Admin\VerificationController::class, 'serveFile'])->name('file');
+    });
+});
+
+// ──────────────────────────────────────────────────────────────
+// Verification routes (untuk semua role yang sudah login)
+// ──────────────────────────────────────────────────────────────
+Route::middleware('auth')->prefix('verification')->name('verification.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\VerificationController::class, 'index'])->name('index');
+    Route::post('/upload', [\App\Http\Controllers\VerificationController::class, 'upload'])->name('upload');
+    Route::get('/file/{verification}', [\App\Http\Controllers\VerificationController::class, 'serveFile'])->name('file');
 });
 
 

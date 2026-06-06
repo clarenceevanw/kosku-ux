@@ -127,6 +127,11 @@
                         <div class="absolute top-4 left-4 bg-white/95 backdrop-blur-md text-teal-800 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm border border-teal-100">
                             📸 Foto Terverifikasi
                         </div>
+                        @if(!empty($kos['owner_is_verified']) && $kos['owner_is_verified'])
+                        <div class="absolute bottom-4 left-4 bg-green-600 text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                             <span class="material-symbols-outlined text-[12px]" style="font-variation-settings:'FILL' 1">verified</span> Pemilik Terverifikasi
+                        </div>
+                        @endif
                         <div class="absolute top-4 right-4 bg-[#111827] text-white px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider shadow-sm">
                             {{ $kos['gender_label'] }}
                         </div>

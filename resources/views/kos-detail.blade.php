@@ -38,9 +38,11 @@
                 {{-- Header --}}
                 <div>
                     <div class="flex items-center gap-2 mb-4 flex-wrap">
+                        @if(!empty($boardingHouse['owner']) && $boardingHouse['owner']['is_verified'])
                         <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[15px]">verified</span> Terverifikasi
+                            <span class="material-symbols-outlined text-[15px]" style="font-variation-settings:'FILL' 1">verified</span> Pemilik Terverifikasi
                         </span>
+                        @endif
                         <span class="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-semibold">
                             {{ $boardingHouse['gender_label'] }}
                         </span>
@@ -234,7 +236,14 @@
                         </div>
                         <div>
                             <p class="text-xs text-gray-400">Pemilik</p>
-                            <p class="text-sm font-bold text-[#111827]">{{ $boardingHouse['owner']['name'] }}</p>
+                            <div class="flex items-center gap-1.5">
+                                <p class="text-sm font-bold text-[#111827]">{{ $boardingHouse['owner']['name'] }}</p>
+                                @if($boardingHouse['owner']['is_verified'])
+                                <span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded-full border border-green-200">
+                                    <span class="material-symbols-outlined text-[11px]" style="font-variation-settings:'FILL' 1">verified</span> Terverifikasi
+                                </span>
+                                @endif
+                            </div>
                         </div>
                         @if($boardingHouse['owner']['phone_number'])
                         <a href="https://wa.me/{{ preg_replace('/^0/', '62', $boardingHouse['owner']['phone_number']) }}"

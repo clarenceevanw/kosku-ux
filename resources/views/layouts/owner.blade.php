@@ -97,7 +97,7 @@
     {{-- ══════════════════════════════════════════════
          Main Content Area
     ══════════════════════════════════════════════ --}}
-    <main class="flex-1 md:ml-64 p-4 md:p-8 max-w-7xl mx-auto w-full pb-24 md:pb-8">
+    <main class="flex-1 md:ml-64 p-4 pt-[72px] md:pt-8 md:p-8 max-w-7xl mx-auto w-full">
 
         {{-- Flash Messages --}}
         @if(session('success'))
