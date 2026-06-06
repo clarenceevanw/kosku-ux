@@ -165,6 +165,10 @@ Route::prefix('ux2')->name('ux2.')->group(function () {
         Route::get('/tickets', [App\Http\Controllers\ux2\Owner\TicketController::class, 'index'])->name('tickets.index');
         Route::get('/tickets/{id}', [App\Http\Controllers\ux2\Owner\TicketController::class, 'show'])->name('tickets.show');
         Route::put('/tickets/{id}', [App\Http\Controllers\ux2\Owner\TicketController::class, 'updateStatus'])->name('tickets.update');
+
+        // Pemesanan
+        Route::get('/pemesanan', [App\Http\Controllers\ux2\Owner\TransactionController::class, 'index'])->name('transactions.index');
+        Route::post('/pemesanan/{id}/approve', [App\Http\Controllers\ux2\Owner\TransactionController::class, 'approve'])->name('transactions.approve');
         
         // Keuangan
         Route::get('/keuangan', [App\Http\Controllers\ux2\Owner\FinanceController::class, 'index'])->name('keuangan.index');

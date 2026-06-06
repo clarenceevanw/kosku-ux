@@ -160,6 +160,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('ux2.owner.transactions.index') }}" class="flex items-center gap-sm px-md py-sm rounded-xl transition-colors {{ request()->routeIs('ux2.owner.transactions.*') ? 'nav-item-active' : 'hover:bg-surface-container' }}">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <span class="font-label-md text-label-md">Pemesanan</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('ux2.owner.tickets.index') }}" class="flex items-center gap-sm px-md py-sm rounded-xl transition-colors {{ request()->routeIs('ux2.owner.tickets.*') ? 'nav-item-active' : 'hover:bg-surface-container' }}">
                         <span class="material-symbols-outlined">build</span>
                         <span class="font-label-md text-label-md">Laporan Kerusakan</span>
