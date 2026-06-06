@@ -590,9 +590,11 @@
 
                 <div class="relative aspect-[4/3] overflow-hidden bg-gray-100">
                     <div class="absolute top-4 left-4 z-10 flex gap-2">
+                        @if(!empty($kos['owner_is_verified']) && $kos['owner_is_verified'])
                         <span class="px-3 py-1 bg-green-100 text-green-700 text-[11px] font-bold rounded-full flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[13px]">verified</span> Terverifikasi
+                            <span class="material-symbols-outlined text-[13px]" style="font-variation-settings:'FILL' 1">verified</span> Pemilik Terverifikasi
                         </span>
+                        @endif
                     </div>
                     <button class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm
                                    flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors shadow-sm">
