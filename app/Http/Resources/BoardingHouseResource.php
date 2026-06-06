@@ -88,6 +88,9 @@ class BoardingHouseResource extends JsonResource
             // Facility preview for cards
             'facility_preview'     => $facilityPreview,
 
+            // Owner verified badge — for cards
+            'owner_is_verified'    => $this->relationLoaded('owner') && $this->owner?->is_verified,
+
             // All facilities (full detail page)
             'facilities'           => FacilityResource::collection($this->whenLoaded('facilities')),
 
@@ -104,6 +107,7 @@ class BoardingHouseResource extends JsonResource
                     'id'           => $this->owner->id,
                     'name'         => $this->owner->name,
                     'phone_number' => $this->owner->phone_number,
+                    'is_verified'  => (bool) $this->owner->is_verified,
                 ]
             ),
 
