@@ -47,6 +47,12 @@
                 @if($keyword)
                     <input type="hidden" name="q" value="{{ $keyword }}">
                 @endif
+                {{-- Carry location params --}}
+                @if(!empty($activeFilters['landmark_id']))
+                    <input type="hidden" name="landmark_id" value="{{ $activeFilters['landmark_id'] }}">
+                @elseif(!empty($activeFilters['district_id']))
+                    <input type="hidden" name="district_id" value="{{ $activeFilters['district_id'] }}">
+                @endif
 
                 {{-- ── KOTA ── --}}
                 @if($cities->isNotEmpty())
@@ -578,9 +584,65 @@
             <input class="bg-transparent border-none outline-none text-sm w-full placeholder-gray-400 text-[#111827] focus:ring-0"
                    placeholder="Cari lokasi atau nama kos..."
                    type="text" name="q" value="{{ $keyword }}">
+            {{-- Carry location context in mobile form --}}
+            @if(!empty($activeFilters['landmark_id']))
+                <input type="hidden" name="landmark_id" value="{{ $activeFilters['landmark_id'] }}">
+            @elseif(!empty($activeFilters['district_id']))
+                <input type="hidden" name="district_id" value="{{ $activeFilters['district_id'] }}">
+            @endif
         </form>
 
-        {{-- Results Grid --}}
+        {{-- ── Location Context Badge ──────────────────────────────────── --}}
+        @if($activeLandmark)
+        <div class="flex items-start gap-3 mb-6 p-4 rounded-2xl bg-gradient-to-r from-blue-50 to-indigo-50
+                    border border-blue-100">
+            <div class="w-9 h-9 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-blue-600 text-[18px]"
+                      style="font-variation-settings:'FILL' 1">
+                    @switch($activeLandmark->type?->value)
+                        @case('campus') school @break
+                        @case('station') train @break
+                        @case('mall') shopping_bag @break
+                        @default location_on
+                    @endswitch
+                </span>
+            </div>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-black uppercase tracking-wider text-blue-500 mb-0.5">Pencarian Lokasi</p>
+                <p class="text-sm font-bold text-[#111827]">
+                    Menampilkan Kos di sekitar:
+                    <span class="text-blue-700">{{ $activeLandmark->name }}</span>
+                </p>
+                <p class="text-xs text-gray-500 mt-0.5 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-[13px] text-gray-400">radar</span>
+                    Radius <strong>3 km</strong> &nbsp;·&nbsp;
+                    {{ $activeLandmark->district?->name }}, {{ $activeLandmark->district?->city?->name }}
+                </p>
+            </div>
+            <a href="{{ route('search', array_filter(['q' => $keyword])) }}"
+               class="shrink-0 w-7 h-7 rounded-full bg-blue-100 hover:bg-blue-200 flex items-center justify-center
+                      transition-colors" title="Hapus filter lokasi">
+                <span class="material-symbols-outlined text-[14px] text-blue-600">close</span>
+            </a>
+        </div>
+        @elseif($activeDistrict)
+        <div class="flex items-center gap-3 mb-6 p-3 rounded-2xl bg-teal-50 border border-teal-100">
+            <span class="material-symbols-outlined text-teal-600 text-[18px]" style="font-variation-settings:'FILL' 1">location_on</span>
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-black uppercase tracking-wider text-teal-500">Filter Area</p>
+                <p class="text-sm font-bold text-[#111827]">
+                    Area: <span class="text-teal-700">{{ $activeDistrict->name }}</span>
+                    <span class="font-normal text-gray-500">, {{ $activeDistrict->city?->name }}</span>
+                </p>
+            </div>
+            <a href="{{ route('search', array_filter(['q' => $keyword])) }}"
+               class="w-7 h-7 rounded-full bg-teal-100 hover:bg-teal-200 flex items-center justify-center transition-colors"
+               title="Hapus filter area">
+                <span class="material-symbols-outlined text-[14px] text-teal-600">close</span>
+            </a>
+        </div>
+        @endif
+
         @if(count($boardingHouses) > 0)
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             @foreach($boardingHouses as $kos)
