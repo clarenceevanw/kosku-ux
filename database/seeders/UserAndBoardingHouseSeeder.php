@@ -317,7 +317,7 @@ class UserAndBoardingHouseSeeder extends Seeder
             $this->command->info("✓ Seeded: {$data['name']} (district: {$data['district_id']})");
         }
 
-        $this->seedUsabilityDemoScenario($sharedFacilities, $roomFacilities, $allRules);
+        $this->seedUsabilityDemoScenario($tenants, $sharedFacilities, $roomFacilities, $allRules);
 
         $this->command->info('');
         $this->command->info('✅ All boarding houses, rooms, facilities, and reviews seeded successfully!');
@@ -325,7 +325,7 @@ class UserAndBoardingHouseSeeder extends Seeder
         $this->command->info('   Total tenants: ' . $tenants->count());
     }
 
-    private function seedUsabilityDemoScenario($sharedFacilities, $roomFacilities, $allRules): void
+    private function seedUsabilityDemoScenario($tenants, $sharedFacilities, $roomFacilities, $allRules): void
     {
         $owner = User::updateOrCreate(
             ['email' => 'budi@kosku.id'],
@@ -485,6 +485,16 @@ class UserAndBoardingHouseSeeder extends Seeder
             ],
         ]);
 
+        Review::updateOrCreate(
+            ['contract_id' => $activeContract->id],
+            [
+                'tenant_id'         => $jessica->id,
+                'boarding_house_id'  => $house->id,
+                'rating'             => 5,
+                'comment'            => 'Kosnya bersih, aman, dan pemilik cepat tanggap. Cocok untuk tinggal jangka menengah.',
+            ]
+        );
+
         $searchableRooms = [
             [
                 'name' => 'Kos Siwalankerto Harmony',
@@ -576,6 +586,36 @@ class UserAndBoardingHouseSeeder extends Seeder
                 'Kasur',
                 'Lemari',
             ]));
+
+            $reviewTenant = $tenants->values()->get($index) ?? $tenants->first();
+
+            $demoContract = Contract::updateOrCreate(
+                [
+                    'tenant_id' => $reviewTenant->id,
+                    'room_id'   => $demoRoom->id,
+                ],
+                [
+                    'contract_number'       => 'KOS-DEMO-REV-' . str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT),
+                    'start_date'            => now()->subMonths(4)->startOfMonth(),
+                    'end_date'              => now()->subMonths(1)->endOfMonth(),
+                    'monthly_fee'           => $demoRoom->price_per_month,
+                    'deposit_fee'           => $demoRoom->price_per_month,
+                    'tenant_signature_date' => now()->subMonths(4)->subDays(2),
+                    'owner_signature_date'  => now()->subMonths(4)->subDay(),
+                    'pdf_url'               => null,
+                    'status'                => ContractStatus::EXPIRED->value,
+                ]
+            );
+
+            Review::updateOrCreate(
+                ['contract_id' => $demoContract->id],
+                [
+                    'tenant_id'         => $reviewTenant->id,
+                    'boarding_house_id'  => $demoHouse->id,
+                    'rating'             => 4 + ($index % 2),
+                    'comment'            => $this->getRandomComment(),
+                ]
+            );
         }
 
         $this->command->info('✓ Usability demo seeded: Aldi, Jessica, and Pak Budi are linked to the same kos flow.');
