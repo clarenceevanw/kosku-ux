@@ -174,6 +174,12 @@
                         <span class="font-label-md text-label-md">Laporan Kerusakan</span>
                     </a>
                 </li>
+                <li>
+                    <a href="{{ route('ux2.verification.index') }}" class="flex items-center gap-sm px-md py-sm rounded-xl transition-colors {{ request()->routeIs('ux2.verification.*') ? 'nav-item-active' : 'hover:bg-surface-container' }}">
+                        <span class="material-symbols-outlined">verified_user</span>
+                        <span class="font-label-md text-label-md">Verifikasi Dokumen</span>
+                    </a>
+                </li>
             </ul>
         </nav>
 
@@ -259,6 +265,10 @@
             <a href="{{ route('ux2.owner.tickets.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.tickets.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
                 <span class="material-symbols-outlined text-[20px]">build</span>
                 <span class="text-[10px] font-semibold">Tiket</span>
+            </a>
+            <a href="{{ route('ux2.verification.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.verification.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">verified_user</span>
+                <span class="text-[10px] font-semibold">Verif</span>
             </a>
         </div>
     </nav>

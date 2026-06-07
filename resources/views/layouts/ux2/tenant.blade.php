@@ -166,13 +166,16 @@
                     ['route' => 'ux2.tenant.tickets', 'icon' => 'build', 'label' => 'Laporan Kerusakan', 'match' => 'laporan'],
                     ['route' => 'ux2.tenant.contract', 'icon' => 'description', 'label' => 'Kontrak Digital', 'match' => 'kontrak'],
                     ['route' => 'ux2.tenant.rules', 'icon' => 'gavel', 'label' => 'Peraturan Kos', 'match' => 'peraturan'],
+                    ['route' => 'ux2.verification.index', 'icon' => 'verified_user', 'label' => 'Verifikasi Identitas', 'match' => null],
                     ['route' => 'ux2.tenant.settings', 'icon' => 'settings', 'label' => 'Pengaturan', 'match' => 'pengaturan'],
                 ];
             @endphp
 
             @foreach($navItems as $item)
                 @php
-                    $isActive = request()->is("ux2/tenant/{$item['match']}*");
+                    $isActive = $item['match']
+                        ? request()->is("ux2/tenant/{$item['match']}*")
+                        : request()->routeIs('ux2.verification.*');
                     $activeClass = $isActive 
                         ? 'bg-secondary-container text-on-secondary-container' 
                         : 'text-white/75 hover:bg-white/10 hover:text-white';
@@ -249,19 +252,23 @@
     <nav class="md:hidden fixed bottom-0 w-full bg-surface-container-lowest border-t border-outline-variant shadow-[0_-4px_20px_rgba(0,0,0,0.05)] z-50">
         <div class="flex justify-around items-center h-16">
             <a class="flex flex-col items-center justify-center w-full h-full {{ request()->routeIs('ux2.tenant.dashboard') ? 'text-secondary' : 'text-on-surface-variant' }}" href="{{ route('ux2.tenant.dashboard') }}">
-                <span class="material-symbols-outlined" {{ request()->routeIs('ux2.tenant.dashboard') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>home</span>
+                <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('ux2.tenant.dashboard') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>home</span>
                 <span class="font-label-sm text-[10px] mt-1">Beranda</span>
             </a>
             <a class="flex flex-col items-center justify-center w-full h-full {{ request()->routeIs('ux2.tenant.payments*') ? 'text-secondary' : 'text-on-surface-variant' }}" href="{{ route('ux2.tenant.payments') }}">
-                <span class="material-symbols-outlined" {{ request()->routeIs('ux2.tenant.payments*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>payments</span>
+                <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('ux2.tenant.payments*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>payments</span>
                 <span class="font-label-sm text-[10px] mt-1">Tagihan</span>
             </a>
             <a class="flex flex-col items-center justify-center w-full h-full {{ request()->routeIs('ux2.tenant.tickets*') ? 'text-secondary' : 'text-on-surface-variant' }}" href="{{ route('ux2.tenant.tickets') }}">
-                <span class="material-symbols-outlined" {{ request()->routeIs('ux2.tenant.tickets*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>build</span>
+                <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('ux2.tenant.tickets*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>build</span>
                 <span class="font-label-sm text-[10px] mt-1">Lapor</span>
             </a>
+            <a class="flex flex-col items-center justify-center w-full h-full {{ request()->routeIs('ux2.verification.*') ? 'text-secondary' : 'text-on-surface-variant' }}" href="{{ route('ux2.verification.index') }}">
+                <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('ux2.verification.*') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>verified_user</span>
+                <span class="font-label-sm text-[10px] mt-1">Verif</span>
+            </a>
             <a class="flex flex-col items-center justify-center w-full h-full {{ request()->routeIs('ux2.tenant.settings') ? 'text-secondary' : 'text-on-surface-variant' }}" href="{{ route('ux2.tenant.settings') }}">
-                <span class="material-symbols-outlined" {{ request()->routeIs('ux2.tenant.settings') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>person</span>
+                <span class="material-symbols-outlined text-[20px]" {{ request()->routeIs('ux2.tenant.settings') ? 'style=font-variation-settings:\'FILL\'1;' : '' }}>person</span>
                 <span class="font-label-sm text-[10px] mt-1">Profil</span>
             </a>
         </div>

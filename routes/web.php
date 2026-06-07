@@ -151,6 +151,13 @@ Route::prefix('ux2')->name('ux2.')->group(function () {
 
     Route::middleware('auth')->group(function () {
         Route::post('/logout', [App\Http\Controllers\ux2\AuthController::class, 'logout'])->name('logout');
+
+        // ── Verifikasi Dokumen (owner & tenant)
+        Route::prefix('verification')->name('verification.')->group(function () {
+            Route::get('/', [App\Http\Controllers\ux2\VerificationController::class, 'index'])->name('index');
+            Route::post('/upload', [App\Http\Controllers\ux2\VerificationController::class, 'upload'])->name('upload');
+            Route::get('/file/{verification}', [App\Http\Controllers\ux2\VerificationController::class, 'serveFile'])->name('file');
+        });
     });
 
     Route::middleware(['auth', 'role:tenant'])->prefix('tenant')->name('tenant.')->group(function () {
