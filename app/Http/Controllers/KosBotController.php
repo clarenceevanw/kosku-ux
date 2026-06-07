@@ -29,14 +29,19 @@ class KosBotController extends Controller
         try {
             $agent = new KosBotAgent;
 
+            // Untuk guest, kita buat instansiasi User kosong agar RemembersConversations 
+            // mengenali ini sebagai "participant" dan menyimpan history-nya dengan user_id = null.
+            $user = request()->user() ?? new \App\Models\User();
+
             // Continue existing conversation or start new one
             if ($conversationId = $request->input('conversation_id')) {
-                // Guest users: continue by conversation ID (no user binding)
+                // Guest users: continue by conversation ID
                 $response = $agent
-                    ->continue($conversationId)
+                    ->continue($conversationId, $user)
                     ->prompt($request->input('message'), provider: Lab::Ollama, model: 'llama3.1:latest', timeout: 3000);
             } else {
-                // New conversation — no user required (guest-friendly)
+                // New conversation — require fake user to trigger DB storage
+                $agent->forUser($user);
                 $response = $agent
                     ->prompt($request->input('message'), provider: Lab::Ollama, model: 'llama3.1:latest', timeout: 3000);
             }
