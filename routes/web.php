@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\GuestBoardingHouseController;
+use App\Http\Controllers\LocationSearchController;
 use App\Http\Controllers\Owner\DashboardController;
 use App\Http\Controllers\Owner\KosController;
 use App\Http\Controllers\Owner\RoomController;
@@ -19,6 +20,9 @@ Route::get('/kos/{id}', [GuestBoardingHouseController::class, 'show'])->name('ko
 Route::get('/kos/{id}/booking', [BookingController::class, 'show'])->name('booking.show')->middleware('auth');
 Route::post('/booking', [BookingController::class, 'store'])->name('booking.store')->middleware('auth');
 Route::get('/bot', [GuestBoardingHouseController::class, 'bot'])->name('bot');
+
+// Location autocomplete API — used by navbar search + KosBot
+Route::get('/api/location/suggest', [LocationSearchController::class, 'suggest'])->name('api.location.suggest');
 
 // ──────────────────────────────────────────────────────────────
 // Authentication routes (guest only)
