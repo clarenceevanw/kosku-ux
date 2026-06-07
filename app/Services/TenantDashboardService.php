@@ -48,7 +48,7 @@ class TenantDashboardService
         return $tenant->contracts()
             ->with([
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
-                'room.boardingHouse:id,owner_id,name,address,city,province',
+                'room.boardingHouse:id,owner_id,name,address,district_id,postal_code,latitude,longitude',
                 'room.boardingHouse.owner:id,name,phone_number',
                 'room.boardingHouse.rules:id,category,name',
             ])
@@ -65,7 +65,7 @@ class TenantDashboardService
         return $tenant->contracts()
             ->with([
                 'room:id,boarding_house_id,type_name,price_per_month,size,image_url',
-                'room.boardingHouse:id,owner_id,name,address,city,province',
+                'room.boardingHouse:id,owner_id,name,address,district_id,postal_code,latitude,longitude',
             ])
             ->whereIn('status', [ContractStatus::ACTIVE->value, ContractStatus::PENDING->value])
             ->latest()
@@ -89,7 +89,7 @@ class TenantDashboardService
             ->with([
                 'contract:id,room_id,contract_number,start_date,end_date,status,monthly_fee',
                 'contract.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.room.boardingHouse:id,name,city',
+                'contract.room.boardingHouse:id,name,district_id',
             ])
             ->orderBy('due_date', 'desc')
             ->get();
@@ -105,7 +105,7 @@ class TenantDashboardService
             ->with([
                 'contract:id,room_id,contract_number,start_date,end_date,status,monthly_fee',
                 'contract.room:id,boarding_house_id,type_name,price_per_month',
-                'contract.room.boardingHouse:id,name,city',
+                'contract.room.boardingHouse:id,name,district_id',
             ])
             ->orderBy('billing_month', 'asc')
             ->get();
