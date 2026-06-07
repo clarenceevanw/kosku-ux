@@ -53,19 +53,30 @@ class GuestBoardingHouseController extends Controller
         // Transform each item through the resource while preserving pagination metadata
         $boardingHouses = BoardingHouseResource::collection($paginator)->resolve();
 
+        // Resolve location context for result header badge
+        $activeLandmark = null;
+        $activeDistrict = null;
+        if (! empty($filters['landmark_id'])) {
+            $activeLandmark = $this->boardingHouseService->getActiveLandmark($filters['landmark_id']);
+        } elseif (! empty($filters['district_id'])) {
+            $activeDistrict = $this->boardingHouseService->getActiveDistrict($filters['district_id']);
+        }
+
         // All lookup data — zero Eloquent in this controller
-        $cities            = $this->boardingHouseService->getAllCities();
-        $facilitiesByType  = $this->boardingHouseService->getAllFacilitiesByType();
-        $rules             = $this->boardingHouseService->getAllRules();  // SupportCollection keyed by category
+        $cities           = $this->boardingHouseService->getAllCities();
+        $facilitiesByType = $this->boardingHouseService->getAllFacilitiesByType();
+        $rules            = $this->boardingHouseService->getAllRules();
 
         return view('search', [
             'boardingHouses'   => $boardingHouses,
             'paginator'        => $paginator,
             'keyword'          => $filters['q'] ?? null,
             'cities'           => $cities,
-            'facilitiesByType' => $facilitiesByType,   // ['bersama' => Collection, 'ruang' => Collection]
-            'rules'            => $rules,              // Collection grouped by category
+            'facilitiesByType' => $facilitiesByType,
+            'rules'            => $rules,
             'activeFilters'    => $filters,
+            'activeLandmark'   => $activeLandmark,   // Landmark model or null
+            'activeDistrict'   => $activeDistrict,   // District model or null
         ]);
     }
 

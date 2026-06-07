@@ -21,6 +21,8 @@ class SearchBoardingHouseRequest extends FormRequest
             'q'                  => ['nullable', 'string', 'max:100', 'min:2'],
             'gender_type'        => ['nullable', 'string', 'in:putra,putri,campur'],
             'city'               => ['nullable', 'string', 'max:100'],
+            'district_id'        => ['nullable', 'string', 'max:7'],     // BPS 7-char code
+            'landmark_id'        => ['nullable', 'string', 'uuid'],      // UUID of a landmark
             'min_price'          => ['nullable', 'integer', 'min:0'],
             'max_price'          => ['nullable', 'integer', 'min:0'],
             'facilities'         => ['nullable', 'array'],
@@ -51,6 +53,8 @@ class SearchBoardingHouseRequest extends FormRequest
             'q'               => $this->validated('q'),
             'gender_type'     => $this->validated('gender_type'),
             'city'            => $this->validated('city'),
+            'district_id'     => $this->validated('district_id'),
+            'landmark_id'     => $this->validated('landmark_id'),
             'min_price'       => $this->validated('min_price'),
             'max_price'       => $this->validated('max_price'),
             'facilities'      => $this->validated('facilities'),
