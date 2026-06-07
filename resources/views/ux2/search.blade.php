@@ -26,19 +26,31 @@
 <main class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop py-lg flex flex-col lg:flex-row gap-gutter relative">
 <!-- Sidebar Filters -->
 <aside class="w-full lg:w-72 flex-shrink-0">
-<div class="sticky top-[104px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-[0px_4px_20px_rgba(15,23,42,0.02)] space-y-md" id="search-filter-form">
+<div class="sticky top-[104px] bg-surface-container-lowest border border-outline-variant rounded-xl p-md shadow-[0px_4px_20px_rgba(15,23,42,0.02)] space-y-md max-h-[calc(100vh-120px)] overflow-y-auto" id="search-filter-form">
 <div class="flex items-center gap-2 border-b border-outline-variant pb-sm">
 <span class="material-symbols-outlined text-primary">filter_list</span>
 <h2 class="font-headline-md text-headline-md text-primary font-bold">Filter</h2>
 </div>
 <!-- Location Search -->
 <div class="space-y-sm">
-<label class="font-label-md text-label-md text-on-surface-variant">Lokasi</label>
+<label class="font-label-md text-label-md text-on-surface-variant">Lokasi (Area/Nama Kos)</label>
 <div class="relative">
 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
-<input class="js-live-filter w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-secondary focus:ring-2 focus:ring-secondary-container/50 outline-none text-body-md font-body-md bg-surface transition-all" id="filter-keyword" name="q" placeholder="Ketik area..." type="text" value="{{ $keyword ?? '' }}"/>
+<input class="js-live-filter w-full pl-10 pr-4 py-2 border border-outline-variant rounded-lg focus:border-secondary focus:ring-2 focus:ring-secondary-container/50 outline-none text-body-md font-body-md bg-surface transition-all" id="filter-keyword" name="q" placeholder="Ketik pencarian..." type="text" value="{{ $keyword ?? '' }}"/>
 </div>
 </div>
+<!-- City Filter -->
+@if(isset($cities) && $cities->isNotEmpty())
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Kota</label>
+<select class="js-live-filter w-full px-4 py-2 border border-outline-variant rounded-lg focus:border-secondary focus:ring-2 focus:ring-secondary-container/50 outline-none text-body-md font-body-md bg-surface transition-all cursor-pointer" id="filter-city" name="city">
+<option value="">Semua Kota</option>
+@foreach($cities as $city)
+<option value="{{ $city }}" @selected(($filters['city'] ?? '') === $city)>{{ $city }}</option>
+@endforeach
+</select>
+</div>
+@endif
 <!-- Price Range -->
 <div class="space-y-sm">
 <label class="font-label-md text-label-md text-on-surface-variant">Harga Per Bulan</label>
@@ -72,6 +84,42 @@
 </label>
 </div>
 </div>
+<!-- Fasilitas Bersama -->
+@php $besamaFacilities = $facilitiesByType['bersama'] ?? collect(); @endphp
+@if($besamaFacilities->isNotEmpty())
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Fasilitas Bersama</label>
+<div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2">
+@foreach($besamaFacilities as $facility)
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="js-live-filter w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="facilities[]" type="checkbox" value="{{ $facility->id }}" @checked(in_array($facility->id, $filters['facilities'] ?? []))/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary transition-colors flex items-center gap-1.5">
+@if($facility->icon)<span class="material-symbols-outlined text-[14px] text-outline">{{ $facility->icon }}</span>@endif
+{{ $facility->name }}
+</span>
+</label>
+@endforeach
+</div>
+</div>
+@endif
+<!-- Fasilitas Kamar -->
+@php $ruangFacilities = $facilitiesByType['ruang'] ?? collect(); @endphp
+@if($ruangFacilities->isNotEmpty())
+<div class="space-y-sm">
+<label class="font-label-md text-label-md text-on-surface-variant">Fasilitas Kamar</label>
+<div class="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2">
+@foreach($ruangFacilities as $facility)
+<label class="flex items-center gap-2 cursor-pointer group">
+<input class="js-live-filter w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="room_facilities[]" type="checkbox" value="{{ $facility->id }}" @checked(in_array($facility->id, $filters['room_facilities'] ?? []))/>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-secondary transition-colors flex items-center gap-1.5">
+@if($facility->icon)<span class="material-symbols-outlined text-[14px] text-outline">{{ $facility->icon }}</span>@endif
+{{ $facility->name }}
+</span>
+</label>
+@endforeach
+</div>
+</div>
+@endif
 </div>
 </aside>
 <!-- Search Results Area -->
@@ -95,7 +143,11 @@
 <!-- Grid Layout -->
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-gutter" id="boarding-house-grid">
 @forelse ($boardingHouses as $house)
-<article class="js-house-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(15,23,42,0.05)] overflow-hidden group hover:-translate-y-1 hover:shadow-[0px_10px_30px_rgba(15,23,42,0.12)] transition-all duration-300 cursor-pointer flex flex-col" data-created-order="{{ $loop->index }}" data-gender="{{ $house['gender_type'] }}" data-price="{{ $house['min_price'] ?? 0 }}" data-search="{{ strtolower(trim(($house['name'] ?? '') . ' ' . ($house['city'] ?? '') . ' ' . ($house['province'] ?? '') . ' ' . ($house['address'] ?? '') . ' ' . ($house['description'] ?? ''))) }}" onclick="window.location='{{ route('ux2.kos.show', $house['id']) }}'">
+@php
+    // Get array of facility IDs for this house (both shared and room facilities for filtering)
+    $allFacilityIds = $house['all_facility_ids'] ?? [];
+@endphp
+<article class="js-house-card bg-surface-container-lowest rounded-xl border border-outline-variant shadow-[0px_4px_20px_rgba(15,23,42,0.05)] overflow-hidden group hover:-translate-y-1 hover:shadow-[0px_10px_30px_rgba(15,23,42,0.12)] transition-all duration-300 cursor-pointer flex flex-col" data-created-order="{{ $loop->index }}" data-gender="{{ $house['gender_type'] }}" data-price="{{ $house['min_price'] ?? 0 }}" data-city="{{ strtolower($house['city'] ?? '') }}" data-facilities="{{ json_encode($allFacilityIds) }}" data-search="{{ strtolower(trim(($house['name'] ?? '') . ' ' . ($house['city'] ?? '') . ' ' . ($house['province'] ?? '') . ' ' . ($house['address'] ?? '') . ' ' . ($house['description'] ?? ''))) }}" onclick="window.location='{{ route('ux2.kos.show', $house['id']) }}'">
 <div class="relative aspect-[4/3] overflow-hidden bg-surface-variant">
 @if (!empty($house['available_stock']))
 <div class="absolute top-3 left-3 z-10 bg-secondary-container text-on-secondary-container font-label-sm text-label-sm px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
@@ -163,7 +215,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const minPriceInput = document.getElementById('filter-min-price');
     const maxPriceInput = document.getElementById('filter-max-price');
     const sortSelect = document.getElementById('filter-sort');
+    const citySelect = document.getElementById('filter-city');
     const genderInputs = Array.from(document.querySelectorAll('input[name="gender_type[]"]'));
+    const facilityInputs = Array.from(document.querySelectorAll('input[name="facilities[]"], input[name="room_facilities[]"]'));
     const controls = Array.from(document.querySelectorAll('.js-live-filter'));
 
     const numberValue = (value) => {
@@ -174,24 +228,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const selectedGenders = () => genderInputs
         .filter((input) => input.checked)
         .map((input) => input.value);
+        
+    const selectedFacilities = () => facilityInputs
+        .filter((input) => input.checked)
+        .map((input) => input.value);
 
     const applyLiveFilters = () => {
         const keyword = (keywordInput.value || '').trim().toLowerCase();
+        const city = citySelect ? (citySelect.value || '').trim().toLowerCase() : '';
         const minPrice = numberValue(minPriceInput.value);
         const maxPrice = numberValue(maxPriceInput.value);
         const genders = selectedGenders();
+        const facilities = selectedFacilities();
 
         const visibleCards = cards.filter((card) => {
             const searchableText = card.dataset.search || '';
             const price = Number(card.dataset.price || 0);
             const gender = card.dataset.gender || '';
+            const cardCity = card.dataset.city || '';
+            const cardFacilities = JSON.parse(card.dataset.facilities || '[]');
 
             const matchesKeyword = !keyword || searchableText.includes(keyword);
+            const matchesCity = !city || cardCity === city;
             const matchesMinPrice = minPrice === null || price >= minPrice;
             const matchesMaxPrice = maxPrice === null || price <= maxPrice;
             const matchesGender = genders.length === 0 || genders.includes(gender);
+            
+            // For facilities, the house must have ALL selected facilities
+            const matchesFacilities = facilities.length === 0 || facilities.every(fId => cardFacilities.includes(fId));
 
-            return matchesKeyword && matchesMinPrice && matchesMaxPrice && matchesGender;
+            return matchesKeyword && matchesCity && matchesMinPrice && matchesMaxPrice && matchesGender && matchesFacilities;
         });
 
         visibleCards.sort((a, b) => {

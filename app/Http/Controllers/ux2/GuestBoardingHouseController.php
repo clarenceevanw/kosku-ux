@@ -58,18 +58,26 @@ class GuestBoardingHouseController extends Controller
             BoardingHouse::query()
             ->with([
                 'rooms:id,boarding_house_id,type_name,price_per_month,stock,size,image_url',
+                'rooms.facilities:id',
                 'facilities:id,name,icon',
                 'reviews:id,boarding_house_id,rating',
+                'district.city' // Need city relation for filtering in UX2
             ])
             ->latest()
             ->get()
         )->resolve();
 
+        // ── Fetch lookup data for UX2 filters ──
+        $cities           = $this->boardingHouseService->getAllCities();
+        $facilitiesByType = $this->boardingHouseService->getAllFacilitiesByType();
+
         return view('ux2.search', [
-            'boardingHouses' => $boardingHouses,
-            'totalHouses'    => count($boardingHouses),
-            'keyword'        => $filters['q'] ?? null,
-            'filters'        => $filters,
+            'boardingHouses'   => $boardingHouses,
+            'totalHouses'      => count($boardingHouses),
+            'keyword'          => $filters['q'] ?? null,
+            'filters'          => $filters,
+            'cities'           => $cities,
+            'facilitiesByType' => $facilitiesByType,
         ]);
     }
 

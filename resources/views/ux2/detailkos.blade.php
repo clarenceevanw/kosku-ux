@@ -380,6 +380,45 @@
                 </div>
             </div>
 
+            {{-- Divider --}}
+            @if(!empty($boardingHouse['reviews']))
+            <div style="height:1px; background:var(--ux2-line);"></div>
+
+            {{-- Ulasan Penyewa --}}
+            <div class="reveal reveal-d4">
+                <div class="flex items-center justify-between mb-md">
+                    <h2 class="font-headline-md text-headline-md" style="color:var(--ux2-ink);">Ulasan Penyewa</h2>
+                    <div class="flex items-center gap-1">
+                        <span class="material-symbols-outlined text-[18px]" style="color:#fbbf24; font-variation-settings:'FILL' 1;">star</span>
+                        <span class="font-label-md text-label-md font-bold" style="color:var(--ux2-ink);">{{ $boardingHouse['rating_formatted'] }}</span>
+                        <span class="font-body-md text-body-md" style="color:var(--ux2-muted);">({{ $boardingHouse['review_count'] }} ulasan)</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    @foreach($boardingHouse['reviews'] as $review)
+                    <div class="rounded-xl p-4 transition-transform hover:-translate-y-1" style="background:var(--ux2-paper); border:1px solid var(--ux2-line); box-shadow:0 4px 12px rgba(0,0,0,0.02);">
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0" style="background:var(--ux2-panel);">
+                                <span class="material-symbols-outlined text-[20px]" style="color:var(--ux2-muted);">person</span>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="font-label-md text-label-md font-bold truncate" style="color:var(--ux2-ink);">{{ $review['tenant_name'] ?? 'Penyewa Anonim' }}</p>
+                                <p class="text-[11px]" style="color:var(--ux2-muted);">{{ $review['created_at'] }}</p>
+                            </div>
+                            <div class="flex items-center shrink-0">
+                                @for($s = 0; $s < 5; $s++)
+                                    <span class="material-symbols-outlined text-[14px]" style="color:{{ $s < $review['rating'] ? '#fbbf24' : 'var(--ux2-line)' }}; font-variation-settings:'FILL' 1;">star</span>
+                                @endfor
+                            </div>
+                        </div>
+                        <p class="font-body-md text-body-md leading-relaxed italic" style="color:var(--ux2-muted);">"{{ $review['comment'] ?? 'Tidak ada komentar.' }}"</p>
+                    </div>
+                    @endforeach
+                </div>
+            </div>
+            @endif
+
         </div>{{-- end left column --}}
 
         {{-- ── RIGHT COLUMN — Booking Widget ───── --}}

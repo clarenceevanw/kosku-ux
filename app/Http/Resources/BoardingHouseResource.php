@@ -46,9 +46,22 @@ class BoardingHouseResource extends JsonResource
         // ── Facilities: first 3 for card display ──────────────────────────
         $facilities = $this->whenLoaded('facilities');
         $facilityPreview = [];
+        $allFacilityIds = [];
+        
         if ($facilities instanceof \Illuminate\Support\Collection) {
             $facilityPreview = FacilityResource::collection($facilities->take(3))->resolve();
+            $allFacilityIds = $facilities->pluck('id')->toArray();
         }
+
+        // Collect room facilities for filtering
+        if ($this->relationLoaded('rooms') && $this->rooms) {
+            foreach ($this->rooms as $room) {
+                if ($room->relationLoaded('facilities') && $room->facilities) {
+                    $allFacilityIds = array_merge($allFacilityIds, $room->facilities->pluck('id')->toArray());
+                }
+            }
+        }
+        $allFacilityIds = array_values(array_unique($allFacilityIds));
 
         // ── Gender badge ───────────────────────────────────────────────────
         $genderLabel = match ($this->gender_type?->value ?? $this->gender_type) {
@@ -91,6 +104,9 @@ class BoardingHouseResource extends JsonResource
 
             // Facility preview for cards
             'facility_preview'     => $facilityPreview,
+            
+            // All facility IDs for filtering
+            'all_facility_ids'     => $allFacilityIds,
 
             // Owner verified badge — for cards
             'owner_is_verified'    => $this->relationLoaded('owner') && $this->owner?->is_verified,
