@@ -26,7 +26,8 @@ class UserAndBoardingHouseSeeder extends Seeder
     private array $housesData = [
         // ─── SURABAYA (8 houses) ───────────────────────────────────────────
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60293',
+            'district_id' => '3578020', // Rungkut, Surabaya
+            'postal_code' => '60293',
             'name' => 'Kos Rungkut Harmoni',
             'address' => 'Jl. Rungkut Mapan Utara No. 12, Rungkut',
             'description' => 'Kos nyaman di kawasan Rungkut, dekat dengan UBAYA dan kawasan industri SIER. Lingkungan tenang, keamanan 24 jam dengan CCTV.',
@@ -34,7 +35,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800', 'https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60282',
+            'district_id' => '3578030', // Gubeng, Surabaya
+            'postal_code' => '60282',
             'name' => 'Kos Gubeng Residence',
             'address' => 'Jl. Gubeng Kertajaya VIII No. 5, Gubeng',
             'description' => 'Kos premium di pusat kota Surabaya. Sangat strategis, dekat stasiun Gubeng, pusat perbelanjaan dan perkantoran.',
@@ -42,7 +44,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800', 'https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60113',
+            'district_id' => '3578060', // Mulyorejo, Surabaya
+            'postal_code' => '60113',
             'name' => 'Kos Mulyosari Premium',
             'address' => 'Jl. Mulyosari Utara No. 88, Mulyosari',
             'description' => 'Kos asri di kawasan Mulyosari. Dekat ITS, PENS, dan kampus Unair. Cocok untuk mahasiswa dan karyawan.',
@@ -50,7 +53,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1540518614846-7eded433c457?w=800', 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60236',
+            'district_id' => '3578010', // Wonocolo, Surabaya
+            'postal_code' => '60236',
             'name' => 'Kos Petra Executive',
             'address' => 'Jl. Siwalankerto Timur No. 22, Wonocolo',
             'description' => 'Kos eksklusif dekat Universitas Kristen Petra. Cocok untuk mahasiswa yang menginginkan hunian bersih dan fasilitas lengkap.',
@@ -58,7 +62,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=800', 'https://images.unsplash.com/photo-1505693314120-0d443867891c?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60117',
+            'district_id' => '3578050', // Sukolilo, Surabaya
+            'postal_code' => '60117',
             'name' => 'Kos ITS Mitra',
             'address' => 'Jl. Arief Rachman Hakim No. 45, Sukolilo',
             'description' => 'Kos strategis tepat di depan ITS Surabaya. Tersedia koneksi WiFi fiber optik dan akses 24 jam.',
@@ -66,7 +71,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=800', 'https://images.unsplash.com/photo-1571508601891-ca5e7a713859?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60119',
+            'district_id' => '3578050', // Sukolilo, Surabaya
+            'postal_code' => '60119',
             'name' => 'Kos Menur Pumpungan',
             'address' => 'Jl. Menur Pumpungan No. 15, Sukolilo',
             'description' => 'Kos modern dekat RS Universitas Airlangga dan RSUD dr. Soetomo. Cocok untuk co-ass dan dokter muda.',
@@ -74,7 +80,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1493809842364-78817add7ffb?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60226',
+            'district_id' => '3578040', // Dukuh Pakis, Surabaya
+            'postal_code' => '60226',
             'name' => 'Kos Darmo Permai',
             'address' => 'Jl. Darmo Permai III No. 7, Dukuh Pakis',
             'description' => 'Kos mewah di kawasan elite Darmo. Dekat pusat bisnis Surabaya Barat, WTC, dan Galaxy Mall.',
@@ -82,7 +89,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800'],
         ],
         [
-            'city' => 'Surabaya', 'province' => 'Jawa Timur', 'postal_code' => '60115',
+            'district_id' => '3578060', // Mulyorejo, Surabaya
+            'postal_code' => '60115',
             'name' => 'Kos Manyar Permai',
             'address' => 'Jl. Manyar Kertoadi No. 11, Mulyorejo',
             'description' => 'Hunian asri dan quiet zone di Manyar. Dekat UNAIR kampus C dan akses mudah ke pusat kota.',
@@ -91,7 +99,8 @@ class UserAndBoardingHouseSeeder extends Seeder
         ],
         // ─── JAKARTA (4 houses) ───────────────────────────────────────────
         [
-            'city' => 'Jakarta Selatan', 'province' => 'DKI Jakarta', 'postal_code' => '12110',
+            'district_id' => '3171010', // Kebayoran Baru, Jakarta Selatan
+            'postal_code' => '12110',
             'name' => 'Kos Eksklusif Senopati',
             'address' => 'Jl. Senopati No. 81, Kebayoran Baru',
             'description' => 'Kos premium dengan desain modern minimalis di kawasan elite Senopati. Dekat pusat bisnis SCBD dan Sudirman.',
@@ -99,7 +108,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1505693314120-0d443867891c?w=800'],
         ],
         [
-            'city' => 'Jakarta Selatan', 'province' => 'DKI Jakarta', 'postal_code' => '12730',
+            'district_id' => '3171020', // Kemang, Jakarta Selatan
+            'postal_code' => '12730',
             'name' => 'Kos Kemang Executive',
             'address' => 'Jl. Kemang Raya No. 12, Kemang',
             'description' => 'Kos bergaya di kawasan Kemang yang artsy dan cosmopolitan. Dekat restoran, cafe, dan pusat hiburan premium.',
@@ -107,7 +117,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=800'],
         ],
         [
-            'city' => 'Jakarta Selatan', 'province' => 'DKI Jakarta', 'postal_code' => '12820',
+            'district_id' => '3171030', // Tebet, Jakarta Selatan
+            'postal_code' => '12820',
             'name' => 'Kos Nyaman Tebet',
             'address' => 'Jl. Tebet Timur Dalam No. 55, Tebet',
             'description' => 'Kos bersih dan nyaman di Tebet. Dekat taman Tebet Eco Park, stasiun MRT Tebet, dan berbagai kuliner.',
@@ -115,7 +126,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1571508601891-ca5e7a713859?w=800'],
         ],
         [
-            'city' => 'Jakarta Pusat', 'province' => 'DKI Jakarta', 'postal_code' => '10350',
+            'district_id' => '3173010', // Menteng, Jakarta Pusat
+            'postal_code' => '10350',
             'name' => 'Kos Menteng Asri',
             'address' => 'Jl. Gondangdia Lama No. 30, Menteng',
             'description' => 'Kos heritage di kawasan Menteng yang bersejarah. Lingkungan tenang dengan bangunan klasik yang terawat.',
@@ -124,7 +136,8 @@ class UserAndBoardingHouseSeeder extends Seeder
         ],
         // ─── BANDUNG (2 houses) ───────────────────────────────────────────
         [
-            'city' => 'Bandung', 'province' => 'Jawa Barat', 'postal_code' => '40135',
+            'district_id' => '3273010', // Coblong, Bandung
+            'postal_code' => '40135',
             'name' => 'Studio Apartment Dago',
             'address' => 'Jl. Dago (Ir. H. Juanda) No. 150, Coblong',
             'description' => 'Studio modern di jantung kota Bandung. View gunung dan udara sejuk khas Bandung. Dekat ITB dan Dago Entertainment.',
@@ -132,7 +145,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800'],
         ],
         [
-            'city' => 'Bandung', 'province' => 'Jawa Barat', 'postal_code' => '40161',
+            'district_id' => '3273020', // Sukajadi, Bandung
+            'postal_code' => '40161',
             'name' => 'Kos Minimalis Pasteur',
             'address' => 'Jl. Pasteur No. 22, Sukajadi',
             'description' => 'Kos modern dekat pintu tol Pasteur. Akses mudah ke seluruh Bandung dan cocok untuk karyawan.',
@@ -141,7 +155,8 @@ class UserAndBoardingHouseSeeder extends Seeder
         ],
         // ─── YOGYAKARTA (2 houses) ─────────────────────────────────────────
         [
-            'city' => 'Sleman, Yogyakarta', 'province' => 'DI Yogyakarta', 'postal_code' => '55281',
+            'district_id' => '3404010', // Depok, Sleman
+            'postal_code' => '55281',
             'name' => 'Kos Minimalis Seturan',
             'address' => 'Jl. Seturan Raya No. 56, Depok',
             'description' => 'Kos modern di kawasan Seturan Yogyakarta. Dekat UPN, AMIKOM, dan UGM. Harga terjangkau dengan fasilitas lengkap.',
@@ -149,7 +164,8 @@ class UserAndBoardingHouseSeeder extends Seeder
             'images' => ['https://images.unsplash.com/photo-1531835551805-16d864c8d311?w=800'],
         ],
         [
-            'city' => 'Sleman, Yogyakarta', 'province' => 'DI Yogyakarta', 'postal_code' => '55283',
+            'district_id' => '3404010', // Depok, Sleman
+            'postal_code' => '55283',
             'name' => 'Kos Condongcatur Permai',
             'address' => 'Jl. Condongcatur No. 8, Depok',
             'description' => 'Kos nyaman di Condongcatur. Lingkungan mahasiswa yang ramai, akses mudah ke berbagai kampus di DIY.',
@@ -206,16 +222,15 @@ class UserAndBoardingHouseSeeder extends Seeder
 
             // Create boarding house
             $house = BoardingHouse::create([
-                'owner_id'     => $owner->id,
-                'name'         => $data['name'],
-                'description'  => $data['description'],
-                'address'      => $data['address'],
-                'city'         => $data['city'],
-                'province'     => $data['province'],
-                'postal_code'  => $data['postal_code'],
-                'latitude'     => $data['latitude'],
-                'longitude'    => $data['longitude'],
-                'gender_type'  => $data['gender_type'],
+                'owner_id'    => $owner->id,
+                'name'        => $data['name'],
+                'description' => $data['description'],
+                'address'     => $data['address'],
+                'district_id' => $data['district_id'],
+                'postal_code' => $data['postal_code'],
+                'latitude'    => $data['latitude'],
+                'longitude'   => $data['longitude'],
+                'gender_type' => $data['gender_type'],
             ]);
 
             // Attach 3–5 shared/area facilities to the boarding house
@@ -237,9 +252,9 @@ class UserAndBoardingHouseSeeder extends Seeder
             $roomTemplatesForHouse = array_slice($this->roomTemplates, 0, rand(2, 3));
 
             $priceMultiplier = match (true) {
-                in_array($data['city'], ['Jakarta Selatan', 'Jakarta Pusat']) => 1.8,
-                $data['city'] === 'Bandung'                                   => 1.3,
-                default => 1.0,
+                in_array($data['district_id'], ['3171010', '3171020', '3171030', '3173010']) => 1.8, // Jakarta
+                in_array($data['district_id'], ['3273010', '3273020'])                       => 1.3, // Bandung
+                default                                                                       => 1.0,
             };
 
             foreach ($roomTemplatesForHouse as $tpl) {
@@ -297,7 +312,7 @@ class UserAndBoardingHouseSeeder extends Seeder
                 ]);
             }
 
-            $this->command->info("✓ Seeded: {$data['name']} ({$data['city']})");
+            $this->command->info("✓ Seeded: {$data['name']} (district: {$data['district_id']})");
         }
 
         $this->command->info('');
