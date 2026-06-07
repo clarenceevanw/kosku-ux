@@ -232,21 +232,53 @@
                         <label for="file" class="block text-sm font-semibold text-on-surface mb-1.5 font-label">
                             File Dokumen <span class="text-red-500">*</span>
                         </label>
-                        <div class="relative flex flex-col items-center gap-3 px-6 py-8 border-2 border-dashed border-outline-variant rounded-xl hover:border-primary/50 hover:bg-primary-container/30 transition-colors cursor-pointer"
-                             onclick="document.getElementById('file').click()">
-                            <span class="material-symbols-outlined text-on-surface-variant text-[40px]">upload_file</span>
-                            <div class="text-center">
-                                <p class="text-sm font-semibold text-on-surface font-label">Klik untuk pilih file</p>
-                                <p class="text-xs text-on-surface-variant mt-0.5">JPG, PNG, atau PDF · Maks. 5 MB</p>
+                        
+                        <!-- Drag and Drop Zone -->
+                        <div id="drop-zone" class="relative group flex flex-col items-center justify-center gap-3 px-6 py-10 border-2 border-dashed border-outline-variant rounded-2xl bg-surface hover:border-primary/50 hover:bg-primary-container/10 transition-all cursor-pointer overflow-hidden" onclick="document.getElementById('file').click()">
+                            
+                            <!-- Initial State -->
+                            <div id="upload-prompt" class="flex flex-col items-center text-center pointer-events-none transition-opacity duration-300">
+                                <div class="w-16 h-16 mb-2 rounded-full bg-primary-container/50 flex items-center justify-center text-primary group-hover:scale-110 transition-transform duration-300">
+                                    <span class="material-symbols-outlined text-[32px]">cloud_upload</span>
+                                </div>
+                                <p class="text-sm font-semibold text-on-surface font-label">Klik atau Tarik file ke sini</p>
+                                <p class="text-xs text-on-surface-variant mt-1">JPG, PNG, atau PDF (Maks. 5 MB)</p>
                             </div>
+
+                            <!-- Preview State -->
+                            <div id="preview-container" class="hidden absolute inset-0 bg-surface flex-col items-center justify-center z-10 p-2">
+                                <img id="image-preview" src="" alt="Preview" class="hidden w-full h-full object-contain rounded-xl">
+                                <div id="pdf-preview" class="hidden flex-col items-center justify-center w-full h-full">
+                                    <span class="material-symbols-outlined text-red-500 text-[48px]">picture_as_pdf</span>
+                                    <p class="mt-2 text-sm font-bold text-on-surface">Dokumen PDF</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Hover Overlay for Preview -->
+                            <div id="preview-overlay" class="hidden absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                                <span class="material-symbols-outlined text-[32px] mb-1">change_circle</span>
+                                <p class="text-sm font-semibold">Ganti File</p>
+                            </div>
+
                             <input type="file" name="file" id="file" accept=".jpg,.jpeg,.png,.pdf" required
-                                class="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                                onchange="showFileName(this)">
+                                class="hidden"
+                                onchange="handleFileSelect(this)">
                         </div>
-                        <p id="file-name-display" class="hidden mt-2 text-xs text-on-surface-variant flex items-center gap-1.5">
-                            <span class="material-symbols-outlined text-[14px] text-primary">description</span>
-                            <span id="file-name-text"></span>
-                        </p>
+
+                        <!-- File Details Banner -->
+                        <div id="file-details" class="hidden mt-3 p-3 bg-primary-container/20 border border-primary/20 rounded-xl flex items-center justify-between">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="material-symbols-outlined text-primary text-[24px] shrink-0">draft</span>
+                                <div class="min-w-0">
+                                    <p id="file-name" class="text-sm font-semibold text-on-surface truncate pr-4">filename.jpg</p>
+                                    <p id="file-size" class="text-xs text-on-surface-variant mt-0.5">1.2 MB</p>
+                                </div>
+                            </div>
+                            <button type="button" onclick="removeFile(event)" class="w-8 h-8 rounded-full hover:bg-red-100 text-red-500 flex items-center justify-center transition-colors shrink-0" title="Hapus File">
+                                <span class="material-symbols-outlined text-[18px]">delete</span>
+                            </button>
+                        </div>
+
                         <p class="mt-2 text-xs text-on-surface-variant leading-relaxed">
                             Pastikan dokumen terlihat jelas, tidak buram, tidak terpotong, dan semua informasi terbaca.
                         </p>
@@ -274,14 +306,98 @@ function setDocType(val) {
     document.getElementById('upload-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function showFileName(input) {
-    const display = document.getElementById('file-name-display');
-    const text    = document.getElementById('file-name-text');
-    if (input.files && input.files[0]) {
-        text.textContent = input.files[0].name;
-        display.classList.remove('hidden');
-        display.classList.add('flex');
+// ── Drag and Drop Logic ──
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file');
+
+['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, preventDefaults, false);
+});
+
+function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+['dragenter', 'dragover'].forEach(eventName => {
+    dropZone.addEventListener(eventName, highlight, false);
+});
+
+['dragleave', 'drop'].forEach(eventName => {
+    dropZone.addEventListener(eventName, unhighlight, false);
+});
+
+function highlight(e) {
+    dropZone.classList.add('border-primary', 'bg-primary-container/10');
+    dropZone.classList.remove('border-outline-variant', 'bg-surface');
+}
+
+function unhighlight(e) {
+    dropZone.classList.remove('border-primary', 'bg-primary-container/10');
+    dropZone.classList.add('border-outline-variant', 'bg-surface');
+}
+
+dropZone.addEventListener('drop', handleDrop, false);
+
+function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    
+    if (files.length) {
+        fileInput.files = files;
+        handleFileSelect(fileInput);
     }
+}
+
+function handleFileSelect(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        
+        // Tampilkan detail file
+        document.getElementById('file-details').classList.remove('hidden');
+        document.getElementById('file-details').classList.add('flex');
+        document.getElementById('file-name').textContent = file.name;
+        document.getElementById('file-size').textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+        
+        // Handle Preview
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            document.getElementById('upload-prompt').classList.add('hidden');
+            document.getElementById('preview-container').classList.remove('hidden');
+            document.getElementById('preview-container').classList.add('flex');
+            document.getElementById('preview-overlay').classList.remove('hidden');
+            
+            if (file.type.startsWith('image/')) {
+                document.getElementById('image-preview').src = e.target.result;
+                document.getElementById('image-preview').classList.remove('hidden');
+                document.getElementById('pdf-preview').classList.add('hidden');
+                document.getElementById('pdf-preview').classList.remove('flex');
+            } else if (file.type === 'application/pdf') {
+                document.getElementById('image-preview').classList.add('hidden');
+                document.getElementById('pdf-preview').classList.remove('hidden');
+                document.getElementById('pdf-preview').classList.add('flex');
+            }
+        }
+        
+        reader.readAsDataURL(file);
+    }
+}
+
+function removeFile(e) {
+    e.stopPropagation();
+    fileInput.value = '';
+    
+    // Reset UI
+    document.getElementById('file-details').classList.add('hidden');
+    document.getElementById('file-details').classList.remove('flex');
+    
+    document.getElementById('upload-prompt').classList.remove('hidden');
+    document.getElementById('preview-container').classList.add('hidden');
+    document.getElementById('preview-container').classList.remove('flex');
+    document.getElementById('preview-overlay').classList.add('hidden');
+    
+    document.getElementById('image-preview').src = '';
 }
 </script>
 @endpush
