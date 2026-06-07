@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Guarded;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 
-#[Fillable(['owner_id', 'name', 'description', 'address', 'city', 'province', 'postal_code', 'latitude', 'longitude', 'gender_type'])]
+#[Fillable(['owner_id', 'name', 'description', 'address', 'district_id', 'postal_code', 'latitude', 'longitude', 'gender_type'])]
 #[Guarded(['id', 'created_at', 'updated_at'])]
 #[Hidden([])]
 class BoardingHouse extends Model
@@ -32,6 +32,32 @@ class BoardingHouse extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
+    }
+
+    /**
+     * The Kecamatan (district) this boarding house belongs to.
+     * Chain: BoardingHouse → District → City → Province
+     */
+    public function district(): BelongsTo
+    {
+        return $this->belongsTo(District::class);
+    }
+
+    /**
+     * Convenience accessor: returns city name via the loaded district relation.
+     * Avoids N+1 when 'district.city' is eager-loaded.
+     */
+    public function getCityNameAttribute(): ?string
+    {
+        return $this->district?->city?->name;
+    }
+
+    /**
+     * Convenience accessor: returns province name via the loaded chain.
+     */
+    public function getProvinceNameAttribute(): ?string
+    {
+        return $this->district?->city?->province?->name;
     }
 
     public function rooms(): HasMany
