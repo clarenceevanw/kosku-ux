@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\ux2;
 
 use App\Enum\ContractStatus;
-use App\Enum\PaymentStatus;
 use App\Http\Resources\BoardingHouseResource;
-use App\Models\BoardingHouse;
 use App\Models\Contract;
 use App\Models\Room;
 use App\Services\BoardingHouseService;
@@ -65,22 +63,21 @@ class BookingController extends Controller
 
         DB::beginTransaction();
         try {
-            // Create contract directly; tenant and room now live on contracts.
             $contractNumber = 'KOS-' . date('Y') . '-' . strtoupper(substr(uniqid(), -6));
 
             $contract = Contract::create([
                 'tenant_id' => $tenant->id,
                 'room_id' => $room->id,
+                'contract_number' => $contractNumber,
                 'start_date' => $startDate,
                 'end_date' => $endDate,
-                'contract_number' => $contractNumber,
                 'monthly_fee' => $monthlyFee,
                 'deposit_fee' => $depositFee,
                 'status' => ContractStatus::PENDING->value,
                 'tenant_signature_date' => now(),
                 'owner_signature_date' => null,
             ]);
-
+            
             // Generate monthly billing transactions
             $monthlyBills = $this->billingService->generateMonthlyBills($contract);
             

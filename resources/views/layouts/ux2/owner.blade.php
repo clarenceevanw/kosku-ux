@@ -116,20 +116,23 @@
             color: #000000;
         }
     </style>
+    @include('layouts.ux2.theme')
 
     @stack('styles')
 </head>
 <body class="bg-background text-on-background font-body-md antialiased flex min-h-screen">
 
     <!-- Sidebar -->
-    <aside class="hidden md:flex md:flex-col md:w-64 bg-surface-container-lowest border-r border-outline-variant fixed h-screen z-40">
+    <aside class="hidden md:flex md:flex-col md:w-64 ux2-dark-panel border-r border-white/10 fixed h-screen z-40">
         <!-- Brand -->
-        <div class="p-lg border-b border-outline-variant">
+        <div class="p-lg border-b border-white/10">
             <a href="{{ route('ux2.home') }}" class="flex items-center gap-sm">
-                <span class="material-symbols-outlined text-secondary-container text-3xl" style="font-variation-settings: 'FILL' 1;">home_work</span>
-                <span class="font-headline-md text-headline-md font-bold text-primary">KosKu</span>
+                <span class="w-11 h-11 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                    <span class="material-symbols-outlined text-3xl" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </span>
+                <span class="font-headline-md text-headline-md font-bold text-on-primary">KosKu</span>
             </a>
-            <p class="font-label-sm text-label-sm text-on-surface-variant mt-xs">Owner Dashboard</p>
+            <p class="font-label-sm text-label-sm text-on-primary-container mt-xs">Owner Dashboard</p>
         </div>
 
         <!-- Navigation -->
@@ -160,6 +163,12 @@
                     </a>
                 </li>
                 <li>
+                    <a href="{{ route('ux2.owner.transactions.index') }}" class="flex items-center gap-sm px-md py-sm rounded-xl transition-colors {{ request()->routeIs('ux2.owner.transactions.*') ? 'nav-item-active' : 'hover:bg-surface-container' }}">
+                        <span class="material-symbols-outlined">receipt_long</span>
+                        <span class="font-label-md text-label-md">Pemesanan</span>
+                    </a>
+                </li>
+                <li>
                     <a href="{{ route('ux2.owner.tickets.index') }}" class="flex items-center gap-sm px-md py-sm rounded-xl transition-colors {{ request()->routeIs('ux2.owner.tickets.*') ? 'nav-item-active' : 'hover:bg-surface-container' }}">
                         <span class="material-symbols-outlined">build</span>
                         <span class="font-label-md text-label-md">Laporan Kerusakan</span>
@@ -169,14 +178,14 @@
         </nav>
 
         <!-- User Profile -->
-        <div class="p-md border-t border-outline-variant">
+        <div class="p-md border-t border-white/10">
             <div class="flex items-center gap-sm mb-md">
-                <div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center">
-                    <span class="material-symbols-outlined text-on-primary-container">person</span>
+                <div class="w-10 h-10 rounded-lg bg-secondary-container flex items-center justify-center">
+                    <span class="material-symbols-outlined text-on-secondary-container">person</span>
                 </div>
                 <div class="flex-1">
-                    <p class="font-label-md text-label-md font-bold text-on-surface">{{ auth()->user()->name }}</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">Owner</p>
+                    <p class="font-label-md text-label-md font-bold text-on-primary">{{ auth()->user()->name }}</p>
+                    <p class="font-label-sm text-label-sm text-on-primary-container">Owner</p>
                 </div>
             </div>
             <form method="POST" action="{{ route('ux2.logout') }}">
@@ -189,8 +198,24 @@
         </div>
     </aside>
 
+    <!-- Mobile Top Bar -->
+    <header class="md:hidden fixed top-0 inset-x-0 z-40 bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant px-margin-mobile py-sm flex items-center justify-between">
+        <a href="{{ route('ux2.home') }}" class="flex items-center gap-xs font-headline-md text-headline-md font-bold text-primary">
+            <span class="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+            </span>
+            KosKu
+        </a>
+        <form method="POST" action="{{ route('ux2.logout') }}">
+            @csrf
+            <button type="submit" class="w-10 h-10 rounded-lg border border-outline-variant text-error flex items-center justify-center">
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </form>
+    </header>
+
     <!-- Main Content -->
-    <main class="flex-1 md:ml-64 p-margin-mobile md:p-lg max-w-7xl mx-auto w-full">
+    <main class="flex-1 md:ml-64 p-margin-mobile pt-24 pb-24 md:pt-lg md:pb-lg md:p-lg max-w-7xl mx-auto w-full">
         <!-- Flash Messages -->
         @if(session('success'))
         <div class="mb-md px-md py-sm bg-secondary-container/20 border border-secondary-container rounded-xl flex items-center gap-sm">
@@ -208,6 +233,35 @@
 
         @yield('content')
     </main>
+
+    <nav class="md:hidden fixed bottom-0 inset-x-0 z-40 bg-surface-container-lowest/95 backdrop-blur-xl border-t border-outline-variant shadow-lg">
+        <div class="grid grid-cols-6 h-16">
+            <a href="{{ route('ux2.owner.dashboard') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.dashboard') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">dashboard</span>
+                <span class="text-[10px] font-semibold">Home</span>
+            </a>
+            <a href="{{ route('ux2.owner.kos.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.kos.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">home_work</span>
+                <span class="text-[10px] font-semibold">Kos</span>
+            </a>
+            <a href="{{ route('ux2.owner.rooms.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.rooms.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">bed</span>
+                <span class="text-[10px] font-semibold">Kamar</span>
+            </a>
+            <a href="{{ route('ux2.owner.keuangan.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.keuangan.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">payments</span>
+                <span class="text-[10px] font-semibold">Uang</span>
+            </a>
+            <a href="{{ route('ux2.owner.transactions.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.transactions.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">receipt_long</span>
+                <span class="text-[10px] font-semibold">Pesan</span>
+            </a>
+            <a href="{{ route('ux2.owner.tickets.index') }}" class="flex flex-col items-center justify-center gap-1 {{ request()->routeIs('ux2.owner.tickets.*') ? 'text-secondary' : 'text-on-surface-variant' }}">
+                <span class="material-symbols-outlined text-[20px]">build</span>
+                <span class="text-[10px] font-semibold">Tiket</span>
+            </a>
+        </div>
+    </nav>
 
     @stack('scripts')
 </body>

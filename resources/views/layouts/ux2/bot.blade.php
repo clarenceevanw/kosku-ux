@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html class="light" lang="id">
 <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -112,23 +112,36 @@
             scrollbar-width: none;
         }
     </style>
+    @include('layouts.ux2.theme')
 </head>
 <body class="bg-background text-on-background h-screen flex overflow-hidden">
     <!-- TopNavBar (Mobile Only) -->
-    <header class="md:hidden w-full top-0 sticky z-50 border-b border-outline-variant bg-background flex justify-between items-center h-20 px-margin-mobile">
-        <div class="font-headline-md text-headline-md font-bold text-primary">KosKu</div>
-        <button class="material-symbols-outlined text-primary text-3xl">menu</button>
+    <header class="md:hidden w-full top-0 sticky z-50 border-b border-outline-variant bg-surface-container-lowest/95 backdrop-blur-xl flex justify-between items-center h-20 px-margin-mobile">
+        <a href="{{ route('ux2.home') }}" class="font-headline-md text-headline-md font-bold text-primary flex items-center gap-xs">
+            <span class="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+            </span>
+            KosKu
+        </a>
+        <a class="w-10 h-10 rounded-lg border border-outline-variant flex items-center justify-center text-primary" href="{{ route('ux2.search') }}">
+            <span class="material-symbols-outlined">search</span>
+        </a>
     </header>
     
     <!-- SideNavBar (Desktop Only) -->
-    <aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-surface shadow-sm flex-col py-6 gap-2 z-40">
+    <aside class="hidden md:flex h-screen w-64 fixed left-0 top-0 ux2-dark-panel shadow-sm flex-col py-6 gap-2 z-40">
         <div class="px-6 mb-6">
-            <div class="font-headline-md text-headline-md font-bold text-primary">KosKu</div>
+            <a href="{{ route('ux2.home') }}" class="font-headline-md text-headline-md font-bold text-on-primary flex items-center gap-xs">
+                <span class="w-10 h-10 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
+                </span>
+                KosKu
+            </a>
         </div>
         <nav class="flex-1 overflow-y-auto px-2">
             <!-- Navigation items mapping from JSON, but prioritizing KosBot AI context -->
-            <a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
-                href="{{ route('ux2.home') }}">
+            <a class="flex items-center gap-3 text-white/75 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
+                href="{{ route('ux2.search') }}">
                 <span class="material-symbols-outlined">search</span>
                 Cari Kos
             </a>
@@ -137,25 +150,25 @@
                 <span class="material-symbols-outlined">auto_awesome</span>
                 KosBot AI
             </a>
-            <a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
+            <a class="flex items-center gap-3 text-white/75 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
                 href="{{ route('ux2.owner.dashboard') }}">
                 <span class="material-symbols-outlined">home_work</span>
                 Untuk Pemilik
             </a>
-            <a class="flex items-center gap-3 text-on-surface-variant px-4 py-3 mx-2 hover:bg-surface-container-high rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
+            <a class="flex items-center gap-3 text-white/75 px-4 py-3 mx-2 hover:bg-white/10 hover:text-white rounded-lg transition-all active:scale-95 duration-150 font-label-md text-label-md"
                 href="{{ route('ux2.tenant.dashboard') }}">
                 <span class="material-symbols-outlined">person</span>
                 Untuk Penghuni
             </a>
         </nav>
-        <div class="mt-auto px-6 pt-4 border-t border-outline-variant/30">
+        <div class="mt-auto px-6 pt-4 border-t border-white/10">
             <div class="flex items-center gap-3 mb-4">
                 <div class="w-10 h-10 rounded-full bg-secondary-container text-on-secondary-container shadow-sm flex items-center justify-center">
                     <span class="material-symbols-outlined">person</span>
                 </div>
                 <div>
-                    <p class="font-label-md text-label-md text-primary font-semibold">{{ auth()->user()->name ?? 'Pengunjung' }}</p>
-                    <p class="font-label-sm text-label-sm text-on-surface-variant">{{ auth()->check() ? 'Kelola hunian Anda' : 'Mode pencarian kos' }}</p>
+                    <p class="font-label-md text-label-md text-on-primary font-semibold">{{ auth()->user()->name ?? 'Pengunjung' }}</p>
+                    <p class="font-label-sm text-label-sm text-white/70">{{ auth()->check() ? 'Kelola hunian Anda' : 'Mode pencarian kos' }}</p>
                 </div>
             </div>
         </div>

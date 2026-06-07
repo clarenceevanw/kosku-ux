@@ -107,7 +107,7 @@ class TenantDashboardService
                 'contract.room:id,boarding_house_id,type_name,price_per_month',
                 'contract.room.boardingHouse:id,name,city',
             ])
-            ->orderBy('due_date', 'desc')
+            ->orderBy('billing_month', 'asc')
             ->get();
     }
 
