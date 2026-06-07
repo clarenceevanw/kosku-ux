@@ -187,8 +187,8 @@
                     $cities = [
                         ['name' => 'Surabaya',   'img' => 'https://images.unsplash.com/photo-1598970605070-a38a6ccd3a2d?w=600'],
                         ['name' => 'Jakarta',     'img' => 'https://images.unsplash.com/photo-1555899434-94d1368aa7af?w=600'],
-                        ['name' => 'Bandung',     'img' => 'https://images.unsplash.com/photo-1619540402154-ab46fa36d04e?w=600'],
-                        ['name' => 'Yogyakarta',  'img' => 'https://images.unsplash.com/photo-1612487060568-c0de35d94424?w=600'],
+                        ['name' => 'Bandung',     'img' => 'https://plus.unsplash.com/premium_photo-1730035378601-e4b6183f3398?q=80&w=1074&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'],
+                        ['name' => 'Yogyakarta',  'img' => 'https://images.unsplash.com/photo-1602057512587-76d5cc4b34e2?q=80&w=1172&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'],
                     ];
                 @endphp
                 @foreach($cities as $city)
