@@ -31,42 +31,47 @@ class FilterByBudgetTool implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'min_price' => $schema->integer()->description('Harga minimum per bulan dalam Rupiah. Contoh: 500000 untuk Rp 500.000.')->nullable(),
-            'max_price' => $schema->integer()->description('Harga maksimum per bulan dalam Rupiah. Contoh: 1500000 untuk Rp 1.500.000.')->nullable(),
-            'city'      => $schema->string()->description('Filter tambahan berdasarkan kota. Contoh: "Surabaya".')->nullable(),
-            'gender'    => $schema->string()->description('Filter berdasarkan tipe kos: "putra", "putri", atau "campur".')->nullable(),
+            'min_price'     => $schema->integer()->description('Harga minimum per bulan dalam Rupiah. Contoh: 500000 untuk Rp 500.000.')->nullable(),
+            'max_price'     => $schema->integer()->description('Harga maksimum per bulan dalam Rupiah. Contoh: 1500000 untuk Rp 1.500.000.')->nullable(),
+            'city'          => $schema->string()->description('Filter tambahan berdasarkan kota. Contoh: "Surabaya".')->nullable(),
+            'gender'        => $schema->string()->description('Filter berdasarkan tipe kos: "putra", "putri", atau "campur".')->nullable(),
+            'landmark_name' => $schema->string()->description('Nama kampus, stasiun, atau mall jika ingin mencari di sekitar lokasi tertentu. Contoh: "ITS", "Petra".')->nullable(),
         ];
     }
 
     public function handle(Request $request): Stringable|string
     {
         \Log::info('Isi Request dari AI: ', (array) $request);
-        $min_price = isset($request['min_price']) ? (int) $request['min_price'] : null;
-        $max_price = isset($request['max_price']) ? (int) $request['max_price'] : null;
-        $city      = $request['city'] ?? null;
-        $gender    = $request['gender'] ?? null;
-        $results = BoardingHouse::query()
-            ->with([
-                'rooms:id,boarding_house_id,type_name,price_per_month,image_url',
-                'reviews:id,boarding_house_id,rating',
-            ])
-            ->when($city, fn(Builder $q) => $q->where('city', 'like', "%{$city}%"))
-            ->when($gender, fn(Builder $q) => $q->where('gender_type', $gender))
-            ->whereHas('rooms', function (Builder $q) use ($min_price, $max_price) {
-                $q->when($min_price, fn(Builder $q) => $q->where('price_per_month', '>=', $min_price))
-                    ->when($max_price, fn(Builder $q) => $q->where('price_per_month', '<=', $max_price));
-            })
-            ->limit(4)
-            ->get()
-            ->map(function ($house) use ($min_price, $max_price) {
-                return $this->formatHouse($house, $min_price, $max_price);
+        
+        $filters = [
+            'min_price'   => isset($request['min_price']) ? (int) $request['min_price'] : null,
+            'max_price'   => isset($request['max_price']) ? (int) $request['max_price'] : null,
+            'city'        => $request['city'] ?? null,
+            'gender_type' => $request['gender'] ?? null,
+        ];
+
+        if (!empty($request['landmark_name'])) {
+            $landmark = \App\Models\Landmark::where('name', 'like', "%{$request['landmark_name']}%")->first();
+            if ($landmark) {
+                $filters['landmark_id'] = $landmark->id;
+            } else {
+                $filters['q'] = $request['landmark_name'];
+            }
+        }
+
+        $paginator = app(\App\Services\BoardingHouseService::class)->searchBoardingHouses($filters);
+
+        $results = collect($paginator->items())
+            ->take(4)
+            ->map(function ($house) use ($filters) {
+                return $this->formatHouse($house, $filters['min_price'], $filters['max_price']);
             })
             ->toArray();
 
         if (empty($results)) {
             $priceRange = [];
-            if ($min_price) $priceRange[] = 'mulai Rp ' . number_format($min_price, 0, ',', '.');
-            if ($max_price) $priceRange[] = 'maksimal Rp ' . number_format($max_price, 0, ',', '.');
+            if ($filters['min_price']) $priceRange[] = 'mulai Rp ' . number_format($filters['min_price'], 0, ',', '.');
+            if ($filters['max_price']) $priceRange[] = 'maksimal Rp ' . number_format($filters['max_price'], 0, ',', '.');
 
             return json_encode([
                 'found'   => false,
@@ -95,7 +100,7 @@ class FilterByBudgetTool implements Tool
         return [
             'id'         => $house->id,
             'name'       => $house->name,
-            'city'       => $house->city,
+            'location'   => ($house->district?->name ?? '') . ', ' . ($house->district?->city?->name ?? ''),
             'address'    => $house->address,
             'gender'     => $house->gender_type,
             'min_price'  => $minPrice,

@@ -114,36 +114,40 @@
             box-shadow: 0 0 0 2px rgba(108, 248, 187, 0.3);
         }
     </style>
+    @include('layouts.ux2.theme')
 </head>
-<body class="bg-background text-on-background min-h-screen flex items-center justify-center font-body-md">
-    <div class="w-full max-w-[1440px] h-screen md:h-[900px] flex flex-col md:flex-row bg-surface-container-lowest overflow-hidden shadow-2xl md:rounded-2xl">
+<body class="bg-background text-on-background min-h-screen flex items-center justify-center font-body-md px-margin-mobile py-margin-mobile">
+    <div class="w-full max-w-[1180px] min-h-[calc(100vh-32px)] md:min-h-[760px] flex flex-col md:flex-row bg-surface-container-lowest overflow-hidden shadow-2xl md:rounded-2xl border border-outline-variant">
         
         <!-- Left Section: Image & Branding -->
-        <div class="hidden md:flex md:w-1/2 relative bg-primary-container items-center justify-center overflow-hidden">
-            <!-- Background Visual -->
-            <div class="absolute inset-0 z-0 bg-primary-container">
-                <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(108,248,187,0.22),transparent_32%),radial-gradient(circle_at_75%_70%,rgba(208,188,255,0.18),transparent_28%)]"></div>
+        <div class="hidden md:flex md:w-[46%] relative ux2-dark-panel items-center justify-center overflow-hidden">
+            <div class="absolute inset-0 z-0 opacity-20"
+                style="background-image: linear-gradient(rgba(255,255,255,.14) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.14) 1px, transparent 1px); background-size: 42px 42px;">
             </div>
             <!-- Branding Content -->
-            <div class="relative z-10 text-center px-lg text-on-primary">
-                <div class="w-20 h-20 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center mx-auto mb-md">
+            <div class="relative z-10 px-lg text-on-primary max-w-md">
+                <div class="w-20 h-20 rounded-2xl bg-secondary-container text-on-secondary-container flex items-center justify-center mb-md">
                     <span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1;">home_work</span>
                 </div>
                 <h1 class="font-display-lg text-display-lg mb-md text-on-primary">KosKu</h1>
-                <p class="font-body-lg text-body-lg opacity-90 max-w-md mx-auto">
-                    Temukan hunian nyaman dan premium dengan mudah. Solusi cerdas untuk pencarian kos Anda.
+                <p class="font-body-lg text-body-lg opacity-90">
+                    Masuk untuk melanjutkan pencarian, pembayaran, atau pengelolaan kos dengan ruang kerja yang lebih rapi.
                 </p>
-                <!-- Decorative Elements -->
-                <div class="mt-xl flex justify-center gap-sm">
-                    <div class="w-16 h-1 bg-secondary-container rounded-full"></div>
-                    <div class="w-4 h-1 bg-surface-variant/30 rounded-full"></div>
-                    <div class="w-4 h-1 bg-surface-variant/30 rounded-full"></div>
+                <div class="mt-xl grid grid-cols-2 gap-sm">
+                    <div class="border border-white/15 bg-white/10 rounded-lg p-sm">
+                        <span class="material-symbols-outlined text-secondary-container mb-xs">verified</span>
+                        <p class="font-label-sm text-label-sm text-white/80">Data kos terkurasi</p>
+                    </div>
+                    <div class="border border-white/15 bg-white/10 rounded-lg p-sm">
+                        <span class="material-symbols-outlined text-secondary-container mb-xs">payments</span>
+                        <p class="font-label-sm text-label-sm text-white/80">Pembayaran escrow</p>
+                    </div>
                 </div>
             </div>
         </div>
         
         <!-- Right Section: Form -->
-        <div class="w-full md:w-1/2 flex flex-col justify-center px-margin-mobile md:px-xl py-lg bg-surface-container-lowest overflow-y-auto">
+        <div class="w-full md:w-[54%] flex flex-col justify-center px-margin-mobile md:px-xl py-lg bg-surface-container-lowest overflow-y-auto">
             @yield('content')
         </div>
     </div>

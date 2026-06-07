@@ -40,13 +40,8 @@ class GetHouseDetailsTool implements Tool
         \Log::info('Isi Request dari AI: ', (array) $request);
         $boarding_house_id = $request['boarding_house_id'] ?? '';
         try {
-            $house = BoardingHouse::with([
-                'rooms.facilities:id,name',
-                'facilities:id,name',
-                'rules:id,category,name,icon',
-                'reviews:id,boarding_house_id,rating,comment',
-                'owner:id,name,phone_number',
-            ])->findOrFail($boarding_house_id);
+            // Gunakan service layer agar mendapatkan eager loading dan struktur lengkap
+            $house = app(\App\Services\BoardingHouseService::class)->getBoardingHouseDetails($boarding_house_id);
         } catch (ModelNotFoundException) {
             return json_encode([
                 'found'   => false,
@@ -62,7 +57,7 @@ class GetHouseDetailsTool implements Tool
             'name'        => $house->name,
             'description' => $house->description,
             'address'     => $house->address,
-            'city'        => $house->city,
+            'location'    => ($house->district?->name ?? '') . ', ' . ($house->district?->city?->name ?? ''),
             'gender'      => $house->gender_type,
             'owner'       => $house->owner?->name,
             'owner_phone' => $house->owner?->phone_number,

@@ -63,8 +63,12 @@ class BoardingHouseResource extends JsonResource
             'name'                 => $this->name,
             'description'          => $this->description,
             'address'              => $this->address,
-            'city'                 => $this->city,
-            'province'             => $this->province,
+
+            // Normalized regional data — requires 'district.city.province' eager-loaded
+            'district_name'        => $this->district?->name,
+            'city'                 => $this->district?->city?->name,
+            'province'             => $this->district?->city?->province?->name,
+
             'gender_type'          => $this->gender_type?->value ?? $this->gender_type,
             'gender_label'         => $genderLabel,
             'latitude'             => $this->latitude,

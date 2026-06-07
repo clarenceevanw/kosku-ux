@@ -4,11 +4,14 @@ namespace App\Services;
 
 use App\Enum\FacilityType;
 use App\Models\BoardingHouse;
+use App\Models\City;
 use App\Models\Facility;
+use App\Models\Landmark;
 use App\Models\Rule;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Collection as SupportCollection;
 
 /**
@@ -28,6 +31,7 @@ class BoardingHouseService
         return BoardingHouse::query()
             ->with([
                 'owner:id,name,phone_number,is_verified',
+                'district.city.province',
                 'rooms:id,boarding_house_id,type_name,price_per_month,stock,size,image_url',
                 'facilities:id,name,icon',
                 'reviews:id,boarding_house_id,rating',
@@ -38,16 +42,15 @@ class BoardingHouseService
     }
 
     /**
-     * Return all distinct cities that have at least one boarding house,
-     * ordered alphabetically. Used to populate the city filter checkboxes.
+     * Return all distinct cities that have at least one boarding house.
+     * Now queries the normalized cities table via district join.
      */
     public function getAllCities(): SupportCollection
     {
-        return BoardingHouse::query()
-            ->select('city')
-            ->distinct()
-            ->orderBy('city')
-            ->pluck('city');
+        return City::query()
+            ->whereHas('districts.boardingHouses')
+            ->orderBy('name')
+            ->pluck('name');
     }
 
     /**
@@ -96,6 +99,8 @@ class BoardingHouseService
      *   q: string|null,
      *   gender_type: string|null,
      *   city: string|null,
+     *   district_id: string|null,
+     *   landmark_id: string|null,
      *   min_price: int|null,
      *   max_price: int|null,
      *   facilities: array|null,
@@ -105,28 +110,72 @@ class BoardingHouseService
      */
     public function searchBoardingHouses(array $filters): LengthAwarePaginator
     {
+        // ── Resolve Landmark for radius search ──────────────────────────────
+        $landmark = null;
+        if (! empty($filters['landmark_id'])) {
+            $landmark = Landmark::find($filters['landmark_id']);
+        }
+
+        // ── Base query with eager loads ─────────────────────────────────────
         $query = BoardingHouse::query()
             ->with([
                 'owner:id,name,phone_number,is_verified',
+                'district.city.province',
                 'rooms:id,boarding_house_id,type_name,price_per_month,stock,size,image_url',
                 'facilities:id,name,icon',
                 'reviews:id,boarding_house_id,rating',
             ]);
 
-        // ── Keyword search (name, city, address, description) ───────────────
+        // ── Haversine distance select (only when landmark search active) ────
+        if ($landmark !== null) {
+            $lat = (float) $landmark->latitude;
+            $lng = (float) $landmark->longitude;
+
+            // Haversine formula returns distance in km.
+            // 6371 = Earth radius in km.
+            $haversine = "
+                ( 6371 * ACOS(
+                    LEAST(1.0, COS(RADIANS(?))
+                    * COS(RADIANS(boarding_houses.latitude))
+                    * COS(RADIANS(boarding_houses.longitude) - RADIANS(?))
+                    + SIN(RADIANS(?))
+                    * SIN(RADIANS(boarding_houses.latitude)))
+                ) )
+            ";
+
+            $query->selectRaw("boarding_houses.*, {$haversine} AS distance", [$lat, $lng, $lat])
+                  ->whereNotNull('boarding_houses.latitude')
+                  ->whereNotNull('boarding_houses.longitude')
+                  ->whereRaw("{$haversine} <= ?", [$lat, $lng, $lat, 3.0])  // 3 km radius
+                  ->orderByRaw("distance ASC");
+        }
+
+        // ── Keyword search (name, address, description, district name) ──────
         if (! empty($filters['q'])) {
             $keyword = $filters['q'];
             $query->where(function (Builder $q) use ($keyword) {
-                $q->where('name', 'like', "%{$keyword}%")
-                  ->orWhere('city', 'like', "%{$keyword}%")
-                  ->orWhere('address', 'like', "%{$keyword}%")
-                  ->orWhere('description', 'like', "%{$keyword}%");
+                $q->where('boarding_houses.name', 'like', "%{$keyword}%")
+                  ->orWhere('boarding_houses.address', 'like', "%{$keyword}%")
+                  ->orWhere('boarding_houses.description', 'like', "%{$keyword}%")
+                  ->orWhereHas('district', function (Builder $dq) use ($keyword) {
+                      $dq->where('name', 'like', "%{$keyword}%");
+                  })
+                  ->orWhereHas('district.city', function (Builder $cq) use ($keyword) {
+                      $cq->where('name', 'like', "%{$keyword}%");
+                  });
             });
         }
 
-        // ── City filter (exact match — values sourced from DB dropdown) ──────
+        // ── District filter (exact BPS code) ────────────────────────────────
+        if (! empty($filters['district_id'])) {
+            $query->where('district_id', $filters['district_id']);
+        }
+
+        // ── City filter (via normalized district → city join) ────────────────
         if (! empty($filters['city'])) {
-            $query->where('city', $filters['city']);
+            $query->whereHas('district.city', function (Builder $q) use ($filters) {
+                $q->where('name', $filters['city']);
+            });
         }
 
         // ── Gender type filter ──────────────────────────────────────────────
@@ -178,8 +227,12 @@ class BoardingHouseService
             }
         }
 
+        // Default ordering only when NOT in landmark/distance mode
+        if ($landmark === null) {
+            $query->latest();
+        }
+
         return $query
-            ->latest()
             ->paginate(9)
             ->withQueryString();
     }
@@ -192,11 +245,32 @@ class BoardingHouseService
     {
         return BoardingHouse::with([
             'owner:id,name,phone_number,is_verified',
+            'district.city.province',
+            'district.landmarks',          // nearby landmarks for proximity display
             'rooms',
             'rooms.facilities:id,name,icon',
             'facilities:id,name,icon',
             'rules:id,category,name,icon',
             'reviews.tenant:id,name',
         ])->findOrFail($id);
+    }
+
+    /**
+     * Fetch a single landmark by ID for display context in the search results.
+     * Returns null if not found (graceful degradation).
+     */
+    public function getActiveLandmark(string $landmarkId): ?\App\Models\Landmark
+    {
+        return \App\Models\Landmark::with('district.city')
+            ->find($landmarkId);
+    }
+
+    /**
+     * Fetch a single district by ID for display context.
+     */
+    public function getActiveDistrict(string $districtId): ?\App\Models\District
+    {
+        return \App\Models\District::with('city')
+            ->find($districtId);
     }
 }

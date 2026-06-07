@@ -43,8 +43,9 @@ class SearchBoardingHouseTool implements Tool
     public function schema(JsonSchema $schema): array
     {
         return [
-            'query' => $schema->string()->description('Kata kunci pencarian: nama kos, kota, kecamatan, atau alamat. Contoh: "ITS", "Surabaya", "Darmo".')->required(),
+            'query' => $schema->string()->description('Kata kunci pencarian umum: nama kos atau alamat. Contoh: "Kos Eksklusif", "Darmo".')->nullable(),
             'city'  => $schema->string()->description('Filter berdasarkan kota secara spesifik. Contoh: "Surabaya", "Jakarta Selatan", "Bandung".')->nullable(),
+            'landmark_name' => $schema->string()->description('Nama kampus, stasiun, atau mall jika ingin mencari di sekitar lokasi tersebut. Contoh: "ITS", "Stasiun Gubeng", "Universitas Kristen Petra". Jika pengguna menyebut "dekat ITS", masukkan "ITS" ke sini.')->nullable(),
         ];
     }
 
@@ -54,30 +55,37 @@ class SearchBoardingHouseTool implements Tool
     public function handle(Request $request): Stringable|string
     {
         \Log::info('Tool search dipanggil dengan query: ', (array) $request);
-        $query = $request['query'] ?? '';
-        $city  = $request['city'] ?? null;
+        
+        $filters = [
+            'q'    => $request['query'] ?? null,
+            'city' => $request['city'] ?? null,
+        ];
 
-        $results = BoardingHouse::query()
-            ->with([
-                'rooms:id,boarding_house_id,type_name,price_per_month,image_url',
-                'reviews:id,boarding_house_id,rating',
-            ])
-            ->where(function (Builder $q) use ($query) {
-                $q->where('name', 'like', "%{$query}%")
-                    ->orWhere('city', 'like', "%{$query}%")
-                    ->orWhere('address', 'like', "%{$query}%")
-                    ->orWhere('description', 'like', "%{$query}%");
-            })
-            ->when($city, fn(Builder $q) => $q->where('city', 'like', "%{$city}%"))
-            ->limit(4)
-            ->get()
+        // Resolusi nama landmark menjadi landmark_id agar fitur Haversine di Service aktif
+        if (!empty($request['landmark_name'])) {
+            $landmark = \App\Models\Landmark::where('name', 'like', "%{$request['landmark_name']}%")->first();
+            if ($landmark) {
+                $filters['landmark_id'] = $landmark->id;
+            } else {
+                // Jika tidak ketemu di DB, gabungkan ke keyword search biasa
+                $filters['q'] = trim($filters['q'] . ' ' . $request['landmark_name']);
+            }
+        }
+
+        // Pendelegasian murni ke layer Service agar semua logic (termasuk radius) terpakai
+        $paginator = app(\App\Services\BoardingHouseService::class)->searchBoardingHouses($filters);
+
+        // Ambil 4 hasil teratas
+        $results = collect($paginator->items())
+            ->take(4)
             ->map(fn($house) => $this->formatHouse($house))
             ->toArray();
 
         if (empty($results)) {
+            $qStr = implode(', ', array_filter([$request['query'] ?? null, $request['landmark_name'] ?? null]));
             return json_encode([
                 'found'    => false,
-                'message'  => "Tidak ditemukan kos yang cocok dengan pencarian '{$query}'.",
+                'message'  => "Tidak ditemukan kos yang cocok dengan pencarian '{$qStr}'.",
                 'results'  => [],
             ]);
         }
@@ -97,7 +105,7 @@ class SearchBoardingHouseTool implements Tool
         return [
             'id'         => $house->id,
             'name'       => $house->name,
-            'city'       => $house->city,
+            'location'   => ($house->district?->name ?? '') . ', ' . ($house->district?->city?->name ?? ''),
             'address'    => $house->address,
             'gender'     => $house->gender_type,
             'min_price'  => $minPrice,
