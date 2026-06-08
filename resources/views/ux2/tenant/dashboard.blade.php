@@ -264,7 +264,7 @@
         <div>
             <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.6); letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px;">Dashboard Penghuni</p>
             <h1 class="font-headline-lg text-headline-lg anim-fade-up d1" style="color:#fff; line-height:1.2;">
-                Selamat Datang, {{ $tenant->name ?? 'Penghuni' }}! 👋
+                Selamat Datang, {{ $tenant->name ?? 'Penghuni' }}! 
             </h1>
             <p class="mt-2 anim-fade-up d2" style="color:rgba(255,255,255,0.7); font-size:14px;">Berikut ringkasan aktivitas kos Anda hari ini.</p>
         </div>
