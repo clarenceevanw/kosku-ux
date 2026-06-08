@@ -72,14 +72,17 @@
 <div class="flex flex-col gap-2">
 <label class="flex items-center gap-2 cursor-pointer group">
 <input class="js-live-filter w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="gender_type[]" type="checkbox" value="campur" @checked(in_array('campur', $filters['gender_type'] ?? []))/>
+<span class="material-symbols-outlined text-[18px] text-violet">group</span>
 <span class="font-body-md text-body-md text-on-surface group-hover:text-secondary transition-colors">Campur</span>
 </label>
 <label class="flex items-center gap-2 cursor-pointer group">
 <input class="js-live-filter w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="gender_type[]" type="checkbox" value="putra" @checked(in_array('putra', $filters['gender_type'] ?? []))/>
+<span class="material-symbols-outlined text-[18px] text-primary">man</span>
 <span class="font-body-md text-body-md text-on-surface group-hover:text-secondary transition-colors">Putra</span>
 </label>
 <label class="flex items-center gap-2 cursor-pointer group">
 <input class="js-live-filter w-4 h-4 rounded border-outline-variant text-secondary focus:ring-secondary-container transition-all" name="gender_type[]" type="checkbox" value="putri" @checked(in_array('putri', $filters['gender_type'] ?? []))/>
+<span class="material-symbols-outlined text-[18px] text-coral">woman</span>
 <span class="font-body-md text-body-md text-on-surface group-hover:text-secondary transition-colors">Putri</span>
 </label>
 </div>
@@ -168,16 +171,28 @@
 <h3 class="font-headline-md text-headline-md text-primary font-bold text-lg leading-tight line-clamp-2">{{ $house['name'] }}</h3>
 <span class="text-outline mt-1"><span class="material-symbols-outlined">favorite_border</span></span>
 </div>
+<div class="flex items-center gap-3">
 <div class="flex items-center gap-1 text-on-surface-variant font-body-md text-body-md text-sm">
 <span class="material-symbols-outlined text-[16px]">location_on</span>
 <span class="truncate">{{ $house['city'] }}{{ !empty($house['province']) ? ', ' . $house['province'] : '' }}</span>
 </div>
+@php
+    $genderIcon = match($house['gender_type']) {
+        'putra' => ['icon' => 'man', 'color' => 'text-primary', 'bg' => 'bg-primary-fixed'],
+        'putri' => ['icon' => 'woman', 'color' => 'text-coral', 'bg' => 'bg-error-container'],
+        'campur' => ['icon' => 'group', 'color' => 'text-violet', 'bg' => 'bg-tertiary-fixed'],
+        default => ['icon' => 'home_work', 'color' => 'text-outline', 'bg' => 'bg-surface-container']
+    };
+@endphp
+<div class="flex items-center gap-1 {{ $genderIcon['bg'] }} px-2 py-1 rounded-md">
+<span class="material-symbols-outlined text-[16px] {{ $genderIcon['color'] }}">{{ $genderIcon['icon'] }}</span>
+<span class="font-label-sm text-label-sm {{ $genderIcon['color'] }} font-semibold">{{ $house['gender_label'] }}</span>
+</div>
+</div>
 <div class="flex flex-wrap gap-2 mt-2">
-@forelse ($house['facility_preview'] ?? [] as $facility)
+@foreach ($house['facility_preview'] ?? [] as $facility)
 <span class="bg-surface-container px-2 py-1 rounded-md text-on-primary-container font-label-sm text-label-sm">{{ $facility['name'] }}</span>
-@empty
-<span class="bg-surface-container px-2 py-1 rounded-md text-on-primary-container font-label-sm text-label-sm">{{ $house['gender_label'] }}</span>
-@endforelse
+@endforeach
 </div>
 <div class="mt-auto pt-4 border-t border-outline-variant/50 flex justify-between items-end">
 <div class="flex flex-col">
