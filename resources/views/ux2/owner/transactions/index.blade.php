@@ -65,13 +65,13 @@
             </div>
         </div>
 
-        <div class="bg-secondary-container rounded-2xl p-md shadow-sm">
+        <div class="bg-tertiary-fixed rounded-2xl p-md shadow-sm">
             <div class="flex items-start justify-between">
                 <div>
-                    <p class="font-label-sm text-label-sm text-on-secondary-container/70 uppercase tracking-wider">Siap Disetujui</p>
-                    <h2 class="font-headline-lg text-headline-lg text-on-secondary-container mt-xs">{{ $waitingApproval }}</h2>
+                    <p class="font-label-sm text-label-sm text-on-tertiary-container/70 uppercase tracking-wider">Siap Disetujui</p>
+                    <h2 class="font-headline-lg text-headline-lg text-on-tertiary-container mt-xs">{{ $waitingApproval }}</h2>
                 </div>
-                <span class="material-symbols-outlined text-on-secondary-container text-3xl">verified</span>
+                <span class="material-symbols-outlined text-on-tertiary-container text-3xl">verified</span>
             </div>
         </div>
 
@@ -112,7 +112,7 @@
                                 <div class="flex flex-wrap items-center gap-sm mb-xs">
                                     <h3 class="font-headline-md text-headline-md text-on-surface">{{ $tenantName }}</h3>
                                     @if ($isReadyForApproval)
-                                        <span class="px-sm py-xs rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-bold">Siap Disetujui</span>
+                                        <span class="px-sm py-xs rounded-full bg-tertiary-fixed text-on-tertiary-container font-label-sm text-label-sm font-bold">Siap Disetujui</span>
                                     @elseif ($paymentStatus === 'pending')
                                         <span class="px-sm py-xs rounded-full bg-error-container text-error font-label-sm text-label-sm font-bold">Belum Bayar</span>
                                     @elseif (in_array($paymentStatus, ['paid_to_escrow', 'released_to_owner']))
@@ -211,8 +211,8 @@
                     </div>
                 </div>
                 <div class="flex gap-sm">
-                    <div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center shrink-0">
-                        <span class="material-symbols-outlined text-sm text-on-secondary-container">edit_document</span>
+                    <div class="w-8 h-8 rounded-full bg-tertiary-fixed flex items-center justify-center shrink-0">
+                        <span class="material-symbols-outlined text-sm text-on-tertiary-container">edit_document</span>
                     </div>
                     <div>
                         <p class="font-label-md text-label-md font-bold text-on-surface">Owner menyetujui</p>
@@ -335,7 +335,7 @@
                                     <template x-if="selected?.can_approve">
                                         <form :action="`{{ url('/ux2/owner/pemesanan') }}/${selected.id}/approve`" method="POST" class="flex-1">
                                             @csrf
-                                            <button type="submit" class="w-full px-md py-sm rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-label-md font-bold hover:bg-secondary-fixed">
+                                            <button type="submit" class="w-full px-md py-sm rounded-xl bg-tertiary-fixed text-on-tertiary-container font-label-md text-label-md font-bold hover:bg-tertiary-fixed-dim">
                                                 Setujui Kontrak
                                             </button>
                                         </form>
