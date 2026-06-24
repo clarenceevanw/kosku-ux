@@ -212,6 +212,51 @@
             </form>
         </div>
     </div>
+
+    {{-- ALERTS --}}
+    @php
+        $pendingContracts = \App\Models\Contract::whereHas('room.boardingHouse', fn($q) => $q->byOwner(auth()->id()))
+            ->where('status', 'pending')->count();
+        $pendingPayments = \App\Models\MonthlyPayment::whereHas('contract.room.boardingHouse', fn($q) => $q->byOwner(auth()->id()))
+            ->where('payment_status', 'paid_to_escrow')->count();
+    @endphp
+
+    @if($pendingContracts > 0 || $pendingPayments > 0)
+    <div class="relative z-10 mt-lg anim-fade-up d5 bg-white rounded-2xl p-md shadow-lg border border-white/20">
+        <div class="flex items-center gap-2 mb-sm">
+            <span class="material-symbols-outlined text-amber-500" style="font-variation-settings:'FILL' 1;">notifications_active</span>
+            <h4 class="font-label-md text-label-md font-bold" style="color:var(--ux2-ink);">Perlu Perhatian Anda</h4>
+        </div>
+        <div class="space-y-2">
+            @if($pendingContracts > 0)
+            <div class="flex items-center justify-between p-sm bg-amber-50 rounded-xl border border-amber-200">
+                <div class="flex items-center gap-sm">
+                    <div class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">person_add</span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-amber-900"><strong>{{ $pendingContracts }}</strong> penyewa menunggu persetujuan</p>
+                </div>
+                <a href="{{ route('ux2.owner.transactions.index') }}" class="px-4 py-2 bg-amber-500 text-white rounded-lg font-label-sm text-label-sm font-bold hover:bg-amber-600 transition-colors">
+                    Lihat
+                </a>
+            </div>
+            @endif
+            @if($pendingPayments > 0)
+            <div class="flex items-center justify-between p-sm bg-blue-50 rounded-xl border border-blue-200">
+                <div class="flex items-center gap-sm">
+                    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-white text-[18px]" style="font-variation-settings:'FILL' 1;">payments</span>
+                    </div>
+                    <p class="font-body-sm text-body-sm text-blue-900"><strong>{{ $pendingPayments }}</strong> pembayaran menunggu verifikasi</p>
+                </div>
+                <a href="{{ route('ux2.owner.transactions.index') }}" class="px-4 py-2 bg-blue-500 text-white rounded-lg font-label-sm text-label-sm font-bold hover:bg-blue-600 transition-colors">
+                    Verifikasi
+                </a>
+            </div>
+            @endif
+        </div>
+    </div>
+    @endif
 </div>
 
 {{-- ════ STAT CARDS ════ --}}

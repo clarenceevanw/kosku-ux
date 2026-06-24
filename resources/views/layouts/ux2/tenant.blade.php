@@ -207,16 +207,41 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 md:ml-64 overflow-y-auto pb-20 md:pb-0">
-        <!-- Top App Bar (Mobile) -->
-        <div class="md:hidden flex justify-between items-center bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant p-4 sticky top-0 z-50 shadow-sm">
-            <a href="{{ route('ux2.home') }}" class="inline-flex items-center gap-2 font-headline-md text-headline-md font-bold text-primary">
-                <span class="w-9 h-9 rounded-lg bg-secondary-container text-on-secondary-container inline-flex items-center justify-center">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_work</span>
-                </span>
-                KosKu
-            </a>
-            <div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container overflow-hidden flex items-center justify-center font-label-sm font-bold">
-                {{ strtoupper(substr($tenant->name ?? 'P', 0, 1)) }}
+        <!-- Top Navbar with Menu & Search -->
+        <div class="bg-surface-container-lowest/95 backdrop-blur-xl border-b border-outline-variant sticky top-0 z-50 shadow-sm">
+            <div class="max-w-[1440px] mx-auto px-margin-mobile md:px-margin-desktop">
+                <div class="flex items-center justify-between h-16 gap-4">
+                    <!-- Navigation Links (Desktop) -->
+                    <div class="hidden md:flex items-center gap-2">
+                        <a class="px-4 py-2 rounded-full {{ request()->routeIs('ux2.search') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors" href="{{ route('ux2.search') }}">
+                            Cari Kos
+                        </a>
+                        <a class="px-4 py-2 rounded-full {{ request()->routeIs('ux2.bot') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors" href="{{ route('ux2.bot') }}">
+                            KosBot AI
+                        </a>
+                        <a href="{{ route('ux2.tenant.dashboard') }}"
+                            class="px-4 py-2 rounded-full {{ request()->routeIs('ux2.tenant.*') ? 'bg-secondary-container text-on-secondary-container font-bold' : 'text-on-surface-variant hover:bg-surface-container hover:text-secondary' }} font-body-md text-body-md cursor-pointer transition-colors">
+                            Dashboard
+                        </a>
+                    </div>
+                    
+                    <!-- Search Bar -->
+                    <form action="{{ route('ux2.search') }}" method="GET" class="flex-1 max-w-md">
+                        <div class="relative">
+                            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+                            <input type="text" name="q" placeholder="Cari kos..."
+                                class="w-full pl-11 pr-4 py-2 rounded-xl border border-outline-variant bg-surface-container-low focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all font-body-md text-body-md">
+                        </div>
+                    </form>
+                    
+                    <!-- Logout Button (Desktop) -->
+                    <form method="POST" action="{{ route('ux2.logout') }}" class="hidden md:block">
+                        @csrf
+                        <button type="submit" class="font-label-md text-label-md text-primary bg-surface-container hover:bg-surface-container-high px-4 py-2 rounded-lg transition-colors">
+                            Logout
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
         

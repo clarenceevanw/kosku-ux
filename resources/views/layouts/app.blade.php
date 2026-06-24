@@ -91,6 +91,7 @@
         body { font-family: 'Inter', sans-serif; }
         .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
     </style>
+    @stack('styles')
 </head>
 <body class="bg-surface-bright text-on-background antialiased selection:bg-primary-container selection:text-on-primary-container">
 
@@ -100,5 +101,6 @@
 
     <x-footer />
 
+    @stack('scripts')
 </body>
 </html>

@@ -264,7 +264,7 @@
         <div>
             <p style="font-size:13px; font-weight:600; color:rgba(255,255,255,0.6); letter-spacing:.05em; text-transform:uppercase; margin-bottom:6px;">Dashboard Penghuni</p>
             <h1 class="font-headline-lg text-headline-lg anim-fade-up d1" style="color:#fff; line-height:1.2;">
-                Selamat Datang, {{ $tenant->name ?? 'Penghuni' }}!
+                Selamat Datang, {{ $tenant->name ?? 'Penghuni' }}! 👋
             </h1>
             <p class="mt-2 anim-fade-up d2" style="color:rgba(255,255,255,0.7); font-size:14px;">Berikut ringkasan aktivitas kos Anda hari ini.</p>
         </div>
@@ -282,6 +282,40 @@
         @endif
     </div>
 </div>
+
+{{-- ════ ALERT TAGIHAN MENDESAK ════ --}}
+@if($upcomingPayment)
+    @php
+        $payStatus = $upcomingPayment->payment_status->value ?? $upcomingPayment->payment_status;
+        $isPending = $payStatus === 'pending';
+        $isUrgent  = $isPending && $daysUntilDue !== null && $daysUntilDue <= 3;
+    @endphp
+    @if($isUrgent)
+    <div class="billing-urgent mb-lg anim-fade-up" style="background:var(--ux2-coral-soft); border:2px solid var(--ux2-coral); border-radius:16px; padding:20px;">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0" style="background:var(--ux2-coral);">
+                <span class="material-symbols-outlined text-2xl" style="color:#fff; font-variation-settings:'FILL' 1;">warning</span>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-headline-md text-headline-md font-bold mb-1" style="color:var(--ux2-coral);">Tagihan Segera Jatuh Tempo!</h3>
+                <p style="font-size:14px; color:var(--ux2-ink); margin-bottom:12px;">
+                    Pembayaran sebesar <strong>Rp {{ number_format($upcomingPayment->amount, 0, ',', '.') }}</strong> 
+                    {{ $daysUntilDue == 0 ? 'jatuh tempo hari ini' : "akan jatuh tempo dalam {$daysUntilDue} hari" }} 
+                    ({{ $upcomingPayment?->due_date?->translatedFormat('d M Y') ?? '-' }}).
+                </p>
+                <a href="{{ route('ux2.tenant.payments') }}"
+                    class="inline-flex items-center gap-2 px-lg py-sm font-label-md text-label-md font-bold rounded-xl transition-colors"
+                    style="background:var(--ux2-coral); color:#fff;"
+                    onmouseover="this.style.background='#c54d44'"
+                    onmouseout="this.style.background='var(--ux2-coral)'">
+                    <span class="material-symbols-outlined text-[18px]" style="font-variation-settings:'FILL' 1;">payment</span>
+                    Bayar Sekarang
+                </a>
+            </div>
+        </div>
+    </div>
+    @endif
+@endif
 
 {{-- ════ STAT CARDS ROW ════ --}}
 <div class="grid grid-cols-1 sm:grid-cols-3 gap-md mb-lg">
